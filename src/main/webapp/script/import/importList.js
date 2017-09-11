@@ -1,29 +1,13 @@
 /**
- * Created by xianyaoji on 2017/3/6.
+ * Created by xianyaoji on 2017/2/12.
  */
 
-$(function(){
-    var url = "";
+$(function () {
+
     var $table;
     var searchParams;
-    var url = "";
-    var userId= "";
-    var isConsultant = $("input[name='isConsultant']").val();
-    userId = $("input[name='userId']").val();
-    var roleName = $('input[name="roleName"]').val();
-    if(isConsultant =='0'){//不是咨询师
-        if(roleName =='管理员' || roleName=='总经理'){
-            url = '/customerInfo/listData?isDelete=0'+"&condition=customer_state&value=33";
-        }else{
-            url = '/customerInfo/listData?isDelete=0'+"&condition=customer_state&value=33&companyId="+$('[name="companyId"]').val();
-        }
-    }else if(isConsultant =='1'){   //是咨询师
-        if(roleName.indexOf('主管')!=-1){
-            url = '/customerInfo/listData?isDelete=0&condition=customer_state&value=33&companyId='+$('[name="companyId"]').val();
-        }else{
-            url = '/customerInfo/listData?isDelete=0&userId='+userId+"&condition=customer_state&value=33";
-        }
-    }
+    var url = "/importInfo/listData";
+
 
     var json ={
         url: url,
@@ -40,7 +24,6 @@ $(function(){
         clickToSelect: true,                //是否启用点击选中行
         smartDisplay: false, // 智能显示 pagination 和 cardview 等
         exportDataType: "basic",              //basic', 'all', 'selected'.
-        showToggle: true,
         showRefresh: true,
         showColumns: true,
         detailView: true,
@@ -88,34 +71,9 @@ $(function(){
              '</table>';*/
             return value;
         },
-        //showFooter:true,
-        silent: true, // 刷新事件必须设置
-        onDblClickRow: function (row, $element) {//双击事件
-            //$('#hiddenCustomerId').val(row.customerId);
 
-        },
-        onClickCell:function(field, value, row, $element){
-            //小tips
-            //边缘弹出
-            if(field =='memo'){
-                if(value=='null '|| value==null || value==''){
-                    value ="暂无备注!";
-                };
-                layer.open({
-                    type: 1
-                    ,offset: 'rb' //具体配置参考：offset参数项   rb:右下
-                    ,title:'备注(弹窗2秒后自动关闭)'
-                    ,content: '<div style="padding: 20px 20px;color:orange;">'+value+'</div>'
-                    ,btn: '关闭'
-                    ,time:2000
-                    ,btnAlign: 'c' //按钮居中
-                    ,shade: 0 //不显示遮罩
-                    ,yes: function(){
-                        layer.closeAll();
-                    }
-                });
-            }
-        },
+        silent: true, // 刷新事件必须设置
+
         columns: [{
             filed: 'customerId',
             title: '编号',
@@ -258,7 +216,17 @@ $(function(){
             field: 'introducerMsg',
             title: '邀约人',
             visible: true,
-            width: 80
+            align:'center',
+            width: 80,
+            formatter:function(value,row,index){
+                var name = row.introducerMsg;
+                if(name == $('[name="name"]').val()){
+                    name ='<span style="background-color:orange;color:white;display: block;">'+name+'</span>';
+                }else if(name =='null' || name ==''){
+                    name ='-';
+                }
+                return name;
+            }
         }, {
             field: 'recruitChannelMsg',
             title: '应聘渠道',
@@ -276,20 +244,18 @@ $(function(){
             field: 'lastTime',
             title: '最后跟进时间',
             width: 150,
-            visible:false,
             formatter: function (value, row, index) {
                 return new Date(parseInt(row.lastTime)).toLocaleString().replace(/年|月/g, "-").replace(/日/g, " ");
             }
         }, {
             field: 'companyIdMsg',
             title: '所属公司',
-            visible: true,
+            visible: false,
             width: 100
         }, {
             field: 'memo',
             title: '备注',
             width: 80,
-            visible:false,
             formatter: function (value, row, index) {
                 var memo = (typeof(row.memo) == 'null') ? "---" : row.memo + "";
                 if (memo.length > 5) {
@@ -306,35 +272,107 @@ $(function(){
             title:'会销',
             align:'center',
             width:20,
-            visible:false,
             formatter:function(value,row,index){
                 var isMarket = row.isMarket;
                 if(isMarket  == '0'){
                     isMarket = '<i style="font-size: 16px;color:green;" class="layui-icon"></i>';
-                } else if(isMarket == '1'){
+                } else if(isMarket =='1'){
                     isMarket ='<i style="font-size: 16px;color:red;" class="layui-icon">ဇ</i>';
-                }else{
+                } else{
                     isMarket = '---';
                 }
                 return isMarket;
             }
-        }]/*,queryParams: function getParams(params){
-
-            var  tmp = {
-                offset:(this.pageNumber)*this.pageSize,
-                limit:this.pageSize ,
-                condition:$('#searchParam option:selected').val(),
-                value:$("#searchValue").val()//,//,
-                /!*sort:this.sortName,
-                 order:this.sortOrder*!/
-            };
-            searchParams =tmp;
-            return tmp;
-        },*/
+        }]
 
     }
-    showEnterClassList();
-    function showEnterClassList(){
+
+    showCustomerInfo();
+    function showCustomerInfo() {
+        //getUrl();
+        $("#table").bootstrapTable('destroy');//先要将table销毁，否则会保留上次加载的内容
         $table = $('#table').bootstrapTable(json);
+    }
+
+    window.setInterval(function(){
+        layer.msg('开始从服务器获取最新的数据!');
+        showCustomerInfo;
+    },10*60*1000);
+
+    //****************************刷新*****************************************
+    $("#searchRefresh").click(function(){
+        $.get(url,function(result){
+            if(typeof(result)=='object'){
+                //清空查询条件
+                $('#searchValue').val('');
+                $('#searchParam').children('option[value="-1"]').attr("selected","selected");
+                $table.bootstrapTable('load', result);
+                layer.msg('已重新获取数据!');
+            }
+        });
+    }) ;
+    //****************************搜索*****************************************
+    $('#searchCustomerInfo').click(function () {
+        //getUrl();
+        //搜索条件和搜索值验证
+        //验证搜索值
+        var $searchValue =$("#searchValue");
+        if($searchValue.val()==''){
+            if($searchValue.val()===''){
+                layer.msg('请输入搜索值!');
+                $searchValue.addClass('search-border-color');
+                return false;
+            }else{
+                $searchValue.removeClass('search-border-color');
+            }
+        }
+
+        //验证搜索条件
+        var $searchParam = $("#searchParam");
+        var $searchParamValue = $("#searchParam").children('option:selected').val();
+        if($searchParamValue=='-1'){
+            $searchParam.addClass('search-border-color');
+            layer.msg('请选择搜索条件!');
+            return false;
+        }else{
+            $searchParam.removeClass('search-border-color');
+        }
+        console.log(url);
+        //searchParams.offset
+        //searchParams.limit
+        var value =url+'&offset=0'+'&limit='+searchParams.limit+
+            '&condition='+$('#searchParam option:selected').val()+ '&value='+$("#searchValue").val();
+        $.get(value,function(result){
+            $table.bootstrapTable('load', result);
+            var tmp = {
+                offset:searchParams.offset,
+                limit:searchParams.limit,
+                condition:$('#searchParam option:selected').val(),
+                value:$("#searchValue").val() //,
+                /* sort:"",
+                 order:""*/
+            };
+            searchParams = tmp;
+        });
+    });
+    function checkSeachParam(){
+        var $searchParam = $('#searchParam option:selected').val();
+        if($searchParam == -1){
+            layer.msg('请选择搜索条件!');
+            return false;
+        }
+        var $searchValue = $('#searchValue');
+        if($searchValue.val() == ''){
+            layer.msg('请输入搜索值!');
+            return false;
+        }
+        if($searchParam == 'age'){
+            if(isNaN($searchValue.val())){
+                layer.msg('年龄不是数字!');
+                $searchValue.val('');
+                return false;
+            }
+        }
+        return true;
     }
 });

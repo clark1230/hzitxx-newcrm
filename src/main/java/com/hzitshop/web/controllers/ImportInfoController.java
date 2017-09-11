@@ -1,9 +1,19 @@
 package com.hzitshop.web.controllers;
 
+import com.baomidou.mybatisplus.enums.SqlLike;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
+import com.baomidou.mybatisplus.plugins.Page;
+import com.baomidou.mybatisplus.toolkit.StringUtils;
+import com.hzitshop.entity.EmployeeInfo;
 import com.hzitshop.entity.ImportInfo;
-import com.hzitshop.service.IImportInfoService;
+import com.hzitshop.entity.TbDict;
+import com.hzitshop.service.ImportInfoService;
+import com.hzitshop.service.ITbDictService;
+import com.hzitshop.vo.BootstrapEntity;
+import com.hzitshop.vo.BootstrapTable;
+import com.hzitshop.vo.ImportInfoVo;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +28,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,16 +40,13 @@ import java.util.Map;
 public class ImportInfoController {
 
     @Autowired
-    private IImportInfoService importInfoServiceImpl;
+    private ImportInfoService importInfoServiceImpl;
+
+    @Autowired
+    private ITbDictService iTbDictService;
+
     private Logger logger = LoggerFactory.getLogger(ImportInfoController.class);
 
-    @RequestMapping(value = "/import/list")
-    @ResponseBody
-    public List<ImportInfo> getImportInfoList(){
-        Wrapper<ImportInfo> wrapper = new EntityWrapper<>();
-        List<ImportInfo> list = importInfoServiceImpl.selectList(wrapper);
-        return list;
-    }
 
     /**
      * 导入Excel
@@ -92,5 +98,34 @@ public class ImportInfoController {
         return resultMap;
     }
 
+    @RequestMapping("/import/importList")
+    public String toImportList(){
+        return "/import/importList";
+    }
+
+
+    @RequestMapping(value = "/importInfo/listData")
+    @ResponseBody
+    public BootstrapTable<ImportInfoVo> listData(BootstrapEntity bt){
+//        Wrapper<ImportInfo> wrapper = new EntityWrapper<>();
+//        List<ImportInfo> list = importInfoServiceImpl.selectList(wrapper);
+//        return list;
+        if (bt.getOffset() == null || bt.getLimit() == null) {
+            bt.setOffset(1);
+            bt.setLimit(20);
+        } else {
+            bt.setOffset(bt.getOffset() / bt.getLimit());
+        }
+
+        Page<ImportInfo> searchPage = new Page<ImportInfo>(bt.getOffset(), bt.getLimit());
+        Wrapper<ImportInfo> ew = null;
+        if("-1".equals(bt.getCondition()) ){
+            bt.setCondition("");
+        }
+
+        BootstrapTable<ImportInfoVo> bootstrapTable = importInfoServiceImpl.ajaxData(searchPage,ew);
+        return bootstrapTable;
+
+    }
 
 }
