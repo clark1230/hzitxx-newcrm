@@ -1,5 +1,8 @@
 package com.hzitshop.web.controllers;
 
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.mapper.Wrapper;
+import com.hzitshop.entity.ImportInfo;
 import com.hzitshop.service.IImportInfoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -29,6 +33,15 @@ public class ImportInfoController {
     @Autowired
     private IImportInfoService importInfoServiceImpl;
     private Logger logger = LoggerFactory.getLogger(ImportInfoController.class);
+
+    @RequestMapping(value = "/import/list")
+    @ResponseBody
+    public List<ImportInfo> getImportInfoList(){
+        Wrapper<ImportInfo> wrapper = new EntityWrapper<>();
+        List<ImportInfo> list = importInfoServiceImpl.selectList(wrapper);
+        return list;
+    }
+
     /**
      * 导入Excel
      */
@@ -78,4 +91,6 @@ public class ImportInfoController {
         }
         return resultMap;
     }
+
+
 }
