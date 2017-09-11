@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>修改密码</title>
+    <link rel="stylesheet" type="text/css" href="/assets/themes/layui/css/layui.css">
+    <style>
+        .edit-disable{
+            pointer-events: none;
+            background-color: grey;
+        }
+        .edit-enable{
+            pointer-events: visible;
+            background-color:#E6F4F3 ;
+        }
+    </style>
+</head>
+<body>
+<div style="margin: 0 auto;width:90%;">
+    <form style="margin:10px auto;" id="personInfoForm"  class="layui-form ">
+        <input type="hidden" name="userId" th:value="${session.employeeInfo.userId}">
+        <div class="layui-form-item">
+            <label class="layui-form-label">原密码<i style="color:orange;" class="layui-icon"></i></label>
+            <div class="layui-input-block">
+                <input type="password" name="password0" required="" lay-verify="password"
+                         placeholder="请输入原密码!" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">新密码<i style="color:orange;" class="layui-icon"></i></label>
+            <div class="layui-input-block">
+                <input type="password" name="password" required="" lay-verify="password1"
+                       placeholder="请输入新密码!" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">确认密码<i style="color:orange;" class="layui-icon"></i></label>
+            <div class="layui-input-block">
+                <input type="password" name="password2" required="" lay-verify="password2"
+                       placeholder="请确认新密码!" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="operate"></label>
+            <div class="layui-input-block" id="operate">
+                <span><input type="button" value="保存" lay-submit="" lay-filter="edit" class="layui-btn layui-btn-small edit-disable" id="edit" /></span>
+                <span><input type="button" value="关闭" class="layui-btn layui-btn-small layui-btn-warm" id="cancel"  /></span>
+            </div>
+
+        </div>
+    </form>
+</div>
+<script src="/assets/js/jquery-2.0.0.min.js"></script>
+<script src="/assets/themes/layui/lay/dest/layui.all.js"></script>
+<script src="/script/employeeInfo/changePwd.js"></script>
+</body>
+</html>

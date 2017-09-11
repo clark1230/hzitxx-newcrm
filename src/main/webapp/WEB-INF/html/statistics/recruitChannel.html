@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>应聘渠道信息统计</title>
+    <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/My97DatePicker/skin/twoer/datepicker.css">
+    <style>
+        .hide-select{
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<input type="hidden" name="companyId" th:value="${session.employeeInfo.companyId}">
+<input type="hidden" name="roleName" th:value="${session.employeeInfo.roleName}">
+<div style="width:100%;margin:0 auto;float: left;">
+    <div style="margin-top:20px;margin-bottom: 20px;" >
+        <form class="form-inline" style="display: inline-block;margin-left: 20px;">
+                <span id="companySpan" style="display: none;">校区:</span>
+                <select name="company" class="form-control" style="width:240px;display: none;" >
+                    <option value="-1">请选择校区!</option>
+                    <option th:each="tbDict,tbDictStat:${tbDictList}"
+                            th:selected="${tbDict.id == session.employeeInfo.companyId}"
+                            th:text="${tbDict.name}" th:value="${tbDict.id}"></option>
+                </select>
+            日期:
+            <input id="month"  class="form-control twoer" style="width:200px;font-size: 16px;"
+                   onClick="WdatePicker({skin:'twoer',dateFmt:'yyyy-MM',onpicked:function(){
+                     $('#search').click();
+                  }})"
+                   type="text" placeholder="请选择时间!">
+
+            <input style="display: none;" type="button" class="form-control" id="search" value="获取数据">
+        </form>
+    </div>
+    <div style="float: left;width:48%;">
+        <div style="margin-left:20px;width:100%;height:500px;border:1px solid orange;border-right: 0px;" id="showCompanyCount">
+        </div>
+    </div>
+    <div style="float: left;width:48%;">
+        <div style="margin-left:20px;width:100%;height:500px;border:1px solid orange;" id="showChuangLiangMonthData">
+        </div>
+    </div>
+
+</div>
+<div style="float: left;width:600px;margin-left: 150px;">
+    <div style="width:600px;height:580px;float: left;margin-top:20px;" id="showBaoMing">
+
+    </div>
+</div>
+<script src="/assets/js/jquery-2.0.0.min.js"></script>
+<script src="/assets/layer/layer.js"></script>
+<script src="/assets/bootstrap/js/bootstrap.min.js"></script>
+<script src="/assets/My97DatePicker/WdatePicker.js"></script>
+<script src="/assets/echarts/echarts.min.js"></script>
+<script src="/script/statistics/recruitChannel.js"></script>
+</body>
+</html>

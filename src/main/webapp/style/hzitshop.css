@@ -1,0 +1,49 @@
+*{
+    margin:0;
+    padding:0;
+}
+.menuapp-span{
+    background-color: #2bddf9;
+    width:200px;
+    height:80px;
+    border-radius: 2px;
+}
+.hidde-btn{
+    display: none;
+}
+/*工具栏 start*/
+/*搜索 start*/
+.search-border-color{
+    border-color:red;
+}
+
+.toolbar-interview{
+    background-color:#FF6666;
+}
+.toolbar-add{
+    background-color: #996600;
+}
+.toolbar-refresh{
+    background-color: #CC00FF;
+}
+/*搜索end*/
+/*工具栏end*/
+/*学员*/
+.customerinfo-li{
+    width:400px;
+    height:35px;
+    padding-left:10px;
+    background-color:#E1E1E2;
+    border-radius: 5px;
+    color: black;
+    font-size: 16px;
+    font-family: 微软雅黑;
+    overflow: scroll;
+    float: left;
+    margin-top:2px;
+    cursor:pointer;
+}
+.customerinfo-li:hover{
+    background-color: #C9C8C8;
+    font-size: 17px;
+}

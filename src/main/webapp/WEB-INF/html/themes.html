@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>主题设置</title>
+    <meta name="keywords" content="desktop-Webos,Webos,windows-webos">
+    <meta name="description" content="">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" type="text/css" href="/assets/themes/layui/css/layui.css">
+    <style>
+        .desktop-themes {
+            width: 450px;
+            margin: 0 auto;
+            overflow: hidden;
+            padding: 10px 5px;
+        }
+
+        .set-themes {
+            width: 140px;
+            height: 140px;
+            float: left;
+            margin: 5px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .set-themes img {
+            width: 140px;
+            height: 100px;
+        }
+
+        .set-themes .title {
+            line-height: 40px;
+            height: 40px;
+            font-size: 18px;
+            color: #5FB878
+        }
+
+        .btn-random {
+            width: 200px;
+            height: 40px;
+            background-color: orange;
+            color: white;
+            font-family: 宋体, 微软雅黑;
+            border-radius: 4px;
+            font-size: 18px;
+            text-align: center;
+            line-height: 40px;
+            cursor: pointer;
+
+        }
+        .btn-random:hover{
+            background-color: purple;
+            font-size: 19px;
+        }
+    </style>
+</head>
+
+<body>
+<div class="desktop-themes" style="width:800px;">
+
+</div>
+<div style="width: 300px;margin: 0 auto;">
+    <div id="randomDesktop" class="btn-random">开启随机桌面</div>
+</div>
+<script>
+    var themesdata = [
+        {
+            "id": "1",
+            "name": "炫酷",
+            "smallurl": "/assets/themes/desktop/images/bg1_small.jpg",
+            "url": "/assets/themes/desktop/images/bg1.jpg"
+        },
+        {
+            "id": "2",
+            "name": "win8",
+            "smallurl": "/assets/themes/desktop/images/bg2_small.jpg",
+            "url": "/assets/themes/desktop/images/bg2.jpg"
+        },
+        {
+            "id": "3",
+            "name": "风力",
+            "smallurl": "/assets/themes/desktop/images/bg3_small.jpg",
+            "url": "/assets/themes/desktop/images/bg3.jpg"
+        },
+        {
+            "id": "4",
+            "name": "都市",
+            "smallurl": "/assets/themes/desktop/images/bg4_small.jpg",
+            "url": "/assets/themes/desktop/images/bg4.jpg"
+        },
+        {
+            "id": "5",
+            "name": "风景",
+            "smallurl": "/assets/themes/desktop/images/bg5_small.jpg",
+            "url": "/assets/themes/desktop/images/bg5.jpg"
+        }, {
+            "id": "6",
+            "name": "公司",
+            "smallurl": "/assets/themes/desktop/images/background/company1_small.png",
+            "url": "/assets/themes/desktop/images/background/company_2.png"
+        }, {
+            "id": "7",
+            "name": "美女",
+            "smallurl": "/assets/images/bg/bg_small_1.png",
+            "url": "/assets/images/bg/bg_big_1.jpg"
+        }, {
+            "id": "8",
+            "name": "风景",
+            "smallurl": "/assets/images/bg/bg_small_2.png",
+            "url": "/assets/images/bg/bg_big_2.jpg"
+        }, {
+            "id": "9",
+            "name": "恬静",
+            "smallurl": "/assets/images/bg/bg_small_3.png",
+            "url": "/assets/images/bg/bg_big_3.jpg"
+        }
+        , {
+            "id": "10",
+            "name": "小黄人",
+            "smallurl": "/assets/images/bg/bg_small_4.png",
+            "url": "/assets/images/bg/bg_big_4.jpg"
+        }
+        , {
+            "id": "11",
+            "name": "阿狸",
+            "smallurl": "/assets/images/bg/bg_small_5.png",
+            "url": "/assets/images/bg/bg_big_5.jpg"
+        }
+        , {
+            "id": "12",
+            "name": "游戏",
+            "smallurl": "/assets/images/bg/bg_small_6.png",
+            "url": "/assets/images/bg/bg_big_6.jpg"
+        }, {
+            "id": "13",
+            "name": "游戏",
+            "smallurl": "/assets/images/bg/bg_small_7.png",
+            "url": "/assets/images/bg/bg_big_7.jpg"
+        }, {
+            "id": "14",
+            "name": "浪漫",
+            "smallurl": "/assets/images/bg/bg_small_8.png",
+            "url": "/assets/images/bg/bg_big_8.jpg"
+        }, {
+            "id": "15",
+            "name": "军事",
+            "smallurl": "/assets/images/bg/bg_small_9.png",
+            "url": "/assets/images/bg/bg_big_9.jpg"
+        }, {
+            "id": "16",
+            "name": "鲜花",
+            "smallurl": "/assets/images/bg/bg_small_10.png",
+            "url": "/assets/images/bg/bg_big_10.jpg"
+        }, {
+            "id": "17",
+            "name": "鲜花",
+            "smallurl": "/assets/images/bg/bg_small_11.png",
+            "url": "/assets/images/bg/bg_big_11.jpg"
+        }
+
+    ];
+</script>
+<script src="/assets/themes/layui/layui.js"></script>
+<script>
+    layui.use(['jquery', 'flow', 'upload', 'laytpl', 'layer'], function () {
+        var $ = layui.jquery, flow = layui.flow, laytpl = layui.laytpl, layer = layui.layer;
+        var themestmp = [
+            '{{# layui.each(d, function(index, item){}}'
+            , '<div class="set-themes" data-url="{{item.url}}" data-id="" data-name="{{item.name}}">'
+            , '<img lay-src="{{item.smallurl}}">'
+            , '<label class="title">{{item.name}}</label>'
+            , '</div>'
+            , '{{# });}}'].join("")
+            , upload = ['<div class="set-themes">'
+            , '<div class="themes-upbar">'
+            , '<input type="file" name="file" class="layui-upload-file" id="themes-upbar">'
+            , '</div>'
+            , '</div>'].join("");
+        laytpl(themestmp).render(themesdata, function (html) {
+            $(".desktop-themes").html(html + upload);
+        });
+        flow.lazyimg();
+        $(".set-themes").on("click", function () {
+            var that = $(this), data = that.data();
+            parent.layui.jquery("body").css("background-image", "url(" + data.url + ")");
+            layer.msg('设置成功!');
+            //离线存储
+            //var imgCookie = document.cookie;
+            //console.log("-----"+imgCookie);
+            if (typeof(data.url) == 'undefined') {
+                data.rul = "/assets/themes/desktop/images/background/company_2.png";
+            }
+            var date = new Date();
+            date.setDate(date.getDate() + 60);
+            document.cookie = "bg_img=" + data.url + ";expires=" + date.toGMTString(); //保存cookie
+            
+        });
+        var cookieArr = document.cookie.split(";");
+        if(cookieArr.length >0){
+            for(var i=0;i<cookieArr.length;i++){
+                if(cookieArr[i].indexOf('randomDesktop')!=-1){
+                    var randomDesktop = cookieArr[i];
+                    randomDesktop = randomDesktop.substr(randomDesktop.indexOf("=")+1,randomDesktop.length);
+                    if(randomDesktop =='1'){
+                       $('#randomDesktop').html('关闭随机桌面');
+                    }else{
+                        $('#randomDesktop').html('开启随机桌面');
+                    }
+                }
+            }
+        }
+        //开启随机桌面
+        $('#randomDesktop').click(function(){
+            var date = new Date();
+            date.setDate(date.getDate() + 60);
+            if($(this).html()=='开启随机桌面'){
+                $(this).html('关闭随机桌面');
+                document.cookie = "randomDesktop=1;expires="+ date.toGMTString();
+            }else{
+                $(this).html('开启随机桌面');
+                document.cookie = "randomDesktop=0;expires="+ date.toGMTString();
+            }
+        });
+        /*layui.upload({
+         url: '/employeeInfo/fileUpload'
+         , elem: '#themes-upbar' //指定原始元素，默认直接查找class="layui-upload-file"
+         , method: 'post' //上传接口的http类型
+         , success: function (result) {
+         alert("哈哈");
+         console.log(result);
+         document.cookie = "bg_img="+result.url;
+         }
+         });*/
+    });
+
+
+
+</script>
+
+</body>
+</html>

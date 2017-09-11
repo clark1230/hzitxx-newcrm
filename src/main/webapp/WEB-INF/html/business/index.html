@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/bootstrap-table-master/dist/bootstrap-table.css">
+    <link rel="stylesheet" type="text/css" href="/assets/themes/layui/css/layui.css">
+    <link rel="stylesheet" type="text/css" href="/style/hzitshop.css">
+</head>
+<body>
+<input type="hidden" name="companyId" th:value="${session.employeeInfo.companyId}">
+<div id="toolbar" style="margin-left:20px;">
+    <span id="span-add"><button  class="layui-btn layui-btn-danger layui-btn-small "><i
+            class="layui-icon">&#xe608;</i>添加</button></span>
+    <span  id="span-edit"><button id="edit" class="layui-btn layui-btn-small "><i
+            class="layui-icon">&#xe642;</i>修改</button></span>
+    <span  id="span-grant" ><button id="grant" class="layui-btn layui-btn-small " style="background-color:purple;color:white;"><i class="layui-icon"></i>分配</button></span>
+</div>
+<table id="table">
+</table>
+<script src="/assets/js/jquery.min.js"></script>
+<script src="/assets/bootstrap/js/bootstrap.min.js"></script>
+<script src="/assets/bootstrap-table-master/dist/bootstrap-table.js"></script>
+<script src="/assets/bootstrap-table-master/dist/locale/bootstrap-table-zh-CN.js"></script>
+<script src="/assets/themes/layui/lay/dest/layui.all.js"></script>
+<script src="/script/business/index.js"></script>
+</body>
+</html>

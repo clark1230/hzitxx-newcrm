@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>报表导出</title>
+    <link rel="stylesheet" type="text/css" href="/assets/themes/layui/css/layui.css">
+</head>
+<body>
+<input type="hidden" name="roleName" th:value="${session.employeeInfo.roleName}">
+<input type="hidden" name="myCompanyId" th:value="${session.employeeInfo.companyId}">
+<form id="addCustomerInfoForm" class="layui-form layui-form-pane" style="margin: 20px;">
+    <div class="layui-input-inline" style="width:80px;">
+        <select name="selectDate" id="selectDate" lay-filter="selectDate" >
+            <option value="date">按天</option>
+            <option value="month">按月</option>
+            <option value="year">按年</option>
+        </select>
+    </div>
+    <div class="layui-input-inline" style="width:204px;" id="excelDate">
+        <input name="date" type="text" lay-verify="date" class="layui-input" onClick="WdatePicker({skin:'twoer',dateFmt:'yyyy-MM-dd'})"
+               placeholder="请选择日期!">
+    </div>
+    <div class="layui-input-inline"  style="display: none;" id="divShowCompany">
+        <select name="companyId" id="companyId" lay-filter="companyId">
+            <option value="">请选择校区!</option>
+            <option th:each="company,companyStat:${companyList}"
+                    th:selected="${session.employeeInfo.companyId == company.id}"
+                    th:text="${company.name}" th:value="${company.id}"></option>
+        </select>
+    </div>
+    <div class="layui-input-inline">
+        <select name="userId" id="userId" lay-verify="userId">
+            <option value="-1">请选择咨询师!</option>
+            <option th:each="employeeInfo,employeeInfoStat:${employeeInfoList}"
+                    th:text="${employeeInfo.name}" th:value="${employeeInfo.userId}"></option>
+        </select>
+    </div>
+    <div class="layui-input-inline">
+        <select name="customerState" id="customerState" lay-verify="customerState">
+            <option value="-1">请选择学员状态!</option>
+            <option th:each="customerState,customerStateStat:${customerStateList}"
+                    th:text="${customerState.name}" th:value="${customerState.id}"></option>
+        </select>
+    </div>
+    <div class="layui-form-item" style="margin-top:20px;">
+        <span id="span-exportAll" style="display: none;"><input id="exportAll"  type="button"
+                     style="color:white;background-color: purple;" class="layui-btn"  value="导出所有"></span>
+        <span><input id="export" lay-submit="" type="button" class="layui-btn" lay-filter="export" value="导出"></span>
+        <span><input type="reset" class="layui-btn" style="background-color:red;color:white;" value="重置"></span>
+        <span><div id="cancel" class="layui-btn layui-btn-warm" >关闭</div></span>
+    </div>
+</form>
+  <script src="/assets/js/jquery-2.0.0.min.js"></script>
+<script src="/assets/My97DatePicker/WdatePicker.js"></script>
+  <script src="/assets/themes/layui/lay/dest/layui.all.js"></script>
+  <script>
+      $(function(){
+          var roleName = $("[name='roleName']").val();
+
+          $('[name="date"]').val(today());
+          function today(){
+              var today=new Date();
+              var h=today.getFullYear();
+              var m=today.getMonth()+1;
+              var d=today.getDate();
+              m= m<10?"0"+m:m;   //  这里判断月份是否<10,如果是在月份前面加'0'
+              d= d<10?"0"+d:d;        //  这里判断日期是否<10,如果是在日期前面加'0'
+              return h+"-"+m+"-"+d;
+          }
+          var companyId = -1;
+          if(roleName.indexOf("管理员")!=-1 || roleName.indexOf('总经理')!=-1){
+               $('#divShowCompany').removeAttr('style');
+               $('#span-exportAll').removeAttr('style');
+               companyId = $('[name="companyId"]').children('option:selected').val();
+          }else{
+               companyId =  $('[name="companyId"]').children('option:selected').val();
+          }
+          layui.use(['layer','form'],function(){
+             var form = layui.form();
+             var layer2 = layui.layer;
+              form.on('select(companyId)', function(data) {
+                 $.get('/employeeInfo/getConsultant?companyId='+data.value,function(result){
+                   $('[name="userId"]').children().remove();
+                   var $userId = $('[name="userId"]');
+                   var $option =$('<option value="-1">请选择咨询师！</option>');
+                   $userId.append($option);
+                   for(var i =0;i<result.length;i++){
+                        $option = $('<option value="'+result[i].userId+'">'+result[i].name+'</option>');
+                        $userId.append($option);
+                   }
+                 form.render();
+             });
+                  //表单验证
+                  form.verify({
+                      datetime: function (value) {
+                          if (value  =='') {
+                              return '请选择时间!';
+                          }
+                      }
+
+                  });
+              });
+              form.on('select(companyId)',function(){
+
+              })
+              form.on('select(selectDate)',function(data) {
+                  var $date = $('[name="date"]');
+                  var $excelDate = $('#excelDate');
+                  $excelDate.html('');
+                  var textDate;
+                  if (data.value == 'date') {
+                      textDate = $('<input name="date" type="text" class="layui-input" onClick="WdatePicker({skin:\'twoer\',dateFmt:\'yyyy-MM-dd\'})" placeholder="请选择日期!">');
+
+                  } else if (data.value == 'month') {
+                      textDate = $('<input name="date" type="text" class="layui-input" onClick="WdatePicker({skin:\'twoer\',dateFmt:\'yyyy-MM\'})" placeholder="请选择月份!">');
+
+                  } else if (data.value == 'year') {
+                      textDate = $('<input name="date" type="text" class="layui-input" onClick="WdatePicker({skin:\'twoer\',dateFmt:\'yyyy\'})" placeholder="请选择年份!">');
+                    
+                  }
+                  $excelDate.append(textDate);
+          });
+              //提交表单
+              form.on('submit(export)', function (data) {
+                  if(roleName.indexOf("管理员")!=-1 || roleName.indexOf('总经理')!=-1){
+                      $('#divShowCompany').removeAttr('style');
+                      $('#span-exportAll').removeAttr('style');
+                      companyId = $('[name="companyId"]').children('option:selected').val();
+                  }else{
+                      companyId =  $('[name="companyId"]').children('option:selected').val();
+                  }
+                  console.log(companyId);
+                  window.location.href="/customerInfo/exportData?date="+$('[name="date"]').val()
+                      +"&companyId="+ companyId
+                      +"&userId="+$('[name="userId"]').children('option:selected').val()+"&customerState="
+                      +$('[name="customerState"]').val();
+              });
+          });
+          var index = parent.layer.getFrameIndex(window.name); //获取当前窗体索引
+          $('#cancel').click(function(){
+              parent.layer.close(index);//关闭层
+          });
+
+         $('[name="date"]').click(function(){
+            var value = $("[name='userId']").children("option:selected").val();
+            if(value == 'date'){
+                $(this).attr('onClick',"WdatePicker({skin:'twoer',dateFmt:'yyyy-MM-dd'})");
+            } else if(value =='month'){
+                $(this).attr('onClick',"WdatePicker({skin:'twoer',dateFmt:'yyyy-MM'})");
+            } else if(value=='year'){
+                $(this).attr('onClick',"WdatePicker({skin:'twoer',dateFmt:'yyyy'})");
+            }
+         });
+          $("#exportAll").click(function(){
+                window.location.href="/customerInfo/exportAllData?isDelete=0";
+          });
+         /* $('[name="date"]').click(function(){
+             $(this).css('border','1px solid lightgrey');
+          });*/
+      });
+  </script>
+</body>
+</html>
