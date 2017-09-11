@@ -1,7 +1,6 @@
 /**
- * Created by xianyaoji on 2017/3/6.
+ * Created by 吕游 on 2017/9/11.
  */
-
 $(function(){
     var url = "";
     var $table;
@@ -320,17 +319,17 @@ $(function(){
             }
         }]/*,queryParams: function getParams(params){
 
-            var  tmp = {
-                offset:(this.pageNumber)*this.pageSize,
-                limit:this.pageSize ,
-                condition:$('#searchParam option:selected').val(),
-                value:$("#searchValue").val()//,//,
-                /!*sort:this.sortName,
-                 order:this.sortOrder*!/
-            };
-            searchParams =tmp;
-            return tmp;
-        },*/
+         var  tmp = {
+         offset:(this.pageNumber)*this.pageSize,
+         limit:this.pageSize ,
+         condition:$('#searchParam option:selected').val(),
+         value:$("#searchValue").val()//,//,
+         /!*sort:this.sortName,
+         order:this.sortOrder*!/
+         };
+         searchParams =tmp;
+         return tmp;
+         },*/
 
     }
     showEnterClassList();

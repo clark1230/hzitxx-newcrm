@@ -78,4 +78,9 @@ public class ImportInfoController {
         }
         return resultMap;
     }
+
+    @RequestMapping("/import/importList")
+    public String toImportList(){
+        return "/import/importList";
+    }
 }

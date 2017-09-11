@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>文件导入</title>
+    <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/bootstrap-table-master/dist/bootstrap-table.css">
+    <link rel="stylesheet" type="text/css" href="/assets/themes/layui/css/layui.css">
+    <link rel="stylesheet" type="text/css" href="/style/hzitshop.css">
+</head>
+<body>
+<!--<input type="hidden" name="isConsultant" th:value="${session.employeeInfo.isConsultant}">-->
+<div id="toolbar" style="margin-left: 10px;font-size: 17px;">
+    <!--学员进班 end-->
+    <span ><button id="import" class="layui-btn layui-btn-normal layui-btn-small "><i
+            class="layui-icon">&#xe61e;</i>报表导入</button></span>
+    <!--<span id="span-company">
+        <button  class="layui-btn layui-btn-danger layui-btn-small toolbar-refresh">
+            <i class="layui-icon"></i>本公司数据</button>
+    </span>-->
+</div>
+<table id="table">
+</table>
+<script src="/assets/js/jquery.min.js"></script>
+<script src="/assets/bootstrap/js/bootstrap.min.js"></script>
+<script src="/assets/bootstrap-table-master/dist/bootstrap-table.js"></script>
+<script src="/assets/bootstrap-table-master/dist/locale/bootstrap-table-zh-CN.js"></script>
+<script src="/assets/themes/layui/lay/dest/layui.all.js"></script>
+<script src="/script/import/importList.js"></script>
+</body>
+</html>
