@@ -115,8 +115,9 @@ public class GanjiCustomerVo {
         if(workAge.contains("年")){
             if(workAge.contains("-")){
                 result = Integer.parseInt(workAge.substring(0,workAge.indexOf('-')));
+            }else{
+                result = Integer.parseInt(workAge.substring(0,workAge.indexOf('年')));
             }
-            result = Integer.parseInt(workAge.substring(0,workAge.indexOf('年')));
         }else {
             result = 0;
         }
