@@ -59,7 +59,7 @@ public class ImportInfoController {
 //            licenseName字段为分校的校区名
 //            由于登入功能暂时没实现，获取不到session中的数据，暂时固定写死
 //            String licenseName = "宝安";
-            String path = request.getSession().getServletContext().getRealPath("");
+            String path = request.getSession().getServletContext().getRealPath("/");
             File f = new File(path+"/excel/"+file.getOriginalFilename());
             if(!f.exists()){
                 try {
@@ -103,6 +103,10 @@ public class ImportInfoController {
         return "/import/importList";
     }
 
+    @RequestMapping("/import/importPage")
+    public String toImportPage(){
+        return "/import/importPage";
+    }
 
     @RequestMapping(value = "/importInfo/listData")
     @ResponseBody

@@ -311,68 +311,23 @@ $(function () {
             }
         });
     }) ;
-    //****************************搜索*****************************************
-    $('#searchCustomerInfo').click(function () {
-        //getUrl();
-        //搜索条件和搜索值验证
-        //验证搜索值
-        var $searchValue =$("#searchValue");
-        if($searchValue.val()==''){
-            if($searchValue.val()===''){
-                layer.msg('请输入搜索值!');
-                $searchValue.addClass('search-border-color');
-                return false;
-            }else{
-                $searchValue.removeClass('search-border-color');
-            }
-        }
 
-        //验证搜索条件
-        var $searchParam = $("#searchParam");
-        var $searchParamValue = $("#searchParam").children('option:selected').val();
-        if($searchParamValue=='-1'){
-            $searchParam.addClass('search-border-color');
-            layer.msg('请选择搜索条件!');
-            return false;
-        }else{
-            $searchParam.removeClass('search-border-color');
-        }
-        console.log(url);
-        //searchParams.offset
-        //searchParams.limit
-        var value =url+'&offset=0'+'&limit='+searchParams.limit+
-            '&condition='+$('#searchParam option:selected').val()+ '&value='+$("#searchValue").val();
-        $.get(value,function(result){
-            $table.bootstrapTable('load', result);
-            var tmp = {
-                offset:searchParams.offset,
-                limit:searchParams.limit,
-                condition:$('#searchParam option:selected').val(),
-                value:$("#searchValue").val() //,
-                /* sort:"",
-                 order:""*/
-            };
-            searchParams = tmp;
-        });
-    });
-    function checkSeachParam(){
-        var $searchParam = $('#searchParam option:selected').val();
-        if($searchParam == -1){
-            layer.msg('请选择搜索条件!');
-            return false;
-        }
-        var $searchValue = $('#searchValue');
-        if($searchValue.val() == ''){
-            layer.msg('请输入搜索值!');
-            return false;
-        }
-        if($searchParam == 'age'){
-            if(isNaN($searchValue.val())){
-                layer.msg('年龄不是数字!');
-                $searchValue.val('');
-                return false;
+    /**
+     * 报表导入
+     */
+    $("#import").click(function(){
+        layer.open({
+            type:2,
+            title:'导出数据',
+            shadeClose:true,
+            shade:0,
+            maxmin:true,
+            area:["750px","558px"],
+            content:['/import/importPage','on'],
+            end:function(layer,index){
+                $("#table").bootstrapTable("refresh"); //刷新
             }
-        }
-        return true;
-    }
+
+        })
+    });
 });
