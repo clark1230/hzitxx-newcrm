@@ -128,7 +128,7 @@ public class ImportInfoController {
         }
 
         Page<ImportInfo> searchPage = new Page<ImportInfo>(bt.getOffset(), bt.getLimit());
-        Wrapper<ImportInfo> ew = null;
+        Wrapper<ImportInfo> ew = new EntityWrapper<ImportInfo>().orderBy("create_time desc");
         if("-1".equals(bt.getCondition()) ){
             bt.setCondition("");
         }
