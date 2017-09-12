@@ -52,8 +52,9 @@ $(function(){
                                 layer.msg('导入失败，请稍后再试！',{icon: 5});
                             }else if(resp.code == 200){
                                 var index = parent.layer.getFrameIndex(window.name); //获取当前窗体索引
-                                parent.layer.close(index);
+
                                 layer.msg('导入成功！',{icon: 6});
+                                setTimeout(parent.layer.close(index),2000);
                             }
 
                         },
@@ -64,7 +65,7 @@ $(function(){
                     });
                 }else{
                     //alert("不包含");
-                    layer.msg('请检查上传文件是否有误',{icon: 2});
+                    layer.msg('请检查上传文件与渠道是否匹配!',{icon: 2});
                 }
             }
 
