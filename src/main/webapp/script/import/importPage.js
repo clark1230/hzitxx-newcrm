@@ -57,7 +57,7 @@ $(function(){
 
                                 setTimeout(function(){
                                     parent.layer.close(index);
-                                },2000);
+                                },1000);
                             }
 
                         },
