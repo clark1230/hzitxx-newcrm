@@ -40,15 +40,16 @@
                                 <input type="hidden" name="companyId" th:value="${session.employeeInfo.companyId}">
                                 <fieldset>
                                     <div class="am-form-group">
+                                        <label for="tel">电话号码:</label>
+                                        <input type="text" name="tel" class="am-form-field am-radius" id="tel" placeholder="请输入电话号码!" required="required">
+                                    </div>
+                                    <div class="am-form-group">
                                         <label for="realName">应聘者姓名:</label>
                                         <input type="text" name="realName" class="am-form-field am-radius" id="realName" placeholder="请输入应聘者姓名!"
                                                required="required"  >
                                     </div>
 
-                                    <div class="am-form-group">
-                                        <label for="tel">电话号码:</label>
-                                        <input type="text" name="tel" class="am-form-field am-radius" id="tel" placeholder="请输入电话号码!" required="required">
-                                    </div>
+
                                     <div class="am-form-group">
                                         <label for="userId">咨询师:</label>
                                         <select  name="userId" id="userId" required>
