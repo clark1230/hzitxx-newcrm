@@ -89,13 +89,13 @@ public class ImportInfoServiceImpl extends ServiceImpl<ImportInfoMapper,ImportIn
         return bootstrapTable;
     }
 
-    private List<ImportInfoVo> getImportInfoVos(List<ImportInfo> customerInfoList) {
+    private List<ImportInfoVo> getImportInfoVos(List<ImportInfo> importInfoList) {
         List<ImportInfoVo> importInfoVos = new ArrayList<>();
         //数据字典
         ImportInfoVo importInfoVo =  null;
         EmployeeInfo employeeInfo = null;
         TbDict tbDict =  null;
-        for(ImportInfo importInfo : customerInfoList){
+        for(ImportInfo importInfo : importInfoList){
             importInfoVo = new ImportInfoVo();
             BeanUtils.copyProperties(importInfo, importInfoVo);
             if(importInfo.getSex()!=null){
