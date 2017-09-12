@@ -48,23 +48,25 @@ public class ExcelUtil {
         try {
             list = ExcelImportUtil.importExcel(inputStream, ZhilianCustomerVo.class, params);
             List<ImportInfo> list2 = new ArrayList<>();
-                    for(ZhilianCustomerVo z : list){
-                        if(z.getTel() != null) {
-                            z.setRecruitChannel(recruitChannel);
-                            z.setCompanyId(em.getCompanyId());
-                            z.setIntroducer(em.getUserId().toString());
-                            ImportInfo i = z.changeToCustomerInfo(z);
-                            list2.add(i);
-                        }
+            if(list.size() != 0 && list != null){
+                for(ZhilianCustomerVo z : list){
+                    if(z.getTel() != null) {
+                        z.setRecruitChannel(recruitChannel);
+                        z.setCompanyId(em.getCompanyId());
+                        z.setIntroducer(em.getUserId().toString());
+                        ImportInfo i = z.changeToCustomerInfo(z);
+                        list2.add(i);
+                    }
+                }
             }
             for(ImportInfo i : list2){
-
-//                int result = 0;
-//                result = importInfoMapper.insert(i);
-//                if(result == 0){
-//                    return false;
-//                }
-                System.out.println(i);
+                if(!"".equals(i.getTel()) && i.getTel() != null){
+                    int result = 0;
+                    result = importInfoMapper.insert(i);
+                    if(result == 0){
+                        return false;
+                    }
+                }
             }
             flag = true;
         } catch (Exception e) {
@@ -101,27 +103,31 @@ public class ExcelUtil {
         try {
             list = ExcelImportUtil.importExcel(inputStream, TongchengCustomerVo.class, params);
             List<ImportInfo> list2 = new ArrayList<>();
-            for(TongchengCustomerVo tc : list){
-                if(tc.getTel() != null) {
-                    tc.setRecruitChannel(recruitChannel);
-                    tc.setCompanyId(em.getCompanyId());
-                    tc.setIntroducer(em.getUserId().toString());
-                    ImportInfo i = tc.changeToCustomerInfo(tc);
-                    list2.add(i);
+            if(list.size() != 0 && list != null) {
+                for (TongchengCustomerVo tc : list) {
+                    if (tc.getTel() != null) {
+                        tc.setRecruitChannel(recruitChannel);
+                        tc.setCompanyId(em.getCompanyId());
+                        tc.setIntroducer(em.getUserId().toString());
+                        ImportInfo i = tc.changeToCustomerInfo(tc);
+                        list2.add(i);
+                    }
                 }
             }
             for(ImportInfo i : list2){
-//                int result = 0;
-//                result = importInfoMapper.insert(i);
-//                if(result == 0){
-//                    return false;
-//                }
-                System.out.println(i);
+                if(!"".equals(i.getTel()) && i.getTel() != null){
+                    int result = 0;
+                    result = importInfoMapper.insert(i);
+                    if(result == 0){
+                        return false;
+                    }
+                }
             }
             flag = true;
         } catch (Exception e) {
+            logger.error(e.getMessage());
             flag = false;
-            e.printStackTrace();
+            return flag;
         } finally {
             if (inputStream!=null)
                 try {
@@ -151,27 +157,31 @@ public class ExcelUtil {
         try {
             list = ExcelImportUtil.importExcel(inputStream, QianchengCustomerVo.class, params);
             List<ImportInfo> list2 = new ArrayList<>();
-            for(QianchengCustomerVo qc : list){
-                if(qc.getTel() != null) {
-                    qc.setRecruitChannel(recruitChannel);
-                    qc.setIntroducer(em.getUserId().toString());
-                    qc.setCompanyId(em.getCompanyId());
-                    ImportInfo i = qc.changeToCustomerInfo(qc);
-                    list2.add(i);
+            if(list.size() != 0 && list != null){
+                for(QianchengCustomerVo qc : list){
+                    if(qc.getTel() != null) {
+                        qc.setRecruitChannel(recruitChannel);
+                        qc.setIntroducer(em.getUserId().toString());
+                        qc.setCompanyId(em.getCompanyId());
+                        ImportInfo i = qc.changeToCustomerInfo(qc);
+                        list2.add(i);
+                    }
                 }
             }
             for(ImportInfo i : list2){
-//                int result = 0;
-//                result = importInfoMapper.insert(i);
-//                if(result == 0){
-//                    return false;
-//                }
-                System.out.println(i);
+                if(!"".equals(i.getTel()) && i.getTel() != null){
+                    int result = 0;
+                    result = importInfoMapper.insert(i);
+                    if(result == 0){
+                        return false;
+                    }
+                }
             }
             flag = true;
         }  catch (Exception e) {
+            logger.error(e.getMessage());
             flag = false;
-            e.printStackTrace();
+            return flag;
         }finally {
             if (inputStream!=null)
                 try {
@@ -201,27 +211,31 @@ public class ExcelUtil {
         try {
             list = ExcelImportUtil.importExcel(inputStream, GanjiCustomerVo.class, params);
             List<ImportInfo> list2 = new ArrayList<>();
-            for(GanjiCustomerVo gj : list){
-                if(gj.getTel() != null) {
-                    gj.setRecruitChannel(recruitChannel);
-                    gj.setCompanyId(em.getCompanyId());
-                    gj.setIntroducer(em.getUserId().toString());
-                    ImportInfo i = gj.changeToCustomerInfo(gj);
-                    list2.add(i);
+            if(list.size() != 0 && list != null) {
+                for (GanjiCustomerVo gj : list) {
+                    if (gj.getTel() != null) {
+                        gj.setRecruitChannel(recruitChannel);
+                        gj.setCompanyId(em.getCompanyId());
+                        gj.setIntroducer(em.getUserId().toString());
+                        ImportInfo i = gj.changeToCustomerInfo(gj);
+                        list2.add(i);
+                    }
                 }
             }
             for(ImportInfo i : list2){
-//                int result = 0;
-//                result = customerInfoMapper.insert(c);
-//                if(result == 0){
-//                    return false;
-//                }
-                System.out.println(i);
+                if(!"".equals(i.getTel()) && i.getTel() != null){
+                    int result = 0;
+                    result = importInfoMapper.insert(i);
+                    if(result == 0){
+                        return false;
+                    }
+                }
             }
             flag = true;
         } catch (Exception e) {
+            logger.error(e.getMessage());
             flag = false;
-            e.printStackTrace();
+            return flag;
         }finally {
             if (inputStream!=null)
                 try {
@@ -258,27 +272,31 @@ public class ExcelUtil {
         try {
             list = ExcelImportUtil.importExcel(inputStream, RencaiCustomerVo.class, params);
             List<ImportInfo> list2 = new ArrayList<>();
-            for(RencaiCustomerVo rc : list){
-                if(rc.getTel() != null) {
-                    rc.setRecruitChannel(recruitChannel);
-                    rc.setIntroducer(em.getUserId().toString());
-                    rc.setCompanyId(em.getCompanyId());
-                    ImportInfo c = rc.changeToCustomerInfo(rc);
-                    list2.add(c);
+            if(list.size() != 0 && list != null) {
+                for (RencaiCustomerVo rc : list) {
+                    if (rc.getTel() != null) {
+                        rc.setRecruitChannel(recruitChannel);
+                        rc.setIntroducer(em.getUserId().toString());
+                        rc.setCompanyId(em.getCompanyId());
+                        ImportInfo c = rc.changeToCustomerInfo(rc);
+                        list2.add(c);
+                    }
                 }
             }
             for(ImportInfo i : list2){
-//                int result = 0;
-//                result = customerInfoMapper.insert(c);
-//                if(result == 0){
-//                    return false;
-//                }
-                System.out.println(i);
+                if(!"".equals(i.getTel()) && i.getTel() != null){
+                    int result = 0;
+                    result = importInfoMapper.insert(i);
+                    if(result == 0){
+                        return false;
+                    }
+                }
             }
             flag = true;
         } catch (Exception e) {
+            logger.error(e.getMessage());
             flag = false;
-            e.printStackTrace();
+            return flag;
         }finally {
             if (inputStream!=null)
                 try {
@@ -308,27 +326,31 @@ public class ExcelUtil {
         try {
             list = ExcelImportUtil.importExcel(inputStream, ZhonghuaCustomerVo.class, params);
             List<ImportInfo> list2 = new ArrayList<>();
-            for(ZhonghuaCustomerVo zh : list){
-                if(zh.getTel() != null) {
-                    zh.setRecruitChannel(recruitChannel);
-                    zh.setIntroducer(em.getUserId().toString());
-                    zh.setCompanyId(em.getCompanyId());
-                    ImportInfo i = zh.changeToCustomerInfo(zh);
-                    list2.add(i);
+            if(list.size() != 0 && list != null) {
+                for (ZhonghuaCustomerVo zh : list) {
+                    if (zh.getTel() != null) {
+                        zh.setRecruitChannel(recruitChannel);
+                        zh.setIntroducer(em.getUserId().toString());
+                        zh.setCompanyId(em.getCompanyId());
+                        ImportInfo i = zh.changeToCustomerInfo(zh);
+                        list2.add(i);
+                    }
                 }
             }
             for(ImportInfo i : list2){
-//                int result = 0;
-//                result = importInfoMapper.insert(i);
-//                if(result == 0){
-//                    return false;
-//                }
-                System.out.println(i);
+                if(!"".equals(i.getTel()) && i.getTel() != null){
+                    int result = 0;
+                    result = importInfoMapper.insert(i);
+                    if(result == 0){
+                        return false;
+                    }
+                }
             }
             flag = true;
         } catch (Exception e) {
+            logger.error(e.getMessage());
             flag = false;
-            e.printStackTrace();
+            return flag;
         }finally {
             if (inputStream!=null)
                 try {

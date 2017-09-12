@@ -11,8 +11,8 @@ $(function(){
 
     $("#import").click(function(){
         if($("#selectID").val() == ""){
-                layer.msg('请选择渠道号！',{icon: 2});
-                return;
+            layer.msg('请选择渠道号！',{icon: 2});
+            return;
         }else{
             if($("#file-5").val() == ""){
                 layer.msg('文件不能为空！',{icon: 2});
@@ -28,7 +28,7 @@ $(function(){
                     fileName = fileName.replace("51job", "前程无忧");
                 }
                 if(fileName.indexOf("赶集") > -1){
-                   fileName =  fileName.replace("赶集", "赶集网");
+                    fileName =  fileName.replace("赶集", "赶集网");
                 }
                 if(fileName.indexOf("58") > -1){
                     fileName =  fileName.replace("58", "58同城");
@@ -70,4 +70,5 @@ $(function(){
 
         }
     });
+
 });

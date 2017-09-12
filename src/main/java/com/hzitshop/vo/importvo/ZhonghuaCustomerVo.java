@@ -160,6 +160,7 @@ public class ZhonghuaCustomerVo implements Serializable {
             i.setJob(zh.getWorkExperienceVo().get(0).getJob());
             i.setWorkExperience(zh.getWorkExperienceVo().get(0).getWorkExperience());
         }
+        i.setCreateTime(new Date());
         return i;
     }
 

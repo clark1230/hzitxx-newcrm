@@ -28,8 +28,13 @@ $(function () {
         showColumns: true,
         detailView: true,
         detailFormatter: function (index, row) {
-            var lastTime = new Date(parseInt(row.lastTime)).toLocaleString().replace(/年|月/g, "-").replace(/日/g, " ");
-            var createTime = new Date(parseInt(row.lastTime)).toLocaleString().replace(/年|月/g, "-").replace(/日/g, " ");
+            var lastTime = "---";
+            if(row.lastTime === null || row.lastTime === ""){
+                lastTime = "---";
+            }else{
+                lastTime = new Date(parseInt(row.lastTime)).toLocaleString().replace(/年|月/g, "-").replace(/日/g, " ");
+            }
+            var createTime = new Date(parseInt(row.createTime)).toLocaleString().replace(/年|月/g, "-").replace(/日/g, " ");
             var sex = '';
             if(row.sex == '1'){
                 sex= '男';
@@ -245,6 +250,9 @@ $(function () {
             title: '最后跟进时间',
             width: 150,
             formatter: function (value, row, index) {
+                if(row.lastTime === null || row.lastTime === ""){
+                    return "---";
+                }
                 return new Date(parseInt(row.lastTime)).toLocaleString().replace(/年|月/g, "-").replace(/日/g, " ");
             }
         }, {
