@@ -48,16 +48,17 @@ public class ExcelUtil {
         try {
             list = ExcelImportUtil.importExcel(inputStream, ZhilianCustomerVo.class, params);
             List<ImportInfo> list2 = new ArrayList<>();
-            for(ZhilianCustomerVo z : list){
-                if(z.getTel() != null) {
-                    z.setRecruitChannel(recruitChannel);
-                    z.setCompanyId(em.getCompanyId());
-                    z.setIntroducer(em.getUserId().toString());
-                    ImportInfo i = z.changeToCustomerInfo(z);
-                    list2.add(i);
-                }
+                    for(ZhilianCustomerVo z : list){
+                        if(z.getTel() != null) {
+                            z.setRecruitChannel(recruitChannel);
+                            z.setCompanyId(em.getCompanyId());
+                            z.setIntroducer(em.getUserId().toString());
+                            ImportInfo i = z.changeToCustomerInfo(z);
+                            list2.add(i);
+                        }
             }
             for(ImportInfo i : list2){
+
 //                int result = 0;
 //                result = importInfoMapper.insert(i);
 //                if(result == 0){
@@ -67,8 +68,9 @@ public class ExcelUtil {
             }
             flag = true;
         } catch (Exception e) {
+            logger.error(e.getMessage());
             flag = false;
-            e.printStackTrace();
+            return flag;
         } finally {
             if (inputStream!=null)
                 try {
