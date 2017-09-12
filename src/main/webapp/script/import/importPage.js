@@ -54,7 +54,10 @@ $(function(){
                                 var index = parent.layer.getFrameIndex(window.name); //获取当前窗体索引
 
                                 layer.msg('导入成功！',{icon: 6});
-                                setTimeout(parent.layer.close(index),2000);
+
+                                setTimeout(function(){
+                                    parent.layer.close(index);
+                                },2000);
                             }
 
                         },
