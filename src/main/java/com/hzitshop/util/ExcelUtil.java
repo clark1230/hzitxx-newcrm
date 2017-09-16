@@ -1,8 +1,11 @@
 package com.hzitshop.util;
 
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hzitshop.entity.EmployeeInfo;
 import com.hzitshop.entity.ImportInfo;
 import com.hzitshop.mapper.ImportInfoMapper;
+import com.hzitshop.service.ImportInfoService;
+import com.hzitshop.service.impl.ImportInfoServiceImpl;
 import com.hzitshop.vo.importvo.*;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -10,6 +13,7 @@ import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.entity.ImportParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
@@ -21,6 +25,13 @@ import java.util.List;
  * Created by 冼耀基 on 2016/9/24.
  */
 public class ExcelUtil {
+
+    @Autowired
+    private static ImportInfoService importInfoServiceImpl ;
+
+    @Autowired
+    private static ImportInfoMapper importInfoMapper;
+
          public static void test(){
 
              HSSFWorkbook workbook = new HSSFWorkbook();//创建工作簿对象
@@ -59,16 +70,12 @@ public class ExcelUtil {
                     }
                 }
             }
-            for(ImportInfo i : list2){
-                if(!"".equals(i.getTel()) && i.getTel() != null){
-                    int result = 0;
-                    result = importInfoMapper.insert(i);
-                    if(result == 0){
-                        return false;
-                    }
-                }
+            //插入去重过滤
+            if(insertFilter(list2,importInfoMapper)){
+                flag = true;
+            }else{
+                flag = false;
             }
-            flag = true;
         } catch (Exception e) {
             logger.error(e.getMessage());
             flag = false;
@@ -114,16 +121,12 @@ public class ExcelUtil {
                     }
                 }
             }
-            for(ImportInfo i : list2){
-                if(!"".equals(i.getTel()) && i.getTel() != null){
-                    int result = 0;
-                    result = importInfoMapper.insert(i);
-                    if(result == 0){
-                        return false;
-                    }
-                }
+            //插入去重过滤
+            if(insertFilter(list2,importInfoMapper)){
+                flag = true;
+            }else{
+                flag = false;
             }
-            flag = true;
         } catch (Exception e) {
             logger.error(e.getMessage());
             flag = false;
@@ -168,16 +171,12 @@ public class ExcelUtil {
                     }
                 }
             }
-            for(ImportInfo i : list2){
-                if(!"".equals(i.getTel()) && i.getTel() != null){
-                    int result = 0;
-                    result = importInfoMapper.insert(i);
-                    if(result == 0){
-                        return false;
-                    }
-                }
+            //插入去重过滤
+            if(insertFilter(list2,importInfoMapper)){
+                flag = true;
+            }else{
+                flag = false;
             }
-            flag = true;
         }  catch (Exception e) {
             logger.error(e.getMessage());
             flag = false;
@@ -222,16 +221,12 @@ public class ExcelUtil {
                     }
                 }
             }
-            for(ImportInfo i : list2){
-                if(!"".equals(i.getTel()) && i.getTel() != null){
-                    int result = 0;
-                    result = importInfoMapper.insert(i);
-                    if(result == 0){
-                        return false;
-                    }
-                }
+            //插入去重过滤
+            if(insertFilter(list2,importInfoMapper)){
+                flag = true;
+            }else{
+                flag = false;
             }
-            flag = true;
         } catch (Exception e) {
             logger.error(e.getMessage());
             flag = false;
@@ -283,16 +278,12 @@ public class ExcelUtil {
                     }
                 }
             }
-            for(ImportInfo i : list2){
-                if(!"".equals(i.getTel()) && i.getTel() != null){
-                    int result = 0;
-                    result = importInfoMapper.insert(i);
-                    if(result == 0){
-                        return false;
-                    }
-                }
+            //插入去重过滤
+            if(insertFilter(list2,importInfoMapper)){
+                flag = true;
+            }else{
+                flag = false;
             }
-            flag = true;
         } catch (Exception e) {
             logger.error(e.getMessage());
             flag = false;
@@ -337,16 +328,12 @@ public class ExcelUtil {
                     }
                 }
             }
-            for(ImportInfo i : list2){
-                if(!"".equals(i.getTel()) && i.getTel() != null){
-                    int result = 0;
-                    result = importInfoMapper.insert(i);
-                    if(result == 0){
-                        return false;
-                    }
-                }
+            //插入去重过滤
+            if(insertFilter(list2,importInfoMapper)){
+                flag = true;
+            }else{
+                flag = false;
             }
-            flag = true;
         } catch (Exception e) {
             logger.error(e.getMessage());
             flag = false;
@@ -361,4 +348,33 @@ public class ExcelUtil {
         }
         return flag;
     }
+
+    /**
+     * 传入ImportInfo List,判断该学员是否存在,然后去重
+     * @param list
+     * @param importInfoMapper
+     * @return
+     */
+    private static boolean insertFilter(List<ImportInfo> list,ImportInfoMapper importInfoMapper){
+        for(ImportInfo i : list){
+            if(!"".equals(i.getTel()) && i.getTel() != null){
+                int result = 0;
+                ImportInfo im = new ImportInfo();
+                im.setCompanyId(i.getCompanyId());
+                im.setTel(i.getTel());
+                //如果存在CompanyId、Tel相同的记录，则覆盖，否则则新增一条记录
+                if((im = importInfoMapper.selectOne(im)) != null){
+                    result = importInfoMapper.update(i, new EntityWrapper<ImportInfo>()
+                            .where("customer_id=" + im.getCustomerId()));
+                }else {
+                    result = importInfoMapper.insert(i);
+                }
+                if(result == 0){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
 }
