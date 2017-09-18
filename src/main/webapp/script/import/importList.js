@@ -143,7 +143,6 @@ $(function () {
                  }*/
                 return educationBgMsg;
             }
-
         }, {
             field: 'graduateTime',
             title: '毕业时间',
