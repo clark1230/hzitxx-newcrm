@@ -11,7 +11,16 @@
 <body>
 <!--<input type="hidden" name="isConsultant" th:value="${session.employeeInfo.isConsultant}">-->
 <div id="toolbar" style="margin-left: 10px;font-size: 17px;">
-    <!--学员进班 end-->
+    <form class="form-inline" style="display: inline-block;">
+        <select class="form-control" style="width:150px;" id="searchParam">
+            <option value="-1">请选择搜索条件!</option>
+            <option value="real_name">学员姓名</option>
+            <option value="tel">电话号码</option>
+        </select>
+        <input type="text"  class="form-control " style="width:130px;" id="searchValue" placeholder="请输入搜索值!">
+    </form>
+    <span ><button id="searchImport" class="layui-btn layui-btn-normal layui-btn-small "><i
+            class="layui-icon">&#xe615;</i>搜索</button></span>
     <span ><button id="import" class="layui-btn layui-btn-normal layui-btn-small "><i
             class="layui-icon">&#xe61e;</i>报表导入</button></span>
     <!--<span id="span-company">

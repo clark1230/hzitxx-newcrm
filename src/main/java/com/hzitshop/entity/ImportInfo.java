@@ -19,7 +19,7 @@ import java.io.Serializable;
  * @since 2017-02-18
  */
 @TableName("import_info")
-public class ImportInfo extends Model<CustomerInfo> {
+public class ImportInfo extends Model<ImportInfo> {
 
     private static final long serialVersionUID = 1L;
 
@@ -393,7 +393,7 @@ public class ImportInfo extends Model<CustomerInfo> {
 
     @Override
     public String toString() {
-        return "CustomerInfoVo{" +
+        return "ImportInfo{" +
                 "customerId=" + customerId +
                 ", realName='" + realName + '\'' +
                 ", sex=" + sex +

@@ -61,7 +61,6 @@ public class ImportInfoController {
 //            licenseName字段为分校的校区名
 //            由于登入功能暂时没实现，获取不到session中的数据，暂时固定写死
 //            String licenseName = "宝安";
-
             
             String path = request.getSession().getServletContext().getRealPath("/");
             File f = new File(path+"/excel/"+file.getOriginalFilename());
@@ -116,10 +115,8 @@ public class ImportInfoController {
 
     @RequestMapping(value = "/importInfo/listData")
     @ResponseBody
-    public BootstrapTable<ImportInfoVo> listData(BootstrapEntity bt){
-//        Wrapper<ImportInfo> wrapper = new EntityWrapper<>();
-//        List<ImportInfo> list = importInfoServiceImpl.selectList(wrapper);
-//        return list;
+    public BootstrapTable<ImportInfoVo> listData(BootstrapEntity bt,HttpSession session){
+
         if (bt.getOffset() == null || bt.getLimit() == null) {
             bt.setOffset(1);
             bt.setLimit(20);
@@ -128,7 +125,12 @@ public class ImportInfoController {
         }
 
         Page<ImportInfo> searchPage = new Page<ImportInfo>(bt.getOffset(), bt.getLimit());
-        Wrapper<ImportInfo> ew = new EntityWrapper<ImportInfo>().orderBy("create_time desc");
+        EmployeeInfo em = (EmployeeInfo) session.getAttribute("employeeInfo");
+        //根据当前登录用户所在校区筛选导入列表
+        Wrapper<ImportInfo> ew = new EntityWrapper<ImportInfo>()
+                .where("company_id="+em.getCompanyId())
+                .like(bt.getCondition(),bt.getValue())
+                .orderBy("create_time desc");
         if("-1".equals(bt.getCondition()) ){
             bt.setCondition("");
         }

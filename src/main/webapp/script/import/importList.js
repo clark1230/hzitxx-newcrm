@@ -296,10 +296,13 @@ $(function () {
 
             var  tmp = {
                 offset:(this.pageNumber)*this.pageSize,
-                limit:this.pageSize
+                limit:this.pageSize,
+                condition:$('#searchParam option:selected').val(),
+                value:$("#searchValue").val()
                 /*sort:this.sortName,
                  order:this.sortOrder*/
             };
+            searchParams =tmp;
             return tmp;
         }
 
@@ -316,6 +319,43 @@ $(function () {
         layer.msg('开始从服务器获取最新的数据!');
         showCustomerInfo;
     },10*60*1000);
+
+
+    //****************************搜索*****************************************
+    $("#searchImport").click(function(){
+        var searchParam = $('#searchParam option:selected').val();
+        var searchValue = $("#searchValue").val();
+
+        if(searchParam=='-1'){
+            layer.msg('请选择搜索条件!');
+            $('#searchParam').css('border','1px solid red');
+            return false;
+        }else{
+            $('#searchParam').css('border','1px solid lightgrey');
+        }
+        if(searchValue==''){
+            layer.msg('请输入搜索值!');
+            $('#searchValue').css('border','1px solid red');
+            return false;
+        }else{
+            $('#searchValue').css('border','1px solid lightgrey');
+        }
+        var value= url+"?offset="+searchParams.offset+"&limit="+searchParams.limit+"&condition="+searchParam+"&value="+searchValue;
+
+        $.get(value,function(result){
+            $("#table").bootstrapTable("load",result);
+            var tmp = {
+                offset:searchParams.offset,
+                limit:searchParams.limit,
+                condition:searchParam,
+                value:searchValue //,
+
+            };
+            searchParams = tmp;
+        });
+
+    });
+
 
     //****************************刷新*****************************************
     $("#searchRefresh").click(function(){
@@ -348,4 +388,6 @@ $(function () {
 
         })
     });
+
+
 });

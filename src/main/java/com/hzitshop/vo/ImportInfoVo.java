@@ -485,7 +485,7 @@ public class ImportInfoVo {
 
 	@Override
 	public String toString() {
-		return "CustomerInfoVo{" +
+		return "ImportInfoVo{" +
 				"customerId=" + customerId +
 				", realName='" + realName + '\'' +
 				", sex=" + sex +
