@@ -47,7 +47,6 @@ $(function(){
                         contentType: false,
                         processData: false,
                         success: function (resp) {
-                            console.log(resp);
                             if(resp.code == 300){
                                 layer.msg('导入失败，请稍后再试！',{icon: 5});
                             }else if(resp.code == 200){

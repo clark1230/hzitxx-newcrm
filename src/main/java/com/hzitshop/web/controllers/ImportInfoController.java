@@ -138,4 +138,25 @@ public class ImportInfoController {
 
     }
 
+    @RequestMapping("/import/checkImportInfo")
+    @ResponseBody
+    public Map<String,Object> checkImportInfo(ImportInfo importInfo){
+        ImportInfo i = null;
+        Map<String,Object> resultMap = new HashMap<>();
+        i = importInfoServiceImpl.selectOne(new EntityWrapper<ImportInfo>()
+                .where("tel="+importInfo.getTel())
+                .and("company_id="+importInfo.getCompanyId()));
+        if(i == null){
+            resultMap.put("code",300);
+            resultMap.put("msg","系统暂未导入该用户简历,请手动录入!");
+        }else {
+            i.setCustomerId(null);
+            i.setCreateTime(null);
+            resultMap.put("code",200);
+            resultMap.put("msg","简历已导入,请核对用户姓名后再录入!");
+            resultMap.put("importInfo",i);
+        }
+        return resultMap;
+    }
+
 }

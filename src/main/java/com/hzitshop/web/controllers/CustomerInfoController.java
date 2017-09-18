@@ -680,7 +680,6 @@ public class CustomerInfoController {
         return "/customerinfo/enterClassList";
    }
 
-
     /**
      * 根据用户名和电话号码检测该用户是否存在(防止抢单)
      * @return
@@ -701,6 +700,32 @@ public class CustomerInfoController {
         }
         return resultMap;
     }
+
+    /**
+     * 根据用户名和电话号码检测该用户是否存在(防止抢单)
+     * @return
+     */
+    @RequestMapping("/customerInfo/checkTelAndName")
+    @ResponseBody
+    public  Map<String,Object> checkTelAndName(CustomerInfo customerInfo){
+        customerInfo =iCustomerInfoService.selectOne(new EntityWrapper<CustomerInfo>()
+                .where("tel='"+customerInfo.getTel()+"'")
+                .and("real_name='"+customerInfo.getRealName()+"'"));
+        Map<String,Object> resultMap = new HashMap<>();
+        //该学员为二次上门，请重新分配咨询师!(预热:姓名-南山)
+        if(customerInfo != null){
+            resultMap.put("code",300);
+            EmployeeInfo employeeInfo = iEmployeeInfoService.selectById(customerInfo.getUserId());
+            String str = "该学员为二次上门，请重新分配咨询师!(预热:"+employeeInfo.getName()+"--"
+                    +iTbDictService.selectById(employeeInfo.getCompanyId()).getName()+")";
+            resultMap.put("msg",str);
+        }else{
+            resultMap.put("code",200);
+            resultMap.put("msg","可以录入!");
+        }
+        return resultMap;
+    }
+
     @ExcelEntity
     private List<CustomerInfoVo> customerInfoVoList;
     /**
@@ -869,6 +894,8 @@ public class CustomerInfoController {
         }
         //outputStream.flush();
     }
+
+
 
     /**
      * 导入Excel

@@ -2,6 +2,7 @@
  * Created by 冼耀基 on 2016/11/10.
  */
 $(function(){
+
     //权限验证 -----start---------------------
     //页面加载时根据用户编号获取用户所能访问的按钮,移除隐藏样式
     var isEditCustomerInfo =false;
@@ -161,40 +162,61 @@ $(function(){
         layer.msg('页面即将刷新数据!');
         showWaitTime;
     },5*60*1000);//每3分钟刷新一次*/
+
     $('#realName').blur(function(){
        if($(this).val() ==''){
            layer.msg('请输入姓名!');
            $('#realName').css('border-color','red');
        }else{
            $('#realName').css('border-color','lightgrey');
+           if($('#tel').val() === ''){
+               layer.msg('请先输入电话!');
+           }else{
+               checkTelAndCompanyId();
+           }
        }
     });
     $('#tel').blur(function(){
         return   checUserExists();
     });
-    
+
+    //查询导入表中的客户数据
+    var importInfo = null;
     function checUserExists(){
         checkTel();
         if($('#tel').val() !=''){
             $('#tel').css('border-color','lightgrey');
-            if($("#realName").val()!=''){
-                //到服务器中检测该用户是否存在!!
-                $.get('/customerInfo/checkCustomerInfo?realName='+$("#realName").val()+"&tel="+$("#tel").val(),function(result){
-                    if(result.code==200){
-                        console.log('可以录入');
-                        layer.msg(result.msg);
-                        $('#realName').css('border-color','lightgrey');
-
-                    }else{
-                        console.log('不能录入');
-                        $('#realName').css('border-color','red');
-                        layer.alert(result.msg);
-                        return false;
-                    }
-                });
-            }
+            //到服务器中检测该用户是否存在!!
+            $.get("/import/checkImportInfo?tel="+$("#tel").val()+"&companyId="+$("input[name='companyId']").val(),function(resp){
+                if(resp.code === 300){
+                    layer.msg(resp.msg);
+                }else if(resp.code === 200){
+                    importInfo = resp.importInfo;
+                    layer.msg(resp.msg);
+                    $('#realName').val(resp.importInfo.realName);
+                    setTimeout(checkTelAndCompanyId,1000);
+                }
+            })
         }
     }
+
+    function checkTelAndCompanyId(){
+        $.ajax({
+            type:'get',
+            url:'/customerInfo/checkTelAndName?tel='+$("#tel").val()+'&realName='+$("#realName").val(),
+            success:function(result){
+                if(result.code === 300){
+                    $("#consultantTips").html(result.msg);
+                }else{
+                    layer.msg(result.msg);
+                }
+            },
+            error:function(){
+
+            }
+        });
+    }
+
     function checkTel(){
         if($('#tel').val()==''){
             layer.msg('请输入电话!');
@@ -208,13 +230,8 @@ $(function(){
         var $realName = $('#realName');//姓名
         var $tel = $('#tel');//电话号码
         var isMob =/^0?1[2345678]\d{9}$/;
-        if($realName.val() == ''){
-            layer.msg('请输入姓名!');
-            $realName.css('border-color','red');
-            return false;
-        }
         if($tel.val()==''){
-           layer.msg('请输入电话!');
+            layer.msg('请输入电话!');
             $tel.css('border-color','red');
             return false;
         }else {
@@ -226,6 +243,12 @@ $(function(){
                 return false;
             }
         }
+        if($realName.val() == ''){
+            layer.msg('请输入姓名!');
+            $realName.css('border-color','red');
+            return false;
+        }
+
         //选择所属咨询师
         var $userId = $('#userId option:selected');
         if($userId.val() == -1){
@@ -234,46 +257,41 @@ $(function(){
             return false;
         }
 
-        $.get('/customerInfo/checkCustomerInfo?realName='+$("#realName").val()+"&tel="+$("#tel").val(),function(result){
-            if(result.code==200){
-                console.log('可以录入');
-                layer.msg(result.msg);
-                $('#realName').css('border-color','lightgrey');
-                var index2 = layer.load(1,{time: 20*1000},{shade: [0.1, '#fff']}); //0.1透明度的白色背景
-                //表单验证
-                //异步提交表单
-                $.ajax({
-                    type:'post',
-                    url:'/foreground/addCustomerInfo',
-                    data:$("#addCustomerForm").serialize(),
-                    success:function(result){
-                        layer.close(index2); //关闭当前弹层
-                        if(typeof(result)=='object'){
-                            $('#userId').css({'border':'solid 1px lightgrey'});
-                            if(result.code != 200){
-                                layer.msg(result.msg);
-                            }else{
-                                //清空表单内容
-                                $("#realName").val('');
-                                $("#tel").val('');
-                                $('#userId option[value="-1"]').attr("selected", true);
-                                layer.msg(result.msg);
-                                showWaitTime();//重新获取数据
-                            }
-                        }else{
-                            layer.msg('对不起，您没有权限保存学员信息!');
-                        }
-                    },
-                    error:function(){
-                        layer.close(index2); //关闭当前弹层
-                        layer.msg('对不起，您没有权限保存学员信息!');
+        var index2 = layer.load(1,{time: 20*1000},{shade: [0.1, '#fff']}); //0.1透明度的白色背景
+        //表单验证
+        //异步提交表单
+        var data = null;
+        if(importInfo === null){
+            data = $("#addCustomerForm").serialize();
+        }else{
+            data = importInfo;
+        }
+        $.ajax({
+            type:'post',
+            url:'/foreground/addCustomerInfo',
+            data:data,
+            success:function(result){
+                layer.close(index2); //关闭当前弹层
+                if(typeof(result)=='object'){
+                    $('#userId').css({'border':'solid 1px lightgrey'});
+                    if(result.code != 200){
+                        layer.msg(result.msg);
+                    }else{
+                        //清空表单内容
+                        $("#realName").val('');
+                        $("#tel").val('');
+                        $('#userId option[value="-1"]').attr("selected", true);
+                        $("#consultantTips").html("");
+                        layer.msg(result.msg);
+                        showWaitTime();//重新获取数据
                     }
-                });
-            }else{
-                console.log('不能录入');
-                $('#realName').css('border-color','red');
-                layer.alert(result.msg);
-                return false;
+                }else{
+                    layer.msg('对不起，您没有权限保存学员信息!');
+                }
+            },
+            error:function(){
+                layer.close(index2); //关闭当前弹层
+                layer.msg('对不起，您没有权限保存学员信息!');
             }
         });
     });
