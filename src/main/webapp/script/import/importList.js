@@ -86,7 +86,7 @@ $(function () {
             checkbox: true
         }, {
             field: 'realName',
-            title: '学员姓名',
+            title: '姓名',
             width: 60
         }, {
             field: 'sex',
@@ -100,7 +100,7 @@ $(function () {
                 } else if (row.sex == 2) {
                     sex = '<img style="width:20px;height:16px;" alt="女" src="/assets/images/女.png"/>';
                 }else{
-                    sex = '<img style="width:20px;height:16px;" alt="女" src="/assets/images/未知.png"/>';
+                    sex = '<img style="width:20px;height:16px;" alt="未知" src="/assets/images/未知.png"/>';
                 }
                 return sex;
             }
@@ -113,9 +113,7 @@ $(function () {
             field: 'age',
             title: '年龄',
             align: 'center',
-            width: 10,
-            visible:false
-
+            width: 10
         }, {
             field: 'nativePlace',
             title: '籍贯',
@@ -135,7 +133,6 @@ $(function () {
             field: 'educationBgMsg',
             title: '学历',
             width: 50,
-            visible:false,
             formatter: function (value, row, index) {
                 var educationBgMsg = row.educationBgMsg;
                 /*if(row.educationBgMsg=='数据字典'){
@@ -146,13 +143,11 @@ $(function () {
         }, {
             field: 'graduateTime',
             title: '毕业时间',
-            width: 80,
-            visible: false
+            width: 80
         }, {
             field: 'graduateFrom',
             title: '毕业学校',
-            width: 100,
-            visible: false
+            width: 100
         }, {
             field: 'majorIn',
             title: '专业',
@@ -177,7 +172,7 @@ $(function () {
             field: 'userIdMsg',
             title: '咨询师',
             width: 80,
-            visible:true
+            visible: false
         }, {
             field: 'educateExperience',
             title: '教育培训经历',
@@ -187,17 +182,19 @@ $(function () {
         }, {
             field: 'guandaMsg',
             title: '关单人',
-            visible: true,
+            visible: false,
             width: 80
         }, {
             field: 'customerStateMsg',
             title: '学员状态',
-            width: 40
+            width: 40,
+            visible: false
         }, {
             field: 'customerLevelMsg',
             title: '学员级别',
             align: 'center',
             width: 20,
+            visible: false,
             formatter:function(value,row,index){
                 var customerLevelMsg =row.customerLevelMsg;
                 if(customerLevelMsg=='数据字典' || customerLevelMsg =='null'){
@@ -215,7 +212,7 @@ $(function () {
             }
         }, {
             field: 'targetSkillMsg',
-            title: '目标技能',
+            title: '求职岗位',
             width: 70
         }, {
             field: 'introducerMsg',
@@ -280,6 +277,7 @@ $(function () {
             title:'会销',
             align:'center',
             width:20,
+            visible:false,
             formatter:function(value,row,index){
                 var isMarket = row.isMarket;
                 if(isMarket  == '0'){
@@ -353,6 +351,54 @@ $(function () {
             searchParams = tmp;
         });
 
+    });
+
+
+    /*------------------回收站--------------------------------*/
+    $("#remove").click(function () {
+        var $selectData = $table.bootstrapTable('getAllSelections');
+        var importIdArr = [];
+        if ($selectData.length < 1) {
+            layer.msg('请选择要丢进回收站的学员!');
+        } else {
+            for (var item in $selectData) {
+                importIdArr.push($selectData[item].customerId);
+            }
+            var data = "importIdArr=" + importIdArr;
+            layer.msg(data);
+            //加载层
+            //var index2 = layer.load(0, {shade: false}); //0代表加载的风格，支持0-2
+            //loading层
+            var index2 = layer.load(1, {
+                shade: [0.1, '#fff'] //0.1透明度的白色背景
+            });
+            layer.confirm('是否要把所选数据丢进回收站!', {
+                btn: ['确定','取消'] //按钮
+            }, function(){
+                removeData();
+            }, function(){
+                layer.close(index2); //关闭当前弹层
+                layer.msg('已经取消了!');
+
+            });
+            function  removeData() {
+                $.ajax({
+                    type: 'post',
+                    url: '/importInfo/remove',
+                    data: data,
+                    success: function (result) {
+                        layer.close(index2); //关闭当前弹层
+                        if (result.code == 200) {
+                            layer.msg("操作成功!");
+                            $("#table").bootstrapTable("refresh"); //刷新
+                        } else {
+                            layer.msg('操作失败!');
+                        }
+
+                    }
+                });
+            }
+        }
     });
 
 
