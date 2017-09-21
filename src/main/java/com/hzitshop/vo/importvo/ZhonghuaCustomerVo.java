@@ -141,10 +141,14 @@ public class ZhonghuaCustomerVo implements Serializable {
      */
     private Integer modifyWorkAge(String workAge) {
         Integer result = null;
-        if(workAge.contains("年")){
-            result = Integer.parseInt(workAge.substring(0, workAge.indexOf("年")));
+        if(workAge != null) {
+            if (workAge.contains("年")) {
+                result = Integer.parseInt(workAge.substring(0, workAge.indexOf("年")));
+            } else {
+                result = 0;
+            }
         }else {
-            result = 0;
+            return null;
         }
         return result;
     }

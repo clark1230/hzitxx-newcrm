@@ -166,10 +166,14 @@ public class QianchengCustomerVo {
      */
     private Integer modifyWorkAge(String workAge) {
         Integer result = null;
-        if(workAge.contains("年")){
-            result = Integer.parseInt(workAge.substring(0, workAge.indexOf("年")));
+        if(workAge != null) {
+            if (workAge.contains("年")) {
+                result = Integer.parseInt(workAge.substring(0, workAge.indexOf("年")));
+            } else {
+                result = 0;
+            }
         }else {
-            result = 0;
+            return null;
         }
         return result;
     }
@@ -203,7 +207,7 @@ public class QianchengCustomerVo {
     public String toString() {
         return "QianchengCustomerVo{" +
                 "realName='" + realName + '\'' +
-                ", recruitChannel=" + recruitChannel +
+                ", recruitChannel='" + recruitChannel + '\'' +
                 ", sex=" + sex +
                 ", nativePlace='" + nativePlace + '\'' +
                 ", workAge='" + workAge + '\'' +
@@ -213,7 +217,6 @@ public class QianchengCustomerVo {
                 ", tel='" + tel + '\'' +
                 ", job='" + job + '\'' +
                 ", workExperience='" + workExperience + '\'' +
-                ", applyJob='" + applyJob + '\'' +
                 ", introducer='" + introducer + '\'' +
                 ", companyId=" + companyId +
                 '}';

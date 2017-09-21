@@ -82,6 +82,11 @@ public class ImportInfoServiceImpl extends ServiceImpl<ImportInfoMapper,ImportIn
             flag = ExcelUtil.ganjiImport(is, recruitChannel,cvType, importInfoMapper, session);
             return flag;
         }
+        if(recruitChannel == channelPropertiesVo.getBaixing()){
+            //百姓网
+            flag = ExcelUtil.baixingImport(is,recruitChannel,cvType,importInfoMapper,session);
+            return flag;
+        }
         return flag;
     }
 

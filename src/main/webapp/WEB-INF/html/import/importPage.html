@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html  xmlns:th="http://www.w3.org/1999/xhtml">
 <head lang="en">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
@@ -17,12 +17,8 @@
             <div class="layui-input-block">
                 <select name="recruitChannel" placeholder="请选择导入渠道!" id="selectID">
                     <option value="">请选择导入渠道!</option>
-                    <option value="22">智联招聘</option>
-                    <option value="23">前程无忧</option>
-                    <option value="24">58同城</option>
-                    <option value="87">人才热线</option>
-                    <option value="88">中华英才</option>
-                    <option value="89">赶集网</option>
+                    <option th:each="recruitChannel:${recruitChannelList}"
+                            th:text="${recruitChannel.name}" th:value="${recruitChannel.id}"></option>
                 </select>
             </div>
         </div>

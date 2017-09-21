@@ -22,6 +22,7 @@ public class ChannelPropertiesVo {
     private Integer rencai;
     private Integer zhonghua;
     private Integer ganji;
+    private Integer baixing;
 
     public ChannelPropertiesVo() {
     }
@@ -72,5 +73,13 @@ public class ChannelPropertiesVo {
 
     public void setGanji(Integer ganji) {
         this.ganji = ganji;
+    }
+
+    public Integer getBaixing() {
+        return baixing;
+    }
+
+    public void setBaixing(Integer baixing) {
+        this.baixing = baixing;
     }
 }
