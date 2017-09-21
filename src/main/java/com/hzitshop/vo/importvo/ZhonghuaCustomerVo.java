@@ -28,6 +28,8 @@ public class ZhonghuaCustomerVo implements Serializable {
     private String workAge;
     @Excel(name = "手机", isImportField = "true_tel",needMerge = true)
     private String tel;
+    @Excel(name = "应聘（适合）职位",needMerge = true)
+    private String applyJob;
     /**
      * 推荐人（创量部电话邀约）
      */
@@ -108,6 +110,14 @@ public class ZhonghuaCustomerVo implements Serializable {
         this.workExperienceVo = workExperienceVo;
     }
 
+    public String getApplyJob() {
+        return applyJob;
+    }
+
+    public void setApplyJob(String applyJob) {
+        this.applyJob = applyJob;
+    }
+
     public String getIntroducer() {
         return introducer;
     }
@@ -160,6 +170,7 @@ public class ZhonghuaCustomerVo implements Serializable {
             i.setJob(zh.getWorkExperienceVo().get(0).getJob());
             i.setWorkExperience(zh.getWorkExperienceVo().get(0).getWorkExperience());
         }
+        i.setApplyJob(zh.getApplyJob());
         i.setCreateTime(new Date());
         return i;
     }
@@ -170,9 +181,10 @@ public class ZhonghuaCustomerVo implements Serializable {
                 "realName='" + realName + '\'' +
                 ", sex=" + sex +
                 ", age=" + age +
-                ", recruitChannel='" + recruitChannel + '\'' +
+                ", recruitChannel=" + recruitChannel +
                 ", workAge='" + workAge + '\'' +
                 ", tel='" + tel + '\'' +
+                ", applyJob='" + applyJob + '\'' +
                 ", introducer='" + introducer + '\'' +
                 ", companyId=" + companyId +
                 ", eduBackgroundVo=" + eduBackgroundVo +

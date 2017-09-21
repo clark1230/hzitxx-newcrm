@@ -50,36 +50,36 @@ public class ImportInfoServiceImpl extends ServiceImpl<ImportInfoMapper,ImportIn
 
     @Transactional
     @Override
-    public boolean importExcel(InputStream is, Integer recruitChannel,HttpSession session) {
+    public boolean importExcel(InputStream is, Integer recruitChannel,Integer cvType,HttpSession session) {
         boolean flag = false;
         if(recruitChannel == channelPropertiesVo.getZhilian()) {
             //智联招聘渠道文件导入
-            flag = ExcelUtil.zhilianImport(is, recruitChannel, importInfoMapper, session);
+            flag = ExcelUtil.zhilianImport(is, recruitChannel,cvType, importInfoMapper, session);
             return flag;
         }
         if(recruitChannel == channelPropertiesVo.getQiancheng()) {
             //前程无忧渠道文件导入
-            flag = ExcelUtil.qianchengImport(is, recruitChannel, importInfoMapper, session);
+            flag = ExcelUtil.qianchengImport(is, recruitChannel,cvType, importInfoMapper, session);
             return flag;
         }
         if(recruitChannel == channelPropertiesVo.getTongcheng()) {
             //58同城
-            flag = ExcelUtil.tongchengImport(is, recruitChannel, importInfoMapper, session);
+            flag = ExcelUtil.tongchengImport(is, recruitChannel,cvType, importInfoMapper, session);
             return flag;
         }
         if(recruitChannel == channelPropertiesVo.getRencai()) {
             //人才热线
-            flag = ExcelUtil.rencaiImport(is, recruitChannel, importInfoMapper, session);
+            flag = ExcelUtil.rencaiImport(is, recruitChannel,cvType, importInfoMapper, session);
             return flag;
         }
         if(recruitChannel == channelPropertiesVo.getZhonghua()) {
             //中华英才
-            flag = ExcelUtil.zhonghuaImport(is, recruitChannel, importInfoMapper, session);
+            flag = ExcelUtil.zhonghuaImport(is, recruitChannel,cvType, importInfoMapper, session);
             return flag;
         }
         if(recruitChannel == channelPropertiesVo.getGanji()) {
             //赶集网
-            flag = ExcelUtil.ganjiImport(is, recruitChannel, importInfoMapper, session);
+            flag = ExcelUtil.ganjiImport(is, recruitChannel,cvType, importInfoMapper, session);
             return flag;
         }
         return flag;
@@ -140,14 +140,6 @@ public class ImportInfoServiceImpl extends ServiceImpl<ImportInfoMapper,ImportIn
                     importInfoVo.setCustomerLevelMsg(tbDict.getName());
                 }
             }
-            //目标技能
-            if(StringUtils.isNotEmpty(importInfo.getTargetSkill())){
-                tbDict = tbDictMapper.selectById(importInfo.getTargetSkill());
-                if(tbDict!= null){
-                    importInfoVo.setTargetSkillMsg(tbDict.getName());
-                }
-
-            }
             //应聘渠道
             if(importInfo.getRecruitChannel() !=null){
                 tbDict =tbDictMapper.selectById(importInfo.getRecruitChannel());
@@ -182,6 +174,13 @@ public class ImportInfoServiceImpl extends ServiceImpl<ImportInfoMapper,ImportIn
                 employeeInfo = employeeInfoMapper.selectById(importInfo.getIntroducer());
                 if(employeeInfo !=null){
                     importInfoVo.setIntroducerMsg(employeeInfo.getName());
+                }
+            }
+            if(importInfo.getCvType() != null){
+                if(importInfo.getCvType() == 1){
+                    importInfoVo.setCvTypeMsg("投递");
+                }else if(importInfo.getCvType() == 2){
+                    importInfoVo.setCvTypeMsg("下载");
                 }
             }
             importInfoVos.add(importInfoVo);

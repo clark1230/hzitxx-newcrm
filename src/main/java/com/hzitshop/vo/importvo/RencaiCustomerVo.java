@@ -32,6 +32,8 @@ public class RencaiCustomerVo {
     private String workExperience;
     @Excel(name = "最近职位", isImportField = "job")
     private String job;
+    @Excel(name = "应聘职位")
+    private String applyJob;
     /**
      * 推荐人（创量部电话邀约）
      */
@@ -140,6 +142,14 @@ public class RencaiCustomerVo {
         this.companyId = companyId;
     }
 
+    public String getApplyJob() {
+        return applyJob;
+    }
+
+    public void setApplyJob(String applyJob) {
+        this.applyJob = applyJob;
+    }
+
     public ImportInfo changeToCustomerInfo(RencaiCustomerVo rc){
         ImportInfo i = new ImportInfo();
         i.setRealName(rc.getRealName());
@@ -152,6 +162,7 @@ public class RencaiCustomerVo {
         i.setMajorIn(rc.getMajorIn());
         i.setWorkExperience(rc.getWorkExperience());
         i.setJob(rc.getJob());
+        i.setApplyJob(rc.getApplyJob());
         i.setIntroducer(rc.getIntroducer());
         i.setCompanyId(rc.getCompanyId());
         i.setCreateTime(new Date());
@@ -171,6 +182,7 @@ public class RencaiCustomerVo {
                 ", majorIn='" + majorIn + '\'' +
                 ", workExperience='" + workExperience + '\'' +
                 ", job='" + job + '\'' +
+                ", applyJob='" + applyJob + '\'' +
                 ", introducer='" + introducer + '\'' +
                 ", companyId=" + companyId +
                 '}';

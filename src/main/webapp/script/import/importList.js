@@ -64,13 +64,14 @@ $(function () {
                 '<li class="customerinfo-li">学员状态:' + (row.customerStateMsg==null?'----':row.customerStateMsg) + '</li>' +
                 '<li class="customerinfo-li">学员级别:' + (row.customerLevelMsg==null ?'----':row.customerLevelMsg) + '</li>' +
                 '<li class="customerinfo-li">咨询师:' + (row.userIdMsg==null?'----':row.userIdMsg) + '</li>' +
-                '<li class="customerinfo-li">目标技能:' + (row.targetSkillMsg==null ?'----':row.targetSkillMsg) + '</li>' +
+                '<li class="customerinfo-li">应聘职位:' + (row.applyJob==null ?'----':row.applyJob) + '</li>' +
                 '<li class="customerinfo-li">关单人:' + (row.guandaMsg==null?'----':row.guandaMsg) + '</li>' +
                 '<li class="customerinfo-li">邀约人:' + (row.introducerMsg ==null?'----':row.introducerMsg) + '</li>' +
                 '<li class="customerinfo-li">录入时间:' + (createTime==null ? '----':createTime) + '</li>' +
                 '<li class="customerinfo-li">最后跟进时间:' + (lastTime==null ?'----':lastTime) + '</li>' +
                 '<li class="customerinfo-li">所属公司:' + (row.companyIdMsg==null ?'----':row.companyIdMsg) + '</li>' +
                 '<li class="customerinfo-li">备注:' + (row.memo==null?'----':row.memo) + '</li>' +
+                '<li class="customerinfo-li">简历类型:' + (row.cvTypeMsg==null?'----':row.cvTypeMsg) + '</li>' +
                 '</ul>';
             /* value = '<table>' +
              '' +
@@ -184,8 +185,8 @@ $(function () {
         }, {
             field: 'graduateTime',
             title: '毕业时间',
-            width: 80,
-            visible: false
+            visible:false,
+            width: 80
         }, {
             field: 'graduateFrom',
             title: '毕业学校',
@@ -253,7 +254,7 @@ $(function () {
                 return customerLevelMsg;
             }
         }, {
-            field: 'targetSkillMsg',
+            field: 'applyJob',
             title: '求职岗位',
             width: 70
         }, {
@@ -287,7 +288,7 @@ $(function () {
         }, {
             field: 'lastTime',
             title: '最后跟进时间',
-            width: 120,
+            width: 100,
             formatter: function (value, row, index) {
                 if(row.lastTime === null || row.lastTime === ""){
                     return "---";
@@ -331,6 +332,12 @@ $(function () {
                 }
                 return isMarket;
             }
+        },{
+            field:'cvTypeMsg',
+            title:'简历类型',
+            align:'center',
+            visible: true,
+            width:20
         }],queryParams: function getParams(params){
 
             var  tmp = {

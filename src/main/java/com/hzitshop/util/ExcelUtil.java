@@ -49,7 +49,7 @@ public class ExcelUtil {
      * @return
      */
 
-    public static boolean zhilianImport(InputStream inputStream,Integer recruitChannel,ImportInfoMapper importInfoMapper,HttpSession session){
+    public static boolean zhilianImport(InputStream inputStream,Integer recruitChannel,Integer cvType,ImportInfoMapper importInfoMapper,HttpSession session){
         boolean flag = false;
         EmployeeInfo em = (EmployeeInfo) session.getAttribute("employeeInfo");
         ImportParams params = new ImportParams();
@@ -66,6 +66,7 @@ public class ExcelUtil {
                         z.setCompanyId(em.getCompanyId());
                         z.setIntroducer(em.getUserId().toString());
                         ImportInfo i = z.changeToCustomerInfo(z);
+                        i.setCvType(cvType);
                         list2.add(i);
                     }
                 }
@@ -100,7 +101,7 @@ public class ExcelUtil {
      * @param session
      * @return
      */
-    public static boolean tongchengImport(InputStream inputStream,Integer recruitChannel,ImportInfoMapper importInfoMapper,HttpSession session){
+    public static boolean tongchengImport(InputStream inputStream,Integer recruitChannel,Integer cvType,ImportInfoMapper importInfoMapper,HttpSession session){
         boolean flag = false;
         EmployeeInfo em = (EmployeeInfo) session.getAttribute("employeeInfo");
         ImportParams params = new ImportParams();
@@ -117,6 +118,7 @@ public class ExcelUtil {
                         tc.setCompanyId(em.getCompanyId());
                         tc.setIntroducer(em.getUserId().toString());
                         ImportInfo i = tc.changeToCustomerInfo(tc);
+                        i.setCvType(cvType);
                         list2.add(i);
                     }
                 }
@@ -150,7 +152,7 @@ public class ExcelUtil {
      * @param session
      * @return
      */
-    public static boolean qianchengImport(InputStream inputStream,Integer recruitChannel,ImportInfoMapper importInfoMapper,HttpSession session){
+    public static boolean qianchengImport(InputStream inputStream,Integer recruitChannel,Integer cvType,ImportInfoMapper importInfoMapper,HttpSession session){
         boolean flag = false;
         EmployeeInfo em = (EmployeeInfo) session.getAttribute("employeeInfo");
         ImportParams params = new ImportParams();
@@ -167,6 +169,7 @@ public class ExcelUtil {
                         qc.setIntroducer(em.getUserId().toString());
                         qc.setCompanyId(em.getCompanyId());
                         ImportInfo i = qc.changeToCustomerInfo(qc);
+                        i.setCvType(cvType);
                         list2.add(i);
                     }
                 }
@@ -200,7 +203,7 @@ public class ExcelUtil {
      * @param session
      * @return
      */
-    public static boolean ganjiImport(InputStream inputStream,Integer recruitChannel,ImportInfoMapper importInfoMapper,HttpSession session){
+    public static boolean ganjiImport(InputStream inputStream,Integer recruitChannel,Integer cvType,ImportInfoMapper importInfoMapper,HttpSession session){
         boolean flag = false;
         EmployeeInfo em = (EmployeeInfo) session.getAttribute("employeeInfo");
         ImportParams params = new ImportParams();
@@ -217,6 +220,7 @@ public class ExcelUtil {
                         gj.setCompanyId(em.getCompanyId());
                         gj.setIntroducer(em.getUserId().toString());
                         ImportInfo i = gj.changeToCustomerInfo(gj);
+                        i.setCvType(cvType);
                         list2.add(i);
                     }
                 }
@@ -257,7 +261,7 @@ public class ExcelUtil {
      * @return
      */
 
-    public static boolean rencaiImport(InputStream inputStream,Integer recruitChannel,ImportInfoMapper importInfoMapper,HttpSession session){
+    public static boolean rencaiImport(InputStream inputStream,Integer recruitChannel,Integer cvType,ImportInfoMapper importInfoMapper,HttpSession session){
         boolean flag = false;
         EmployeeInfo em = (EmployeeInfo) session.getAttribute("employeeInfo");
         ImportParams params = new ImportParams();
@@ -273,8 +277,9 @@ public class ExcelUtil {
                         rc.setRecruitChannel(recruitChannel);
                         rc.setIntroducer(em.getUserId().toString());
                         rc.setCompanyId(em.getCompanyId());
-                        ImportInfo c = rc.changeToCustomerInfo(rc);
-                        list2.add(c);
+                        ImportInfo i = rc.changeToCustomerInfo(rc);
+                        i.setCvType(cvType);
+                        list2.add(i);
                     }
                 }
             }
@@ -308,7 +313,7 @@ public class ExcelUtil {
      * @return
      */
 
-    public static boolean zhonghuaImport(InputStream inputStream,Integer recruitChannel,ImportInfoMapper importInfoMapper,HttpSession session){
+    public static boolean zhonghuaImport(InputStream inputStream,Integer recruitChannel,Integer cvType,ImportInfoMapper importInfoMapper,HttpSession session){
         boolean flag = false;
         EmployeeInfo em = (EmployeeInfo) session.getAttribute("employeeInfo");
         ImportParams params = new ImportParams();
@@ -324,6 +329,7 @@ public class ExcelUtil {
                         zh.setIntroducer(em.getUserId().toString());
                         zh.setCompanyId(em.getCompanyId());
                         ImportInfo i = zh.changeToCustomerInfo(zh);
+                        i.setCvType(cvType);
                         list2.add(i);
                     }
                 }

@@ -34,6 +34,8 @@ public class QianchengCustomerVo {
     private String job;
     @Excel(name = "最近一家公司", isImportField = "workExperience")
     private String workExperience;
+    @Excel(name = "应聘职位")
+    private String applyJob;
     /**
      * 推荐人（创量部电话邀约）
      */
@@ -149,6 +151,14 @@ public class QianchengCustomerVo {
         this.companyId = companyId;
     }
 
+    public String getApplyJob() {
+        return applyJob;
+    }
+
+    public void setApplyJob(String applyJob) {
+        this.applyJob = applyJob;
+    }
+
     /**
      * 工作年限格式化
      * @param workAge
@@ -182,6 +192,7 @@ public class QianchengCustomerVo {
         i.setTel(qc.getTel());
         i.setJob(qc.getJob());
         i.setWorkExperience(qc.getWorkExperience());
+        i.setApplyJob(qc.getApplyJob());
         i.setIntroducer(qc.getIntroducer());
         i.setCompanyId(qc.getCompanyId());
         i.setCreateTime(new Date());
@@ -192,7 +203,7 @@ public class QianchengCustomerVo {
     public String toString() {
         return "QianchengCustomerVo{" +
                 "realName='" + realName + '\'' +
-                ", recruitChannel='" + recruitChannel + '\'' +
+                ", recruitChannel=" + recruitChannel +
                 ", sex=" + sex +
                 ", nativePlace='" + nativePlace + '\'' +
                 ", workAge='" + workAge + '\'' +
@@ -202,6 +213,7 @@ public class QianchengCustomerVo {
                 ", tel='" + tel + '\'' +
                 ", job='" + job + '\'' +
                 ", workExperience='" + workExperience + '\'' +
+                ", applyJob='" + applyJob + '\'' +
                 ", introducer='" + introducer + '\'' +
                 ", companyId=" + companyId +
                 '}';

@@ -121,8 +121,8 @@ public class ImportInfo extends Model<ImportInfo> {
     /**
      * 客户感兴趣的目标技能
      */
-    @TableField("target_skill")
-    private String targetSkill;
+    @TableField("apply_job")
+    private String applyJob;
     /**
      * 推荐人（创量部电话邀约）
      */
@@ -152,6 +152,10 @@ public class ImportInfo extends Model<ImportInfo> {
      * 是否是会销(0:是,1:不是)
      */
     private String isMarket;
+    /**
+     * 导入的简历类型(1:投递的简历,2:下载的简历)
+     */
+    private Integer cvType;
 
 
     public Integer getCustomerId() {
@@ -314,12 +318,12 @@ public class ImportInfo extends Model<ImportInfo> {
         this.userId = userId;
     }
 
-    public String getTargetSkill() {
-        return targetSkill;
+    public String getApplyJob() {
+        return applyJob;
     }
 
-    public void setTargetSkill(String targetSkill) {
-        this.targetSkill = targetSkill;
+    public void setApplyJob(String applyJob) {
+        this.applyJob = applyJob;
     }
 
     public String getIntroducer() {
@@ -391,6 +395,14 @@ public class ImportInfo extends Model<ImportInfo> {
         return this.customerId;
     }
 
+    public Integer getCvType() {
+        return cvType;
+    }
+
+    public void setCvType(Integer cvType) {
+        this.cvType = cvType;
+    }
+
     @Override
     public String toString() {
         return "ImportInfo{" +
@@ -414,7 +426,7 @@ public class ImportInfo extends Model<ImportInfo> {
                 ", customerState=" + customerState +
                 ", customerLevel='" + customerLevel + '\'' +
                 ", userId=" + userId +
-                ", targetSkill='" + targetSkill + '\'' +
+                ", applyJob='" + applyJob + '\'' +
                 ", introducer='" + introducer + '\'' +
                 ", memo='" + memo + '\'' +
                 ", lastTime=" + lastTime +
@@ -423,6 +435,7 @@ public class ImportInfo extends Model<ImportInfo> {
                 ", isDelete=" + isDelete +
                 ", guandan=" + guandan +
                 ", isMarket='" + isMarket + '\'' +
+                ", cvType=" + cvType +
                 '}';
     }
 }
