@@ -174,6 +174,7 @@ $(function () {
         }, {
             field: 'educationBgMsg',
             title: '学历',
+            align:'center',
             width: 40,
             formatter: function (value, row, index) {
                 var educationBgMsg = row.educationBgMsg;
@@ -256,13 +257,13 @@ $(function () {
         }, {
             field: 'applyJob',
             title: '求职岗位',
-            width: 70
+            width: 110
         }, {
             field: 'introducerMsg',
             title: '邀约人',
             visible: true,
             align:'center',
-            width: 80,
+            width: 30,
             formatter:function(value,row,index){
                 var name = row.introducerMsg;
                 if(name == $('[name="name"]').val()){
@@ -337,7 +338,7 @@ $(function () {
             title:'简历类型',
             align:'center',
             visible: true,
-            width:20
+            width:10
         }],queryParams: function getParams(params){
 
             var  tmp = {
