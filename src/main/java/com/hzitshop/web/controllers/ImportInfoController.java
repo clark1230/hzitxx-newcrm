@@ -57,13 +57,9 @@ public class ImportInfoController {
      */
     @RequestMapping(value = "/import", method = RequestMethod.POST)
     @ResponseBody
-    public Map<String,Object> importExcel(@RequestParam("excelFile") MultipartFile file,Integer recruitChannel,HttpServletRequest request,HttpSession session){
+    public Map<String,Object> importExcel(@RequestParam("excelFile") MultipartFile file,Integer recruitChannel,Integer cvType,HttpServletRequest request,HttpSession session){
         Map<String,Object> resultMap = new HashMap<>();
         try {
-//            licenseName字段为分校的校区名
-//            由于登入功能暂时没实现，获取不到session中的数据，暂时固定写死
-//            String licenseName = "宝安";
-            
             String path = request.getSession().getServletContext().getRealPath("/");
             File f = new File(path+"/excel/"+file.getOriginalFilename());
             if(!f.exists()){
@@ -83,7 +79,7 @@ public class ImportInfoController {
             }
             file.transferTo(f);
             InputStream is = new FileInputStream(f);
-            boolean result = importInfoServiceImpl.importExcel(is,recruitChannel,session);
+            boolean result = importInfoServiceImpl.importExcel(is,recruitChannel,cvType,session);
             if(result){
                 resultMap.put("code",200);
                 resultMap.put("msg","文件导入成功!");

@@ -19,7 +19,7 @@ import java.io.InputStream;
  */
 public interface ImportInfoService extends IService<ImportInfo> {
 
-    boolean importExcel(InputStream is, Integer recruitChannel,HttpSession session);
+    boolean importExcel(InputStream is, Integer recruitChannel,Integer cvType,HttpSession session);
 
     BootstrapTable<ImportInfoVo> ajaxData(Page<ImportInfo> page, Wrapper<ImportInfo> wrapper);
 }
