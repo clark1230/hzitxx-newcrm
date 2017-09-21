@@ -356,6 +356,58 @@ public class ExcelUtil {
     }
 
     /**
+     * 百姓网简历模板导入
+     * @param inputStream
+     * @param recruitChannel
+     * @param importInfoMapper
+     * @param session
+     * @return
+     */
+
+    public static boolean baixingImport(InputStream inputStream,Integer recruitChannel,Integer cvType,ImportInfoMapper importInfoMapper,HttpSession session){
+        boolean flag = false;
+        EmployeeInfo em = (EmployeeInfo) session.getAttribute("employeeInfo");
+        ImportParams params = new ImportParams();
+        params.setTitleRows(0);
+        params.setHeadRows(1);
+        List<BaixingCustomerVo> list = null;
+        try {
+            list = ExcelImportUtil.importExcel(inputStream, BaixingCustomerVo.class, params);
+            List<ImportInfo> list2 = new ArrayList<>();
+            if(list.size() != 0 && list != null) {
+                for (BaixingCustomerVo bx : list) {
+                    if (bx.getTel() != null) {
+                        bx.setRecruitChannel(recruitChannel);
+                        bx.setIntroducer(em.getUserId().toString());
+                        bx.setCompanyId(em.getCompanyId());
+                        ImportInfo i = bx.changeToCustomerInfo(bx);
+                        i.setCvType(cvType);
+                        list2.add(i);
+                    }
+                }
+            }
+            //插入去重过滤
+            if(insertFilter(list2,importInfoMapper)){
+                flag = true;
+            }else{
+                flag = false;
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            flag = false;
+            return flag;
+        }finally {
+            if (inputStream!=null)
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    logger.error("流关闭异常!"+e.getMessage());
+                }
+        }
+        return flag;
+    }
+
+    /**
      * 传入ImportInfo List,判断该学员是否存在,然后去重
      * @param list
      * @param importInfoMapper

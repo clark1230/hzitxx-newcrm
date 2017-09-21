@@ -121,15 +121,19 @@ public class GanjiCustomerVo {
 
     private Integer modifyWorkAge(String workAge){
         Integer result = null;
-        workAge = workAge.trim();
-        if(workAge.contains("年")){
-            if(workAge.contains("-")){
-                result = Integer.parseInt(workAge.substring(0,workAge.indexOf('-')));
-            }else{
-                result = Integer.parseInt(workAge.substring(0,workAge.indexOf('年')));
+        if(workAge != null) {
+            workAge = workAge.trim();
+            if (workAge.contains("年")) {
+                if (workAge.contains("-")) {
+                    result = Integer.parseInt(workAge.substring(0, workAge.indexOf('-')));
+                } else {
+                    result = Integer.parseInt(workAge.substring(0, workAge.indexOf('年')));
+                }
+            } else {
+                result = 0;
             }
         }else {
-            result = 0;
+            return null;
         }
         return result;
     }

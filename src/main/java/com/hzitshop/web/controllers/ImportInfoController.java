@@ -45,7 +45,7 @@ public class ImportInfoController {
     private ImportInfoService importInfoServiceImpl;
 
     @Autowired
-    private ITbDictService iTbDictService;
+    private ITbDictService iTbDictServiceImpl;
 
     private Logger logger = LoggerFactory.getLogger(ImportInfoController.class);
 
@@ -97,16 +97,28 @@ public class ImportInfoController {
         return resultMap;
     }
 
-
-
     @RequestMapping("/import/importList")
     public String toImportList(){
         return "/import/importList";
     }
 
     @RequestMapping("/import/importPage")
-    public String toImportPage(){
+    public String toImportPage(ModelMap modelMap){
+        List<TbDict> recruitChannelList = this.getTbgDict("21");
+        modelMap.addAttribute("recruitChannelList",recruitChannelList);
         return "/import/importPage";
+    }
+
+    /**
+     * 根据父编号获取数据字典信息
+     *
+     * @param pid
+     * @return
+     */
+    protected List<TbDict> getTbgDict(String pid) {
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("pid", pid);
+        return iTbDictServiceImpl.selectByMap(paramMap);
     }
 
     @RequestMapping("/import/recycleBin")
