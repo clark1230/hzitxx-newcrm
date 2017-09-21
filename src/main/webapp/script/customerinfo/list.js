@@ -114,7 +114,8 @@ $(function () {
             //获取邀约人信息和角色信息
             var roleName = $('[name="roleName"]').val();
             var introducer = row.introducer;
-            console.log(introducer);
+            console.log("角色名称："+roleName);
+            console.log("打印："+introducer);
             var createTime = row.createTime;
             var currentTime = Date.parse(new Date())/1000;
             if(roleName=='创量人员'){ //说明是创量人员
@@ -611,6 +612,8 @@ $(function () {
             //获取邀约人信息和角色信息
             var roleName = $('[name="roleName"]').val();
             var introducer = $selectData[0].introducer;
+            console.log("角色名称："+roleName);
+            console.log("打印："+introducer);
             var createTime = $selectData[0].createTime;
             var currentTime = Date.parse(new Date())/1000;
             if(roleName=='创量人员'){ //说明是创量人员
