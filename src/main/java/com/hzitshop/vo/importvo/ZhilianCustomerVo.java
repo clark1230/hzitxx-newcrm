@@ -18,6 +18,8 @@ public class ZhilianCustomerVo {
     private Integer recruitChannel;
     @Excel(name = "性别", isImportField = "sex", replace = {"男_1", "女_2"})
     private Integer sex;
+    @Excel(name = "出生日期",isImportField = "age")
+    private String age;
     @Excel(name = "工作年限", isImportField = "workAge")
     private Integer workAge;
     @Excel(name = "移动电话", isImportField = "tel")
@@ -68,6 +70,14 @@ public class ZhilianCustomerVo {
 
     public void setSex(Integer sex) {
         this.sex = sex;
+    }
+
+    public String getAge() {
+        return age;
+    }
+
+    public void setAge(String age) {
+        this.age = age;
     }
 
     public Integer getWorkAge() {
@@ -160,6 +170,7 @@ public class ZhilianCustomerVo {
         i.setRealName(z.getRealName());
         i.setRecruitChannel(z.getRecruitChannel());
         i.setSex(z.getSex());
+        i.setAge(z.modifyAge(z.getAge()));
         i.setWorkAge(z.getWorkAge());
         i.setTel(z.getTel());
         i.setNativePlace(z.getNativePlace());
@@ -174,12 +185,29 @@ public class ZhilianCustomerVo {
         return i;
     }
 
+    /**
+     * 获取简历中的年龄
+     * @param age
+     * @return
+     */
+    private Integer modifyAge(String age){
+        Integer result = null;
+        if(age != null){
+            Integer year = Integer.parseInt(age.substring(0, age.indexOf('/')));
+            Date d = new Date();
+            Integer now = Integer.parseInt(DateUtils.getYear(d));
+            result = now - year;
+        }
+        return result;
+    }
+
     @Override
     public String toString() {
         return "ZhilianCustomerVo{" +
                 "realName='" + realName + '\'' +
                 ", recruitChannel=" + recruitChannel +
                 ", sex=" + sex +
+                ", age='" + age + '\'' +
                 ", workAge=" + workAge +
                 ", tel='" + tel + '\'' +
                 ", nativePlace='" + nativePlace + '\'' +

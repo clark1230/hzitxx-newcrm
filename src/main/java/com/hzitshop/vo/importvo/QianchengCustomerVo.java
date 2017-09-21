@@ -1,6 +1,7 @@
 package com.hzitshop.vo.importvo;
 
 import com.hzitshop.entity.ImportInfo;
+import com.hzitshop.util.DateUtils;
 import org.jeecgframework.poi.excel.annotation.Excel;
 
 import java.util.Date;
@@ -18,6 +19,8 @@ public class QianchengCustomerVo {
     private Integer recruitChannel;
     @Excel(name = "性别", isImportField = "sex",replace = {"男_1", "女_2"})
     private Integer sex;
+    @Excel(name = "出生日期",isImportField = "age")
+    private String age;
     @Excel(name = "户口/国籍", isImportField = "nativePlace")
     private String nativePlace;
     @Excel(name = "工作年限", isImportField = "workAge")
@@ -119,6 +122,14 @@ public class QianchengCustomerVo {
         this.sex = sex;
     }
 
+    public String getAge() {
+        return age;
+    }
+
+    public void setAge(String age) {
+        this.age = age;
+    }
+
     public Integer getRecruitChannel() {
         return recruitChannel;
     }
@@ -177,6 +188,23 @@ public class QianchengCustomerVo {
         }
         return result;
     }
+
+    /**
+     * 获取简历中的年龄
+     * @param age
+     * @return
+     */
+    private Integer modifyAge(String age){
+        Integer result = null;
+        if(age != null){
+            Integer year = Integer.parseInt(age.substring(0, age.indexOf('-')));
+            Date d = new Date();
+            Integer now = Integer.parseInt(DateUtils.getYear(d));
+            result = now - year;
+        }
+        return result;
+    }
+
     /**
      * 将智联平台导入的ZhilianCustomerVo对象转换成CustomerInfo对象
      *
@@ -187,6 +215,7 @@ public class QianchengCustomerVo {
         i.setRealName(qc.getRealName());
         i.setRecruitChannel(qc.getRecruitChannel());
         i.setSex(qc.getSex());
+        i.setAge(qc.modifyAge(qc.getAge()));
         i.setNativePlace(qc.getNativePlace());
         Integer workAge = this.modifyWorkAge(qc.getWorkAge());
         i.setWorkAge(workAge);
@@ -207,8 +236,9 @@ public class QianchengCustomerVo {
     public String toString() {
         return "QianchengCustomerVo{" +
                 "realName='" + realName + '\'' +
-                ", recruitChannel='" + recruitChannel + '\'' +
+                ", recruitChannel=" + recruitChannel +
                 ", sex=" + sex +
+                ", age='" + age + '\'' +
                 ", nativePlace='" + nativePlace + '\'' +
                 ", workAge='" + workAge + '\'' +
                 ", educationBg=" + educationBg +
@@ -217,6 +247,7 @@ public class QianchengCustomerVo {
                 ", tel='" + tel + '\'' +
                 ", job='" + job + '\'' +
                 ", workExperience='" + workExperience + '\'' +
+                ", applyJob='" + applyJob + '\'' +
                 ", introducer='" + introducer + '\'' +
                 ", companyId=" + companyId +
                 '}';

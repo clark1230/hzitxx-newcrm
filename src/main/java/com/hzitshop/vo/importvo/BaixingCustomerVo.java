@@ -17,6 +17,8 @@ public class BaixingCustomerVo {
     private Integer recruitChannel;
     @Excel(name = "性别", isImportField = "sex", replace = {"男_1", "女_2"})
     private Integer sex;
+    @Excel(name = "年龄", isImportField = "true_age",suffix = "岁")
+    private Integer age;
     @Excel(name = "投递职位")
     private String applyJob;
     @Excel(name = "联系方式", isImportField = "tel")
@@ -89,6 +91,14 @@ public class BaixingCustomerVo {
         this.workAge = workAge;
     }
 
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+
     public Integer getEducationBg() {
         return educationBg;
     }
@@ -153,6 +163,7 @@ public class BaixingCustomerVo {
         i.setRealName(bx.getRealName());
         i.setRecruitChannel(bx.getRecruitChannel());
         i.setSex(bx.getSex());
+        i.setAge(bx.getAge());
         i.setApplyJob(bx.getApplyJob());
         i.setTel(bx.getTel());
         i.setEducationBg(bx.getEducationBg());
