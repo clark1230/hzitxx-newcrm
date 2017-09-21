@@ -132,9 +132,7 @@ public class ImportInfoVo {
     /**
      * 客户感兴趣的目标技能
      */
-	private String targetSkill;
-	@Excel(name="目标技能")
-	private String targetSkillMsg;
+	private String applyJob;
     /**
      * 推荐人（创量部电话邀约）
      */
@@ -169,6 +167,11 @@ public class ImportInfoVo {
      * 是否是会销(0:是,1:不是)
      */
 	private String isMarket;
+	/**
+	 * 导入的简历类型(1:投递的简历,2:下载的简历)
+	 */
+	private Integer cvType;
+	private String cvTypeMsg;
 
 
 	public Integer getCustomerId() {
@@ -331,12 +334,12 @@ public class ImportInfoVo {
 		this.userId = userId;
 	}
 
-	public String getTargetSkill() {
-		return targetSkill;
+	public String getApplyJob() {
+		return applyJob;
 	}
 
-	public void setTargetSkill(String targetSkill) {
-		this.targetSkill = targetSkill;
+	public void setApplyJob(String applyJob) {
+		this.applyJob = applyJob;
 	}
 
 	public String getIntroducer() {
@@ -435,14 +438,6 @@ public class ImportInfoVo {
 		this.customerLevelMsg = customerLevelMsg;
 	}
 
-	public String getTargetSkillMsg() {
-		return targetSkillMsg;
-	}
-
-	public void setTargetSkillMsg(String targetSkillMsg) {
-		this.targetSkillMsg = targetSkillMsg;
-	}
-
 	public String getUserIdMsg() {
 		return userIdMsg;
 	}
@@ -483,18 +478,38 @@ public class ImportInfoVo {
 		this.sexMsg =sexMsg;
 	}
 
+	public Integer getCvType() {
+		return cvType;
+	}
+
+	public void setCvType(Integer cvType) {
+		this.cvType = cvType;
+	}
+
+	public String getCvTypeMsg() {
+		return cvTypeMsg;
+	}
+
+	public void setCvTypeMsg(String cvTypeMsg) {
+		this.cvTypeMsg = cvTypeMsg;
+	}
+
 	@Override
 	public String toString() {
 		return "ImportInfoVo{" +
 				"customerId=" + customerId +
 				", realName='" + realName + '\'' +
+				", userIdMsg='" + userIdMsg + '\'' +
+				", createTime=" + createTime +
 				", sex=" + sex +
+				", sexMsg='" + sexMsg + '\'' +
 				", age=" + age +
 				", nativePlace='" + nativePlace + '\'' +
 				", tel='" + tel + '\'' +
 				", wechatNo='" + wechatNo + '\'' +
 				", qq='" + qq + '\'' +
 				", educationBg=" + educationBg +
+				", educationBgMsg='" + educationBgMsg + '\'' +
 				", graduateTime='" + graduateTime + '\'' +
 				", graduateFrom='" + graduateFrom + '\'' +
 				", majorIn='" + majorIn + '\'' +
@@ -503,18 +518,25 @@ public class ImportInfoVo {
 				", job='" + job + '\'' +
 				", educateExperience='" + educateExperience + '\'' +
 				", recruitChannel=" + recruitChannel +
+				", recruitChannelMsg='" + recruitChannelMsg + '\'' +
 				", customerState=" + customerState +
+				", customerStateMsg='" + customerStateMsg + '\'' +
 				", customerLevel='" + customerLevel + '\'' +
+				", customerLevelMsg='" + customerLevelMsg + '\'' +
 				", userId=" + userId +
-				", targetSkill='" + targetSkill + '\'' +
+				", applyJob='" + applyJob + '\'' +
 				", introducer='" + introducer + '\'' +
+				", introducerMsg='" + introducerMsg + '\'' +
 				", memo='" + memo + '\'' +
 				", lastTime=" + lastTime +
-				", createTime=" + createTime +
 				", companyId=" + companyId +
+				", companyIdMsg='" + companyIdMsg + '\'' +
 				", isDelete=" + isDelete +
 				", guandan=" + guandan +
+				", guandaMsg='" + guandaMsg + '\'' +
 				", isMarket='" + isMarket + '\'' +
+				", cvType=" + cvType +
+				", cvTypeMsg='" + cvTypeMsg + '\'' +
 				'}';
 	}
 }

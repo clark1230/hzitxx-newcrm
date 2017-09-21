@@ -25,6 +25,8 @@ public class GanjiCustomerVo {
     private String workAge;
     @Excel(name = "手机", isImportField = "tel")
     private String tel;
+    @Excel(name = "求职职位")
+    private String applyJob;
     /**
      * 推荐人（创量部电话邀约）
      */
@@ -109,6 +111,14 @@ public class GanjiCustomerVo {
         this.companyId = companyId;
     }
 
+    public String getApplyJob() {
+        return applyJob;
+    }
+
+    public void setApplyJob(String applyJob) {
+        this.applyJob = applyJob;
+    }
+
     private Integer modifyWorkAge(String workAge){
         Integer result = null;
         workAge = workAge.trim();
@@ -134,6 +144,7 @@ public class GanjiCustomerVo {
         Integer workAge = this.modifyWorkAge(gj.getWorkAge());
         i.setWorkAge(workAge);
         i.setTel(gj.getTel());
+        i.setApplyJob(gj.getApplyJob());
         i.setIntroducer(gj.getIntroducer());
         i.setCompanyId(gj.getCompanyId());
         i.setCreateTime(new Date());
@@ -144,12 +155,13 @@ public class GanjiCustomerVo {
     public String toString() {
         return "GanjiCustomerVo{" +
                 "realName='" + realName + '\'' +
-                ", recruitChannel='" + recruitChannel + '\'' +
+                ", recruitChannel=" + recruitChannel +
                 ", sex=" + sex +
                 ", age=" + age +
                 ", educationBg=" + educationBg +
                 ", workAge='" + workAge + '\'' +
                 ", tel='" + tel + '\'' +
+                ", applyJob='" + applyJob + '\'' +
                 ", introducer='" + introducer + '\'' +
                 ", companyId=" + companyId +
                 '}';

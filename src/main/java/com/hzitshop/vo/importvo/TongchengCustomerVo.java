@@ -36,6 +36,8 @@ public class TongchengCustomerVo {
     private String workExperience;
     @Excel(name = "现职位", isImportField = "job")
     private String job;
+    @Excel(name = "应聘职位")
+    private String applyJob;
     /**
      * 推荐人（创量部电话邀约）
      */
@@ -152,6 +154,14 @@ public class TongchengCustomerVo {
         this.companyId = companyId;
     }
 
+    public String getApplyJob() {
+        return applyJob;
+    }
+
+    public void setApplyJob(String applyJob) {
+        this.applyJob = applyJob;
+    }
+
     public ImportInfo changeToCustomerInfo(TongchengCustomerVo tc){
         ImportInfo i = new ImportInfo();
         i.setRealName(tc.getRealName());
@@ -166,6 +176,7 @@ public class TongchengCustomerVo {
         i.setMajorIn(tc.getMajorIn());
         i.setWorkExperience(tc.getWorkExperience());
         i.setJob(tc.getJob());
+        i.setApplyJob(tc.getApplyJob());
         i.setIntroducer(tc.getIntroducer());
         i.setCompanyId(tc.getCompanyId());
         i.setCreateTime(new Date());
@@ -191,7 +202,7 @@ public class TongchengCustomerVo {
     public String toString() {
         return "TongchengCustomerVo{" +
                 "realName='" + realName + '\'' +
-                ", recruitChannel='" + recruitChannel + '\'' +
+                ", recruitChannel=" + recruitChannel +
                 ", sex=" + sex +
                 ", age=" + age +
                 ", workAge='" + workAge + '\'' +
@@ -201,6 +212,7 @@ public class TongchengCustomerVo {
                 ", majorIn='" + majorIn + '\'' +
                 ", workExperience='" + workExperience + '\'' +
                 ", job='" + job + '\'' +
+                ", applyJob='" + applyJob + '\'' +
                 ", introducer='" + introducer + '\'' +
                 ", companyId=" + companyId +
                 '}';

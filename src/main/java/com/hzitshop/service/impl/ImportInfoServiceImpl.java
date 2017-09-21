@@ -140,14 +140,6 @@ public class ImportInfoServiceImpl extends ServiceImpl<ImportInfoMapper,ImportIn
                     importInfoVo.setCustomerLevelMsg(tbDict.getName());
                 }
             }
-            //目标技能
-            if(StringUtils.isNotEmpty(importInfo.getTargetSkill())){
-                tbDict = tbDictMapper.selectById(importInfo.getTargetSkill());
-                if(tbDict!= null){
-                    importInfoVo.setTargetSkillMsg(tbDict.getName());
-                }
-
-            }
             //应聘渠道
             if(importInfo.getRecruitChannel() !=null){
                 tbDict =tbDictMapper.selectById(importInfo.getRecruitChannel());
@@ -182,6 +174,13 @@ public class ImportInfoServiceImpl extends ServiceImpl<ImportInfoMapper,ImportIn
                 employeeInfo = employeeInfoMapper.selectById(importInfo.getIntroducer());
                 if(employeeInfo !=null){
                     importInfoVo.setIntroducerMsg(employeeInfo.getName());
+                }
+            }
+            if(importInfo.getCvType() != null){
+                if(importInfo.getCvType() == 1){
+                    importInfoVo.setCvTypeMsg("投递");
+                }else if(importInfo.getCvType() == 2){
+                    importInfoVo.setCvTypeMsg("下载");
                 }
             }
             importInfoVos.add(importInfoVo);

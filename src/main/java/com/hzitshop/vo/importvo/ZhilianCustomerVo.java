@@ -32,6 +32,8 @@ public class ZhilianCustomerVo {
     private String majorIn;
     @Excel(name = "最高学历", isImportField = "educationBg",replace = {"小学_8","初中_9","中专_10","高中_11","大专_12","本科_13","硕士_14","博士_15"})
     private Integer educationBg;
+    @Excel(name = "应聘职位")
+    private String applyJob;
     /**
      * 推荐人（创量部电话邀约）
      */
@@ -140,6 +142,14 @@ public class ZhilianCustomerVo {
         this.companyId = companyId;
     }
 
+    public String getApplyJob() {
+        return applyJob;
+    }
+
+    public void setApplyJob(String applyJob) {
+        this.applyJob = applyJob;
+    }
+
     /**
      * 将智联平台导入的ZhilianCustomerVo对象转换成CustomerInfo对象
      *
@@ -159,9 +169,11 @@ public class ZhilianCustomerVo {
         i.setEducationBg(z.getEducationBg());
         i.setIntroducer(z.getIntroducer());
         i.setCompanyId(z.getCompanyId());
+        i.setApplyJob(z.getApplyJob());
         i.setCreateTime(new Date());
         return i;
     }
+
     @Override
     public String toString() {
         return "ZhilianCustomerVo{" +
@@ -175,6 +187,7 @@ public class ZhilianCustomerVo {
                 ", graduateFrom='" + graduateFrom + '\'' +
                 ", majorIn='" + majorIn + '\'' +
                 ", educationBg=" + educationBg +
+                ", applyJob='" + applyJob + '\'' +
                 ", introducer='" + introducer + '\'' +
                 ", companyId=" + companyId +
                 '}';
