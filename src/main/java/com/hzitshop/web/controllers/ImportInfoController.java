@@ -10,6 +10,7 @@ import com.hzitshop.entity.ImportInfo;
 import com.hzitshop.entity.TbDict;
 import com.hzitshop.service.ImportInfoService;
 import com.hzitshop.service.ITbDictService;
+import com.hzitshop.util.DateUtils;
 import com.hzitshop.vo.BootstrapEntity;
 import com.hzitshop.vo.BootstrapTable;
 import com.hzitshop.vo.ImportInfoVo;
@@ -189,9 +190,9 @@ public class ImportInfoController {
      */
     @RequestMapping(value = "/importInfo/remove")
     @ResponseBody
-    public Map<String,Object> remove(String importIdArr){
+    public Map<String,Object> remove(String importIdArr, HttpSession session){
         String condition = "isDelete";
-        return getStringObjectMap(importIdArr,condition);
+        return getStringObjectMap(importIdArr,condition, session);
     }
 
     /**
@@ -201,9 +202,9 @@ public class ImportInfoController {
      */
     @RequestMapping(value = "/importInfo/recover")
     @ResponseBody
-    public Map<String,Object> recover(String importIdArr){
+    public Map<String,Object> recover(String importIdArr, HttpSession session){
         String condition = "isDelete=0";
-        return getStringObjectMap(importIdArr,condition);
+        return getStringObjectMap(importIdArr,condition,session);
     }
 
 
@@ -255,12 +256,21 @@ public class ImportInfoController {
         }
         Page<ImportInfo> searchPage = new Page<ImportInfo>(bt.getOffset(), bt.getLimit());
         EmployeeInfo em = (EmployeeInfo) session.getAttribute("employeeInfo");
-        //根据当前登录用户所在校区筛选导入列表
-        Wrapper<ImportInfo> ew = new EntityWrapper<ImportInfo>()
-                .where("company_id="+em.getCompanyId())
-                .and("isDelete=0")
-                .like(bt.getCondition(), bt.getValue())
-                .orderBy("create_time desc");
+        Wrapper<ImportInfo> ew = null;
+        if("创量超级主管".equals(em.getRoleName())){
+            ew = new EntityWrapper<ImportInfo>()
+                    .where("isDelete=0")
+                    .like(bt.getCondition(), bt.getValue())
+                    .orderBy("create_time desc");
+        }else{
+            //根据当前登录用户所在校区筛选导入列表
+             ew = new EntityWrapper<ImportInfo>()
+                    .where("company_id="+em.getCompanyId())
+                    .and("isDelete=0")
+                    .like(bt.getCondition(), bt.getValue())
+                    .orderBy("create_time desc");
+        }
+
         if("-1".equals(bt.getCondition()) ){
             bt.setCondition("");
         }
@@ -297,22 +307,32 @@ public class ImportInfoController {
      * @param condition
      * @return
      */
-    private Map<String, Object> getStringObjectMap(String importIdArr, String condition) {
+    private Map<String, Object> getStringObjectMap(String importIdArr, String condition, HttpSession session) {
         Map<String, Object> resultMap = new HashMap<>();
+        EmployeeInfo em = (EmployeeInfo) session.getAttribute("employeeInfo");
         try {
             ImportInfo importInfo = null;
             if (StringUtils.isNotEmpty(importIdArr)) {
                 String[] idArr = importIdArr.split(",");
                 for (String id : idArr) {
                     importInfo = new ImportInfo();
+                    importInfo.setCustomerId(Integer.parseInt(id));
                     if ("isDelete".equals(condition)) {
                         importInfo.setIsDelete(1);//逻辑删除数据
                     }else if("isDelete=0".equals(condition)){
+                        importInfo = importInfoServiceImpl.selectOne(new EntityWrapper<ImportInfo>().where("customer_id=" + importInfo.getCustomerId()));
+                        //恢复->同步当前登录用户信息
+                        Date date = new Date();
+                        importInfo.setIntroducer(em.getUserId().toString());
+                        importInfo.setCompanyId(em.getCompanyId());
+                        importInfo.setLastTime(date);
                         importInfo.setIsDelete(0);//恢复逻辑删除的数据
-                    } else if ("customer_sate".equals(condition)) {
-                        importInfo.setCustomerState(29); //修改面试状态为已面试
+                        if(importInfo.getMemo() == null || "".equals(importInfo.getMemo())){
+                            importInfo.setMemo("该数据从公共库恢复");
+                        }else if(!importInfo.getMemo().contains("该数据从公共库恢复")){
+                            importInfo.setMemo("该数据公共库恢复"+importInfo.getMemo());
+                        }
                     }
-                    importInfo.setCustomerId(Integer.parseInt(id));
                     importInfoServiceImpl.update(importInfo,
                             new EntityWrapper<ImportInfo>().where("customer_id=" + importInfo.getCustomerId()));
                 }
