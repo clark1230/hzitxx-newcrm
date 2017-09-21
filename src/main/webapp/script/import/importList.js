@@ -80,6 +80,47 @@ $(function () {
 
         silent: true, // 刷新事件必须设置
 
+        onDblClickRow: function (row, $element) {//双击事件
+
+            layer.open({
+                type: 2,
+                title: '添加备注',
+                shadeClose: true,
+                shade:0,
+                maxmin: true,
+                area:["550px","408px"],
+                content:['/import/editMemo?customerId='+row.customerId,'on'],
+                end: function () {
+                    $("#table").bootstrapTable("refresh"); //刷新
+
+                }
+            });
+
+        },
+
+        onClickCell:function(field, value, row, $element){
+            //小tips
+            //边缘弹出
+            if(field =='memo'){
+                if(value=='null '|| value==null || value==''){
+                    value ="暂无备注!";
+                };
+                layer.open({
+                    type: 1
+                    ,offset: 'rb' //具体配置参考：offset参数项   rb:右下
+                    ,title:'备注(弹窗3秒后自动关闭)'
+                    ,content: '<div style="padding: 20px 20px;color:orange;">'+value+'</div>'
+                    ,btn: '关闭'
+                    ,time:3000
+                    ,btnAlign: 'c' //按钮居中
+                    ,shade: 0 //不显示遮罩
+                    ,yes: function(){
+                        layer.closeAll();
+                    }
+                });
+            }
+        },
+
         columns: [{
             filed: 'customerId',
             title: '编号',
@@ -132,7 +173,7 @@ $(function () {
         }, {
             field: 'educationBgMsg',
             title: '学历',
-            width: 50,
+            width: 40,
             formatter: function (value, row, index) {
                 var educationBgMsg = row.educationBgMsg;
                 /*if(row.educationBgMsg=='数据字典'){
@@ -143,11 +184,12 @@ $(function () {
         }, {
             field: 'graduateTime',
             title: '毕业时间',
-            width: 80
+            width: 80,
+            visible: false
         }, {
             field: 'graduateFrom',
             title: '毕业学校',
-            width: 100
+            width: 110
         }, {
             field: 'majorIn',
             title: '专业',
@@ -245,7 +287,7 @@ $(function () {
         }, {
             field: 'lastTime',
             title: '最后跟进时间',
-            width: 150,
+            width: 120,
             formatter: function (value, row, index) {
                 if(row.lastTime === null || row.lastTime === ""){
                     return "---";
@@ -260,11 +302,11 @@ $(function () {
         }, {
             field: 'memo',
             title: '备注',
-            width: 80,
+            width: 100,
             formatter: function (value, row, index) {
                 var memo = (typeof(row.memo) == 'null') ? "---" : row.memo + "";
-                if (memo.length > 5) {
-                    memo = row.memo.substr(0, 5) + "....";
+                if (memo.length > 10) {
+                    memo = row.memo.substr(0, 10) + "....";
                 }else if(memo == null || memo =='null' || memo ==''){
                     memo = '---'
                 } else {

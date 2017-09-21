@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,10 +30,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author 吕游
@@ -118,8 +116,38 @@ public class ImportInfoController {
     @RequestMapping("/import/recycleBin")
     public String toRecycleBin(){ return "/import/recycleBin"; }
 
+    @RequestMapping("/import/editMemo")
+    public String toEditMemo(ModelMap modelMap, ImportInfo importInfo){
+        importInfo = importInfoServiceImpl.selectOne(new EntityWrapper<ImportInfo>().where("customer_id=" + importInfo.getCustomerId()));
+        modelMap.addAttribute("importInfo", importInfo);
+        return "/import/editMemo";
+    }
+
     /**
-     * 已逻辑删除的数据（公共库）
+     * 保存修改的备注信息
+     * @return
+     */
+    @RequestMapping("/importInfo/editMemo")
+    @ResponseBody
+    public Map<String,Object> editMemo(ImportInfo importInfo){
+        Map<String, Object> resultMap = new HashMap<>();
+        ImportInfo im = new ImportInfo();
+        im = importInfoServiceImpl.selectOne(new EntityWrapper<ImportInfo>().where("customer_id=" + importInfo.getCustomerId()));
+        im.setMemo(importInfo.getMemo());
+        im.setLastTime(new Date());
+        boolean result = importInfoServiceImpl.updateById(im);
+        if(result){
+            resultMap.put("code",200);
+            resultMap.put("msg","备注修改成功!");
+        }else{
+            resultMap.put("code",300);
+            resultMap.put("msg","备注修改失败!");
+        }
+        return resultMap;
+    }
+
+    /**
+     * 查询已逻辑删除的数据（公共库）
      * @param bt
      * @param session
      * @return

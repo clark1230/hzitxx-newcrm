@@ -12,7 +12,7 @@ $(function () {
                 //显示隐藏的按钮
                 //截取字符串
                 var button  = buttonResource.substr(buttonResource.indexOf(":")+1,buttonResource.length);
-                layer.msg(button);
+                //layer.msg(button);
                 $("#span-"+button).removeClass('span-hidden');
             }
         });

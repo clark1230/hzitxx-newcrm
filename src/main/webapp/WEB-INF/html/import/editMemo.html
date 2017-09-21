@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>添加备注</title>
+    <link rel="stylesheet" type="text/css" href="/assets/themes/layui/css/layui.css">
+    <style>
+        .zixun-disable{
+            pointer-events: none;
+        }
+        .zixun-enable{
+            ppointer-events: visible;
+        }
+        .chuangliang-disable{
+            pointer-events: none;
+        }
+        .chuangliang-enable{
+            pointer-events: visible;
+        }
+        .huixiao-disable{
+            pointer-events: none;
+        }
+        
+    </style>
+</head>
+<body>
+<div style="margin:20px auto;">
+   <!-- <input th:text="${customerInfo}">-->
+    <!--<input type="hidden" name="deptId"  th:value="${session.employeeInfo.deptId}">-->
+    <form  id="editImportInfoForm" class="layui-form layui-form-pane"
+           method="post" style="margin: 10px; width: 520px;">
+        <input type="hidden" th:value="${importInfo.customerId}"  name="customerId">
+        <!--<input type="hidden" th:value="${customerInfo.companyId}"  name="companyId">-->
+        <!--<input type="hidden" th:value="${session.employeeInfo.roleName}" name="roleName">-->
+       <!-- <div class="zixun-disable">-->
+           <!--<div class="layui-form-item">
+                <label class="layui-form-label" for="realName" >最后跟进时间</label>
+                <div class="layui-input-inline">
+                    <input name="realName"  id="realName"
+                           th:value="${customerInfo.realName}"   lay-even="" autocomplete="off" placeholder="请输入学员名称!" class="layui-input" type="text">
+                </div>
+           </div>-->
+        <!--</div>-->
+
+       <!-- <div  class="zixun-disable">-->
+            <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label">备注</label>
+                <div class="layui-input-block">
+                <textarea name="memo" placeholder="请输入备注!"
+                          th:text="${importInfo.memo}"  class="layui-textarea" ></textarea>
+                </div>
+            </div>
+        <!--</div>-->
+        <div class="layui-form-item" style="float: right;">
+            <span><input id="edit" lay-submit="" type="button" class="layui-btn layui-btn-small" lay-filter="edit" value="保存"></span>
+            <span><input type="reset" class="layui-btn layui-btn-danger layui-btn-small" value="重置"></span>
+            <span><div id="cancel" class="layui-btn layui-btn-warm layui-btn-small" >关闭</div></span>
+        </div>
+    </form>
+</div>
+<script src="/assets/js/jquery.min.js"></script>
+<script src="/assets/My97DatePicker/WdatePicker.js"></script>
+<script src="/assets/themes/layui/lay/dest/layui.all.js"></script>
+<script src="/script/import/editMemo.js"></script>
+<script>
+    var index = parent.layer.getFrameIndex(window.name); //获取当前窗体索引
+    $('#cancel').click(function(){
+        parent.layer.close(index);//关闭层
+    });
+</script>
+
+</body>
+</html>
