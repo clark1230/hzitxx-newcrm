@@ -1,7 +1,9 @@
 package com.hzitshop.entity;
 
 import com.baomidou.mybatisplus.activerecord.Model;
+
 import java.util.Date;
+
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.annotations.TableName;
@@ -12,7 +14,7 @@ import java.io.Serializable;
 
 /**
  * <p>
- *
+ * <p>
  * </p>
  *
  * @author 冼耀基
@@ -26,7 +28,7 @@ public class ImportInfo extends Model<ImportInfo> {
     /**
      * 客户id
      */
-    @TableId(value="customer_id",type= IdType.AUTO)
+    @TableId(value = "customer_id", type = IdType.AUTO)
     private Integer customerId;
     /**
      * 客户姓名
@@ -141,9 +143,41 @@ public class ImportInfo extends Model<ImportInfo> {
      */
     @TableField("create_time")
     private Date createTime;
+
     @TableField("company_id")
     private Integer companyId;
+
     private Integer isDelete;
+
+    /**
+     * 目前居住地
+     */
+    @TableField("live_address")
+    private String liveAddress;
+
+    /**
+     * 目前年收入
+     */
+    @TableField("cur_income")
+    private String curIncome;
+
+    /**
+     * 应聘公司
+     */
+    private String license;
+
+    /**
+     * 期望薪资
+     */
+    @TableField("expect_salary")
+    private String expectSalary;
+
+    @TableField("job_status")
+    private String jobStatus;
+
+    @TableField("send_time")
+    private Date sendTime;
+
     /**
      * 关单人
      */
@@ -403,6 +437,54 @@ public class ImportInfo extends Model<ImportInfo> {
         this.cvType = cvType;
     }
 
+    public String getLiveAddress() {
+        return liveAddress;
+    }
+
+    public void setLiveAddress(String liveAddress) {
+        this.liveAddress = liveAddress;
+    }
+
+    public String getCurIncome() {
+        return curIncome;
+    }
+
+    public void setCurIncome(String curIncome) {
+        this.curIncome = curIncome;
+    }
+
+    public String getLicense() {
+        return license;
+    }
+
+    public void setLicense(String license) {
+        this.license = license;
+    }
+
+    public String getExpectSalary() {
+        return expectSalary;
+    }
+
+    public void setExpectSalary(String expectSalary) {
+        this.expectSalary = expectSalary;
+    }
+
+    public String getJobStatus() {
+        return jobStatus;
+    }
+
+    public void setJobStatus(String jobStatus) {
+        this.jobStatus = jobStatus;
+    }
+
+    public Date getSendTime() {
+        return sendTime;
+    }
+
+    public void setSendTime(Date sendTime) {
+        this.sendTime = sendTime;
+    }
+
     @Override
     public String toString() {
         return "ImportInfo{" +
@@ -433,6 +515,12 @@ public class ImportInfo extends Model<ImportInfo> {
                 ", createTime=" + createTime +
                 ", companyId=" + companyId +
                 ", isDelete=" + isDelete +
+                ", liveAddress='" + liveAddress + '\'' +
+                ", curIncome='" + curIncome + '\'' +
+                ", license='" + license + '\'' +
+                ", expectSalary='" + expectSalary + '\'' +
+                ", jobStatus='" + jobStatus + '\'' +
+                ", sendTime=" + sendTime +
                 ", guandan=" + guandan +
                 ", isMarket='" + isMarket + '\'' +
                 ", cvType=" + cvType +

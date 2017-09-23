@@ -35,6 +35,22 @@ $(function () {
             }else{
                 lastTime = new Date(parseInt(row.lastTime)).toLocaleString().replace(/年|月/g, "-").replace(/日/g, " ");
             }
+            var sendTime = "---";
+            if(row.sendTime === null || row.sendTime === ""){
+                sendTime = "---";
+            }else{
+                var mydate = new Date(row.sendTime);
+                var year = mydate.getFullYear()+"";
+                var month = mydate.getMonth()+1;
+                if(month <= 9){
+                    month = 0+""+month;
+                }
+                var day = mydate.getDate();
+                if(day <= 9){
+                    day = 0+""+day;
+                }
+                sendTime =  year+"-"+month+"-"+day;
+            }
             var createTime = new Date(parseInt(row.createTime)).toLocaleString().replace(/年|月/g, "-").replace(/日/g, " ");
             var sex = '';
             if(row.sex == '1'){
@@ -70,8 +86,14 @@ $(function () {
                 '<li class="customerinfo-li">录入时间:' + (createTime==null ? '----':createTime) + '</li>' +
                 '<li class="customerinfo-li">最后跟进时间:' + (lastTime==null ?'----':lastTime) + '</li>' +
                 '<li class="customerinfo-li">所属公司:' + (row.companyIdMsg==null ?'----':row.companyIdMsg) + '</li>' +
-                '<li class="customerinfo-li">备注:' + (row.memo==null?'----':row.memo) + '</li>' +
                 '<li class="customerinfo-li">简历类型:' + (row.cvTypeMsg==null?'----':row.cvTypeMsg) + '</li>' +
+                '<li class="customerinfo-li">目前居住地:' + (row.liveAddress==null?'----':row.liveAddress) + '</li>' +
+                '<li class="customerinfo-li">期望薪资:' + (row.expectSalary==null?'----':row.expectSalary) + '</li>' +
+                '<li class="customerinfo-li">应聘公司:' + (row.license==null?'----':row.license) + '</li>' +
+                '<li class="customerinfo-li">目前年收入:' + (row.curIncome==null?'----':row.curIncome) + '</li>' +
+                '<li class="customerinfo-li">求职状态:' + (row.jobStatus==null?'----':row.jobStatus) + '</li>' +
+                '<li class="customerinfo-li">投递时间:' + (row.sendTime==null?'----':sendTime) + '</li>' +
+                '<li class="customerinfo-li">备注:' + (row.memo==null?'----':row.memo) + '</li>' +
                 '</ul>';
             /* value = '<table>' +
              '' +
@@ -273,6 +295,12 @@ $(function () {
                 }
                 return name;
             }
+        },{
+            field:'liveAddress',
+            title:'目前居住地',
+            align:'center',
+            width:50,
+            visible: true
         }, {
             field: 'recruitChannelMsg',
             title: '应聘渠道',
@@ -339,6 +367,31 @@ $(function () {
             align:'center',
             visible: true,
             width:10
+        },{
+            field:'expectSalary',
+            title:'期望薪资',
+            align:'center',
+            visible: false
+        },{
+            field:'license',
+            title:'应聘公司',
+            align:'center',
+            visible: false
+        },{
+            field:'curIncome',
+            title:'目前年收入',
+            align:'center',
+            visible: false
+        },{
+            field:'jobStatus',
+            title:'求职状态',
+            align:'center',
+            visible: false
+        },{
+            field:'sendTime',
+            title:'投递时间',
+            align:'center',
+            visible: false
         }],queryParams: function getParams(params){
 
             var  tmp = {

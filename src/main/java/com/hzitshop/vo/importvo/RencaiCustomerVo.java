@@ -34,6 +34,14 @@ public class RencaiCustomerVo {
     private String job;
     @Excel(name = "应聘职位")
     private String applyJob;
+    @Excel(name = "求职状态", isImportField = "jobStatus")
+    private String jobStatus;
+    @Excel(name = "月薪", isImportField = "curIncome")
+    private String curIncome;
+    @Excel(name = "所在地", isImportField = "liveAddress")
+    private String liveAddress;
+    @Excel(name = "接收/下载日期", isImportField = "sendTime", format = "yyyy-MM-dd")
+    private Date sendTime;
     /**
      * 推荐人（创量部电话邀约）
      */
@@ -150,6 +158,38 @@ public class RencaiCustomerVo {
         this.applyJob = applyJob;
     }
 
+    public String getJobStatus() {
+        return jobStatus;
+    }
+
+    public void setJobStatus(String jobStatus) {
+        this.jobStatus = jobStatus;
+    }
+
+    public String getCurIncome() {
+        return curIncome;
+    }
+
+    public void setCurIncome(String curIncome) {
+        this.curIncome = curIncome;
+    }
+
+    public String getLiveAddress() {
+        return liveAddress;
+    }
+
+    public void setLiveAddress(String liveAddress) {
+        this.liveAddress = liveAddress;
+    }
+
+    public Date getSendTime() {
+        return sendTime;
+    }
+
+    public void setSendTime(Date sendTime) {
+        this.sendTime = sendTime;
+    }
+
     public ImportInfo changeToCustomerInfo(RencaiCustomerVo rc){
         ImportInfo i = new ImportInfo();
         i.setRealName(rc.getRealName());
@@ -166,6 +206,10 @@ public class RencaiCustomerVo {
         i.setIntroducer(rc.getIntroducer());
         i.setCompanyId(rc.getCompanyId());
         i.setCreateTime(new Date());
+        i.setLiveAddress(rc.getLiveAddress());
+        i.setJobStatus(rc.getJobStatus());
+        i.setCurIncome(Integer.parseInt(rc.getCurIncome())*12+"");
+        i.setSendTime(rc.getSendTime());
         return i;
     }
 
@@ -183,6 +227,10 @@ public class RencaiCustomerVo {
                 ", workExperience='" + workExperience + '\'' +
                 ", job='" + job + '\'' +
                 ", applyJob='" + applyJob + '\'' +
+                ", jobStatus='" + jobStatus + '\'' +
+                ", curIncome='" + curIncome + '\'' +
+                ", liveAddress='" + liveAddress + '\'' +
+                ", sendTime=" + sendTime +
                 ", introducer='" + introducer + '\'' +
                 ", companyId=" + companyId +
                 '}';

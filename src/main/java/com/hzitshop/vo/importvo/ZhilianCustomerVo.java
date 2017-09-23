@@ -34,8 +34,16 @@ public class ZhilianCustomerVo {
     private String majorIn;
     @Excel(name = "最高学历", isImportField = "educationBg",replace = {"小学_8","初中_9","中专_10","高中_11","大专_12","本科_13","硕士_14","博士_15"})
     private Integer educationBg;
-    @Excel(name = "应聘职位")
+    @Excel(name = "应聘职位", isImportField = "applyJob")
     private String applyJob;
+    @Excel(name = "标签名称", isImportField = "license")
+    private String license;
+    @Excel(name = "目前居住地", isImportField = "liveAddress")
+    private String liveAddress;
+    @Excel(name = "投递(收藏)时间", isImportField = "sendTime", format = "yyyy-MM-dd")
+    private Date sendTime;
+    @Excel(name = "期望月薪(税前)", isImportField = "expectSalary")
+    private String expectSalary;
     /**
      * 推荐人（创量部电话邀约）
      */
@@ -160,6 +168,38 @@ public class ZhilianCustomerVo {
         this.applyJob = applyJob;
     }
 
+    public String getLicense() {
+        return license;
+    }
+
+    public void setLicense(String license) {
+        this.license = license;
+    }
+
+    public String getLiveAddress() {
+        return liveAddress;
+    }
+
+    public void setLiveAddress(String liveAddress) {
+        this.liveAddress = liveAddress;
+    }
+
+    public Date getSendTime() {
+        return sendTime;
+    }
+
+    public void setSendTime(Date sendTime) {
+        this.sendTime = sendTime;
+    }
+
+    public String getExpectSalary() {
+        return expectSalary;
+    }
+
+    public void setExpectSalary(String expectSalary) {
+        this.expectSalary = expectSalary;
+    }
+
     /**
      * 将智联平台导入的ZhilianCustomerVo对象转换成CustomerInfo对象
      *
@@ -182,6 +222,10 @@ public class ZhilianCustomerVo {
         i.setCompanyId(z.getCompanyId());
         i.setApplyJob(z.getApplyJob());
         i.setCreateTime(new Date());
+        i.setLiveAddress(z.getLiveAddress());
+        i.setExpectSalary(z.getExpectSalary());
+        i.setSendTime(z.getSendTime());
+        i.setLicense(z.getLicense());
         return i;
     }
 
@@ -216,6 +260,10 @@ public class ZhilianCustomerVo {
                 ", majorIn='" + majorIn + '\'' +
                 ", educationBg=" + educationBg +
                 ", applyJob='" + applyJob + '\'' +
+                ", license='" + license + '\'' +
+                ", liveAddress='" + liveAddress + '\'' +
+                ", sendTime=" + sendTime +
+                ", expectSalary='" + expectSalary + '\'' +
                 ", introducer='" + introducer + '\'' +
                 ", companyId=" + companyId +
                 '}';

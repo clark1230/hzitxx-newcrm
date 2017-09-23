@@ -3,6 +3,7 @@ package com.hzitshop.web.controllers;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.hzitshop.entity.CustomerInfo;
 import com.hzitshop.entity.EmployeeInfo;
+import com.hzitshop.entity.ImportInfo;
 import com.hzitshop.entity.TbDict;
 import com.hzitshop.service.ICustomerInfoService;
 import com.hzitshop.service.IEmployeeInfoService;
@@ -71,15 +72,32 @@ public class ForegroundController {
 
     /**
      * 添加学员信息
-     * @param customerInfo
+     * @param i
      * @return
      */
     @RequiresPermissions("foreground:addCustomerInfo")
     @RequestMapping("/foreground/addCustomerInfo")
     @ResponseBody
-    protected Map<String,Object> addCustomerInfo(CustomerInfo customerInfo){
+    protected Map<String,Object> addCustomerInfo(ImportInfo i){
         Map<String,Object> resultMap = new HashMap<>();
+        CustomerInfo customerInfo = new CustomerInfo();
         try{
+            customerInfo.setRealName(i.getRealName());
+            customerInfo.setSex(i.getSex());
+            customerInfo.setAge(i.getAge());
+            customerInfo.setNativePlace(i.getNativePlace());
+            customerInfo.setTel(i.getTel());
+            customerInfo.setEducationBg(i.getEducationBg());
+            customerInfo.setGraduateTime(i.getGraduateTime());
+            customerInfo.setGraduateFrom(i.getGraduateFrom());
+            customerInfo.setMajorIn(i.getMajorIn());
+            customerInfo.setWorkAge(i.getWorkAge());
+            customerInfo.setWorkExperience(i.getWorkExperience());
+            customerInfo.setJob(i.getJob());
+            customerInfo.setEducateExperience(i.getEducateExperience());
+            customerInfo.setRecruitChannel(i.getRecruitChannel());
+            customerInfo.setIntroducer(i.getIntroducer());
+            customerInfo.setCompanyId(i.getCompanyId());
             customerInfo.setCreateTime(new Date());
             customerInfo.setCustomerState(28);
             iCustomerInfoService.insert(customerInfo);

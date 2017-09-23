@@ -172,6 +172,29 @@ public class ImportInfoVo {
 	 */
 	private Integer cvType;
 	private String cvTypeMsg;
+	/**
+	 * 目前居住地
+	 */
+	private String liveAddress;
+
+	/**
+	 * 目前年收入
+	 */
+	private String curIncome;
+
+	/**
+	 * 应聘公司
+	 */
+	private String license;
+
+	/**
+	 * 期望薪资
+	 */
+	private String expectSalary;
+
+	private String jobStatus;
+
+	private Date sendTime;
 
 
 	public Integer getCustomerId() {
@@ -494,6 +517,54 @@ public class ImportInfoVo {
 		this.cvTypeMsg = cvTypeMsg;
 	}
 
+	public String getLiveAddress() {
+		return liveAddress;
+	}
+
+	public void setLiveAddress(String liveAddress) {
+		this.liveAddress = liveAddress;
+	}
+
+	public String getCurIncome() {
+		return curIncome;
+	}
+
+	public void setCurIncome(String curIncome) {
+		this.curIncome = curIncome;
+	}
+
+	public String getLicense() {
+		return license;
+	}
+
+	public void setLicense(String license) {
+		this.license = license;
+	}
+
+	public String getExpectSalary() {
+		return expectSalary;
+	}
+
+	public void setExpectSalary(String expectSalary) {
+		this.expectSalary = expectSalary;
+	}
+
+	public String getJobStatus() {
+		return jobStatus;
+	}
+
+	public void setJobStatus(String jobStatus) {
+		this.jobStatus = jobStatus;
+	}
+
+	public Date getSendTime() {
+		return sendTime;
+	}
+
+	public void setSendTime(Date sendTime) {
+		this.sendTime = sendTime;
+	}
+
 	@Override
 	public String toString() {
 		return "ImportInfoVo{" +
@@ -537,6 +608,12 @@ public class ImportInfoVo {
 				", isMarket='" + isMarket + '\'' +
 				", cvType=" + cvType +
 				", cvTypeMsg='" + cvTypeMsg + '\'' +
+				", liveAddress='" + liveAddress + '\'' +
+				", curIncome='" + curIncome + '\'' +
+				", license='" + license + '\'' +
+				", expectSalary='" + expectSalary + '\'' +
+				", jobStatus='" + jobStatus + '\'' +
+				", sendTime=" + sendTime +
 				'}';
 	}
 }

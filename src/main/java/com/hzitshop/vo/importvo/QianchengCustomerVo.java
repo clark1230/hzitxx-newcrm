@@ -39,6 +39,18 @@ public class QianchengCustomerVo {
     private String workExperience;
     @Excel(name = "应聘职位")
     private String applyJob;
+    @Excel(name = "目前居住地", isImportField = "liveAddress")
+    private String liveAddress;
+    @Excel(name = "应聘公司", isImportField = "license")
+    private String license;
+    @Excel(name = "应聘日期", isImportField = "sendTime", format = "yyyy-MM-dd")
+    private Date sendTime;
+    @Excel(name = "期望薪资", isImportField = "expectSalary")
+    private String expectSalary;
+    @Excel(name = "求职状态", isImportField = "jobStatus")
+    private String jobStatus;
+    @Excel(name = "目前年收入", isImportField = "curIncome")
+    private String curIncome;
     /**
      * 推荐人（创量部电话邀约）
      */
@@ -170,6 +182,54 @@ public class QianchengCustomerVo {
         this.applyJob = applyJob;
     }
 
+    public String getLiveAddress() {
+        return liveAddress;
+    }
+
+    public void setLiveAddress(String liveAddress) {
+        this.liveAddress = liveAddress;
+    }
+
+    public String getLicense() {
+        return license;
+    }
+
+    public void setLicense(String license) {
+        this.license = license;
+    }
+
+    public Date getSendTime() {
+        return sendTime;
+    }
+
+    public void setSendTime(Date sendTime) {
+        this.sendTime = sendTime;
+    }
+
+    public String getExpectSalary() {
+        return expectSalary;
+    }
+
+    public void setExpectSalary(String expectSalary) {
+        this.expectSalary = expectSalary;
+    }
+
+    public String getJobStatus() {
+        return jobStatus;
+    }
+
+    public void setJobStatus(String jobStatus) {
+        this.jobStatus = jobStatus;
+    }
+
+    public String getCurIncome() {
+        return curIncome;
+    }
+
+    public void setCurIncome(String curIncome) {
+        this.curIncome = curIncome;
+    }
+
     /**
      * 工作年限格式化
      * @param workAge
@@ -229,6 +289,12 @@ public class QianchengCustomerVo {
         i.setIntroducer(qc.getIntroducer());
         i.setCompanyId(qc.getCompanyId());
         i.setCreateTime(new Date());
+        i.setLiveAddress(qc.getLiveAddress());
+        i.setExpectSalary(qc.getExpectSalary());
+        i.setSendTime(qc.getSendTime());
+        i.setLicense(qc.getLicense());
+        i.setCurIncome(qc.getCurIncome());
+        i.setJobStatus(qc.getJobStatus());
         return i;
     }
 
@@ -248,6 +314,12 @@ public class QianchengCustomerVo {
                 ", job='" + job + '\'' +
                 ", workExperience='" + workExperience + '\'' +
                 ", applyJob='" + applyJob + '\'' +
+                ", liveAddress='" + liveAddress + '\'' +
+                ", license='" + license + '\'' +
+                ", sendTime=" + sendTime +
+                ", expectSalary='" + expectSalary + '\'' +
+                ", jobStatus='" + jobStatus + '\'' +
+                ", curIncome='" + curIncome + '\'' +
                 ", introducer='" + introducer + '\'' +
                 ", companyId=" + companyId +
                 '}';

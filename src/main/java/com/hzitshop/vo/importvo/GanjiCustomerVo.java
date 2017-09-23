@@ -27,6 +27,12 @@ public class GanjiCustomerVo {
     private String tel;
     @Excel(name = "求职职位")
     private String applyJob;
+    @Excel(name = "投递/下载时间", isImportField = "sendTime", format = "yyyy-MM-dd")
+    private Date sendTime;
+    @Excel(name = "期望薪资", isImportField = "expectSalary")
+    private String expectSalary;
+    @Excel(name = "期望工作地点", isImportField = "liveAddress")
+    private String liveAddress;
     /**
      * 推荐人（创量部电话邀约）
      */
@@ -119,6 +125,30 @@ public class GanjiCustomerVo {
         this.applyJob = applyJob;
     }
 
+    public String getLiveAddress() {
+        return liveAddress;
+    }
+
+    public void setLiveAddress(String liveAddress) {
+        this.liveAddress = liveAddress;
+    }
+
+    public String getExpectSalary() {
+        return expectSalary;
+    }
+
+    public void setExpectSalary(String expectSalary) {
+        this.expectSalary = expectSalary;
+    }
+
+    public Date getSendTime() {
+        return sendTime;
+    }
+
+    public void setSendTime(Date sendTime) {
+        this.sendTime = sendTime;
+    }
+
     private Integer modifyWorkAge(String workAge){
         Integer result = null;
         if(workAge != null) {
@@ -152,6 +182,9 @@ public class GanjiCustomerVo {
         i.setIntroducer(gj.getIntroducer());
         i.setCompanyId(gj.getCompanyId());
         i.setCreateTime(new Date());
+        i.setLiveAddress(gj.getLiveAddress());
+        i.setSendTime(gj.getSendTime());
+        i.setExpectSalary(gj.getExpectSalary());
         return i;
     }
 
@@ -166,6 +199,9 @@ public class GanjiCustomerVo {
                 ", workAge='" + workAge + '\'' +
                 ", tel='" + tel + '\'' +
                 ", applyJob='" + applyJob + '\'' +
+                ", sendTime=" + sendTime +
+                ", expectSalary='" + expectSalary + '\'' +
+                ", liveAddress='" + liveAddress + '\'' +
                 ", introducer='" + introducer + '\'' +
                 ", companyId=" + companyId +
                 '}';

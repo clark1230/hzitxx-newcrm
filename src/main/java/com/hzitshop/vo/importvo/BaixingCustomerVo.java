@@ -1,6 +1,7 @@
 package com.hzitshop.vo.importvo;
 
 import com.hzitshop.entity.ImportInfo;
+import com.hzitshop.util.DateUtils;
 import org.jeecgframework.poi.excel.annotation.Excel;
 
 import java.util.Date;
@@ -31,6 +32,10 @@ public class BaixingCustomerVo {
     private String workExperience;
     @Excel(name = "教育经历", isImportField = "educateExperience")
     private String educateExperience;
+    @Excel(name = "投递时间", isImportField = "sendTime")
+    private String sendTime;
+    @Excel(name = "目前居住地", isImportField = "liveAddress")
+    private String liveAddress;
     /**
      * 推荐人（创量部电话邀约）
      */
@@ -139,6 +144,22 @@ public class BaixingCustomerVo {
         this.recruitChannel = recruitChannel;
     }
 
+    public String getSendTime() {
+        return sendTime;
+    }
+
+    public void setSendTime(String sendTime) {
+        this.sendTime = sendTime;
+    }
+
+    public String getLiveAddress() {
+        return liveAddress;
+    }
+
+    public void setLiveAddress(String liveAddress) {
+        this.liveAddress = liveAddress;
+    }
+
     private Integer modifyWorkAge(String workAge){
         Integer result = null;
         if(workAge!=null) {
@@ -174,6 +195,8 @@ public class BaixingCustomerVo {
         i.setIntroducer(bx.getIntroducer());
         i.setCompanyId(bx.getCompanyId());
         i.setCreateTime(new Date());
+        i.setLiveAddress(bx.getLiveAddress());
+        i.setSendTime(DateUtils.parse(bx.getSendTime(),"yyyy年MM月dd日"));
         return i;
     }
 

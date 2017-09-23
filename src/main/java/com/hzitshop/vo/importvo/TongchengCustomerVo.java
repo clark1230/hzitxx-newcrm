@@ -38,6 +38,12 @@ public class TongchengCustomerVo {
     private String job;
     @Excel(name = "应聘职位")
     private String applyJob;
+    @Excel(name = "期望薪资", isImportField = "expectSalary")
+    private String expectSalary;
+    @Excel(name = "下载日期", isImportField = "sendTime")
+    private String sendTime;
+    @Excel(name = "现居住地", isImportField = "liveAddress")
+    private String liveAddress;
     /**
      * 推荐人（创量部电话邀约）
      */
@@ -162,6 +168,30 @@ public class TongchengCustomerVo {
         this.applyJob = applyJob;
     }
 
+    public String getExpectSalary() {
+        return expectSalary;
+    }
+
+    public void setExpectSalary(String expectSalary) {
+        this.expectSalary = expectSalary;
+    }
+
+    public String getSendTime() {
+        return sendTime;
+    }
+
+    public void setSendTime(String sendTime) {
+        this.sendTime = sendTime;
+    }
+
+    public String getLiveAddress() {
+        return liveAddress;
+    }
+
+    public void setLiveAddress(String liveAddress) {
+        this.liveAddress = liveAddress;
+    }
+
     public ImportInfo changeToCustomerInfo(TongchengCustomerVo tc){
         ImportInfo i = new ImportInfo();
         i.setRealName(tc.getRealName());
@@ -180,7 +210,16 @@ public class TongchengCustomerVo {
         i.setIntroducer(tc.getIntroducer());
         i.setCompanyId(tc.getCompanyId());
         i.setCreateTime(new Date());
+        i.setExpectSalary(tc.getExpectSalary());
+        i.setLiveAddress(tc.getLiveAddress());
+        i.setSendTime(this.modifySendTime(tc.getSendTime()));
         return i;
+    }
+
+    private Date modifySendTime(String sendTime){
+        sendTime = sendTime.replace('/','-');
+        Date result = DateUtils.parse(sendTime,"yyyy-MM-dd");
+        return result;
     }
 
     private Integer modifyWorkAge(String workAge){
@@ -217,6 +256,9 @@ public class TongchengCustomerVo {
                 ", workExperience='" + workExperience + '\'' +
                 ", job='" + job + '\'' +
                 ", applyJob='" + applyJob + '\'' +
+                ", expectSalary='" + expectSalary + '\'' +
+                ", sendTime='" + sendTime + '\'' +
+                ", liveAddress='" + liveAddress + '\'' +
                 ", introducer='" + introducer + '\'' +
                 ", companyId=" + companyId +
                 '}';
