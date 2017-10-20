@@ -7,6 +7,20 @@ $(function () {
     $("#introducer").hide();
     $("#educationBg").hide();
     $("#cvType").hide();
+    //页面加载时根据用户编号获取用户所能访问的按钮,移除隐藏样式
+    $.get('/showButton/show?userId='+$("input[name='userId']").val(),function(result){
+        var $span ="";
+        $.each(result,function(item){
+            var buttonResource =   result[item];
+            if(buttonResource.indexOf("importInfo")!=-1){
+                //显示隐藏的按钮
+                //截取字符串
+                var button  = buttonResource.substr(buttonResource.indexOf(":")+1,buttonResource.length);
+                //layer.msg(button);
+                $("#span-"+button).removeClass('span-hidden');
+            }
+        });
+    });
 
     var $table;
     var searchParams;
@@ -497,6 +511,34 @@ $(function () {
         });
 
     });
+
+
+    /**
+     * 修改
+     */
+   $("#edit").click(function(){
+       var $selectData = $table.bootstrapTable('getAllSelections');
+       if($selectData.length == 1){
+           var customerId = $selectData[0].customerId;
+           layer.open({
+               type: 2,
+               title: '修改数据',
+               shadeClose: true,
+               shade: 0,
+               maxmin: true,
+               area: ['100%', '95%'],
+               content: ['/import/edit?customerId=' + customerId], //iframe的url
+               end: function (layer, index) {
+                   $("#table").bootstrapTable("refresh"); //刷新
+               }
+           });
+       }else if($selectData.length > 1){
+           layer.msg('所选数据大于1条的数据!');
+           $("#table").bootstrapTable("refresh"); //刷新
+       }else{
+           layer.msg('请选择需要修改的数据!');
+       }
+   });
 
 
     /*------------------回收站--------------------------------*/

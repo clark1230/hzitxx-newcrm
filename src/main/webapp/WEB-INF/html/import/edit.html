@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>修改信息</title>
+    <link rel="stylesheet" type="text/css" href="/assets/themes/layui/css/layui.css">
+    <link rel="stylesheet" href="/assets/My97DatePicker/skin/twoer/datepicker.css">
+    <style>
+        .error {
+            color: red;
+        }
+
+        .chuangliang {
+            pointer-events: none;
+        }
+        .label-font{
+            text-align: left;
+        }
+        .cancel-btn{
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div style="margin:10px auto;width:1250px;">
+    <!--<input type="hidden" name="roleName" th:value="${session.employeeInfo.roleName}">-->
+    <form id="editImportInfoForm" class="layui-form layui-form-pane"
+          method="post" style="margin-left: 10px;margin-right: 10px;width:1250px;">
+        <input type="hidden" name="customerId" th:value="${editImportInfo.customerId}">
+        <!--<input type="hidden" th:value="${session.employeeInfo.companyId}" name="companyId">-->
+        <div class="layui-form-item" style="text-align: left;">
+            <label  class="layui-form-label label-font" for="realName">姓名</label>
+            <div class="layui-input-inline">
+                <input name="realName"  id="realName" lay-verify="realName" autocomplete="off" th:value="${editImportInfo.realName}"
+                       placeholder="请输入学员名称!" class="layui-input required" type="text">
+            </div>
+            <label class="layui-form-label label-font" for="sex">性别</label>
+            <div class="layui-input-inline" id="sex">
+                <div class="layui-input-inline">
+                    <input name="sex" value="1"  title="男" th:checked="${editImportInfo.sex == 1}"  type="radio">
+                    <input name="sex" value="2"  title="女" th:checked="${editImportInfo.sex == 2}" checked type="radio">
+                </div>
+            </div>
+            <label class="layui-form-label label-font" for="age">年龄</label>
+            <div class="layui-input-inline">
+                <input name="age" id="age" th:value="${editImportInfo.age}" min="0" max="120"  placeholder="请输入年龄!" autocomplete="off" class="layui-input"
+                       type="number">
+            </div>
+            <label class="layui-form-label label-font" for="nativePlace">籍贯</label>
+            <div class="layui-input-inline">
+                <input name="nativePlace" id="nativePlace" th:value="${editImportInfo.nativePlace}"  placeholder="请输入籍贯!" autocomplete="off"
+                       class="layui-input" type="text">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label label-font"  for="tel">电话号码</label>
+            <div class="layui-input-inline">
+                <input id="oldtel" type="hidden" th:value="${editImportInfo.tel}">
+                <input name="tel" id="tel" th:value="${editImportInfo.tel}" lay-verify="tel" autocomplete="off" placeholder="请输入电话号码!" class="layui-input"
+                       type="text">
+            </div>
+            <label class="layui-form-label label-font">微信号</label>
+            <div class="layui-input-inline">
+                <!--<input name="wechatNo" th:if="${editImportInfo.wechatNo == null}" th:value="无" placeholder="请输入微信号!" autocomplete="off" class="layui-input" type="text">
+                <input name="wechatNo" th:unless="${editImportInfo.wechatNo != null}" th:value="editImportInfo.wechatNo" placeholder="请输入微信号!" autocomplete="off" class="layui-input" type="text">-->
+                <input name="wechatNo" th:value="${editImportInfo.wechatNo}" placeholder="请输入微信号!" autocomplete="off" class="layui-input" type="text">
+            </div>
+            <label class="layui-form-label label-font">qq号</label>
+            <div class="layui-input-inline">
+                <input name="qq" th:value="${editImportInfo.qq}" placeholder="请输入qq号!" autocomplete="off" class="layui-input" type="text">
+            </div>
+            <label class="layui-form-label label-font" for="educationBg">学历</label>
+            <div class="layui-input-inline">
+                <div class="layui-input-inline">
+                    <select  class="form-control" id="educationBg" name="educationBg">
+                        <option value="" selected="selected">请选择学历!</option>
+                        <option th:each="educationBg,educationBgStat:${educationBgList}"
+                                th:selected="${educationBg.id==editImportInfo.educationBg}"
+                                th:text="${educationBg.name}" th:value="${educationBg.id}"></option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label label-font">毕业时间</label>
+            <div class="layui-input-inline">
+                <input name="graduateTime" th:value="${editImportInfo.graduateTime}" class="layui-input" onClick="WdatePicker({skin:'twoer'})" type="text"
+                       placeholder="请输入毕业时间!">
+            </div>
+            <label class="layui-form-label label-font">毕业学校</label>
+            <div class="layui-input-inline">
+                <input name="graduateFrom" th:value="${editImportInfo.graduateFrom}" placeholder="请输入毕业学校!" autocomplete="off" class="layui-input" type="text">
+            </div>
+            <label class="layui-form-label label-font">专业</label>
+            <div class="layui-input-inline">
+                <input name="majorIn" th:value="${editImportInfo.majorIn}" placeholder="请输入专业!" autocomplete="off" class="layui-input" type="text">
+            </div>
+            <label class="layui-form-label label-font">期望薪资</label>
+            <div class="layui-input-inline">
+                <input name="expectSalary" th:value="${editImportInfo.expectSalary}" placeholder="请输入期望薪资!" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label label-font">工作年限</label>
+            <div class="layui-input-inline">
+                <input name="workAge" th:value="${editImportInfo.workAge}" min="0" max="30" placeholder="请输入工作年限!" autocomplete="off" class="layui-input"
+                       type="number">
+            </div>
+            <label class="layui-form-label label-font">工作经历</label>
+            <div class="layui-input-inline">
+                <input name="workExperience" th:value="${editImportInfo.workExperience}" autocomplete="off" placeholder="请输入工作经历!" class="layui-input"
+                       type="text">
+            </div>
+            <label class="layui-form-label label-font">职业</label>
+            <div class="layui-input-inline">
+                <input name="job" th:value="${editImportInfo.job}" placeholder="请输入职业!" autocomplete="off" class="layui-input" type="text">
+            </div>
+            <label class="layui-form-label label-font" >教育培训经历</label>
+            <div class="layui-input-inline">
+                <input name="educateExperience" th:value="${editImportInfo.educateExperience}" placeholder="请输入教育培训经历!" autocomplete="off"
+                       class="layui-input" type="text">
+            </div>
+        </div>
+        <!--<div class="layui-form-item">
+
+            <label class="layui-form-label label-font" for="customerLevel">学员级别</label>
+            <div class="layui-input-inline">
+                <select name="customerLevel"  id="customerLevel">
+                    <option value="">请选择学员级别!</option>
+                    <option th:each="customerLevel,customerLevelStat:${customerLevelList}"
+                            th:text="${customerLevel.name}" th:value="${customerLevel.id}"></option>
+                </select>
+            </div>
+            <label class="layui-form-label label-font" for="targetSkill">目标技能</label>
+            <div class="layui-input-inline">
+                <select name="targetSkill" id="targetSkill" >
+                    <option value="">请选择目标技能!</option>
+                    <option th:each="targetSkill,targetSkillStat:${targetSkillList}"
+                            th:text="${targetSkill.name}" th:value="${targetSkill.id}"></option>
+                </select>
+            </div>
+            <label class="layui-form-label label-font" for="userId">咨询师</label>
+            <div class="layui-input-inline">
+                <select name="userId" id="userId" >
+                    <option value="">请选择咨询师!</option>
+                    <option th:each="guandan,tguandanStat:${guandanList}"
+                            th:selected="${guandan.userId == session.employeeInfo.userId}"
+                            th:text="${guandan.name}" th:value="${guandan.userId}"></option>
+                </select>
+            </div>
+            <label class="layui-form-label label-font" for="isMarket">会销</label>
+            <div class="layui-input-inline">
+                <div class="layui-input-inline" id="isMarket">
+                    <input name="isMarket" value="0" title="是" checked="" type="radio">
+                    <input name="isMarket" value="1" title="否" type="radio">
+                </div>
+            </div>
+            <label class="layui-form-label label-font">关单人<i style="color:orange;" class="layui-icon"></i></label>
+            <div class="layui-input-inline">
+                <select name="guandan" lay-verify="guandan">
+                    <option value="">请选择关单人!</option>
+                    <option th:each="guandan,tguandanStat:${guandanList}"
+                            th:text="${guandan.name}" th:value="${guandan.userId}"></option>
+                </select>
+            </div>
+        </div>-->
+        <div class="layui-form-item" id="yunYing">
+            <label class="layui-form-label label-font" for="recruitChannel">应聘渠道</label>
+            <div class="layui-input-inline">
+                <select name="recruitChannel"  id="recruitChannel" >
+                    <option value="">请选择应聘渠道!</option>
+                    <option th:each="recruitChannel,recruitChannelStat:${recruitChannelList}"
+                            th:selected="${editImportInfo.recruitChannel == recruitChannel.id}"
+                            th:text="${recruitChannel.name}" th:value="${recruitChannel.id}"></option>
+                </select>
+            </div>
+
+            <label class="layui-form-label label-font" for="introducer">邀约人</label>
+            <div class="layui-input-inline ">
+                <select class="form-control" name="introducer"  id="introducer">
+                    <option value="">请选择邀约人!</option>
+                    <option th:each="introducer,introducerStat:${introducerList}"
+                            th:selected="${#strings.toString(introducer.userId) == editImportInfo.introducer}"
+                            th:value="${introducer.userId}"
+                            th:text="${introducer.name}"></option>
+                </select>
+            </div>
+            <!--<label class="layui-form-label label-font" for="customerState">学员状态</label>
+            <div class="layui-input-inline">
+                <select name="customerState" id="customerState" >
+                    <option value="">请选择学员状态!</option>
+                    <option th:each="customerState,customerStateStat:${customerStateList}"
+                            th:selected="${customerState.id==editImportInfo.customerState}"
+                            th:if="${customerState.id!=40}"
+                            th:text="${customerState.name}" th:value="${customerState.id}"></option>
+                </select>
+            </div>-->
+            <label class="layui-form-label label-font">所属校区</label>
+            <!--<div class="layui-input-inline">
+                <input th:each="company:${companyList}" name="companyId"
+                       th:if="${company.id == editImportInfo.companyId}"
+                       th:value="${company.name}" autocomplete="off"  class="layui-input" th:data-id="${company.id}"
+                       type="text" readonly >
+            </div>-->
+            <div class="layui-input-inline">
+                <select name="companyId" id="companyId" disabled="disabled">
+                    <option th:each="company:${companyList}"
+                            th:selected="${company.id == editImportInfo.companyId}"
+                            th:text="${company.name}" th:value="${company.id}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">备注</label>
+            <div class="layui-input-block">
+                <textarea name="memo" lay-verify="memo" placeholder="请输入备注!" class="layui-textarea" th:text="${editImportInfo.memo}"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <span><input id="edit" style="pointer-events: visible;background-color: #0099FF;" type="button" class="layui-btn layui-btn-small" lay-submit="" lay-filter="edit" value="保存"></span>
+            <span><input type="reset" class="layui-btn layui-btn-danger layui-btn-small" value="重置">  </span>
+            <span><input type="button" id="cancel" class="layui-btn layui-btn-small" style="background-color: orange;display: none;" value="关闭">  </span>
+            <!--<input type=button" id="cancel"  class="layui-btn layui-btn-warm layui-btn-small" value="关闭">-->
+        </div>
+    </form>
+</div>
+<script src="/assets/js/jquery.min.js"></script>
+<script src="/assets/My97DatePicker/WdatePicker.js"></script>
+<script src="/assets/themes/layui/lay/dest/layui.all.js"></script>
+<script src="/script/import/edit.js"></script>
+</body>
+</html>
