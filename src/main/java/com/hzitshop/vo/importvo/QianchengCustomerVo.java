@@ -4,6 +4,7 @@ import com.hzitshop.entity.ImportInfo;
 import com.hzitshop.util.DateUtils;
 import org.jeecgframework.poi.excel.annotation.Excel;
 
+
 import java.util.Date;
 
 
@@ -25,7 +26,7 @@ public class QianchengCustomerVo {
     private String nativePlace;
     @Excel(name = "工作年限", isImportField = "workAge")
     private String workAge;
-    @Excel(name = "学历/学位", isImportField = "educationBg",replace = {"小学_8","初中_9","中专_10","中技_10","高中_11","大专_12","本科_13","硕士_14","博士_15"})
+    @Excel(name = "学历/学位", isImportField = "educationBg",replace = {"小学_8","初中及以下_9","初中_9","中专_10","中技_10","高中_11","大专_12","本科_13","硕士_14","博士_15","MBA_15"})
     private Integer educationBg;
     @Excel(name = "毕业学校", isImportField = "graduateFrom")
     private String graduateFrom;

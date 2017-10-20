@@ -19,7 +19,7 @@ public class GanjiCustomerVo {
     private Integer sex;
     @Excel(name = "年龄", isImportField = "age")
     private Integer age;
-    @Excel(name = "学历", isImportField = "educationBg",replace = {"小学_8","初中_9","中专/技校_10","高中_11","大专_12","本科_13","硕士_14","博士_15"})
+    @Excel(name = "学历", isImportField = "educationBg",replace = {"小学_8","初中_9","初中及以下_9","中专/技校_10","高中_11","大专_12","本科_13","硕士_14","硕士及以上_14","博士_15"})
     private Integer educationBg;
     @Excel(name = "工作年限", isImportField = "workAge")
     private String workAge;
@@ -33,6 +33,8 @@ public class GanjiCustomerVo {
     private String expectSalary;
     @Excel(name = "期望工作地点", isImportField = "liveAddress")
     private String liveAddress;
+    @Excel(name = "应聘公司", isImportField = "license")
+    private String license;
     /**
      * 推荐人（创量部电话邀约）
      */
@@ -149,6 +151,14 @@ public class GanjiCustomerVo {
         this.sendTime = sendTime;
     }
 
+    public String getLicense() {
+        return license;
+    }
+
+    public void setLicense(String license) {
+        this.license = license;
+    }
+
     private Integer modifyWorkAge(String workAge){
         Integer result = null;
         if(workAge != null) {
@@ -185,6 +195,7 @@ public class GanjiCustomerVo {
         i.setLiveAddress(gj.getLiveAddress());
         i.setSendTime(gj.getSendTime());
         i.setExpectSalary(gj.getExpectSalary());
+        i.setLicense(gj.getLicense());
         return i;
     }
 
@@ -202,6 +213,7 @@ public class GanjiCustomerVo {
                 ", sendTime=" + sendTime +
                 ", expectSalary='" + expectSalary + '\'' +
                 ", liveAddress='" + liveAddress + '\'' +
+                ", license='" + license + '\'' +
                 ", introducer='" + introducer + '\'' +
                 ", companyId=" + companyId +
                 '}';

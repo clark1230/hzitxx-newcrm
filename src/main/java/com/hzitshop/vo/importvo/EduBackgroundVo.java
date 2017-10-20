@@ -13,7 +13,7 @@ import java.io.Serializable;
  * @description 中华英才简历模板中的学历实体
  */
 public class EduBackgroundVo implements Serializable{
-    @Excel(name = "最高学历",needMerge = true,replace = {"小学_8","初中_9","中专_10","其他_10","高中_11","大专_12","本科_13","硕士_14","博士_15"})
+    @Excel(name = "最高学历",needMerge = true,replace = {"其他_8","初中_9","中技_10","中职_10","中专_10","职高_11","高职_11","高中_11","大专_12","本科_13","硕士_14","MBA_15","EMBA_15","博士_15"})
     private Integer educationBg;
     @Excel(name = "起止时间（xxxx年x月-xxxx年月）",needMerge = true)
     private String graduateTime;

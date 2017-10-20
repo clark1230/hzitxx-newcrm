@@ -32,11 +32,11 @@ public class ZhilianCustomerVo {
     private String graduateFrom;
     @Excel(name = "专业名称", isImportField = "majorIn")
     private String majorIn;
-    @Excel(name = "最高学历", isImportField = "educationBg",replace = {"小学_8","初中_9","中专_10","高中_11","大专_12","本科_13","硕士_14","博士_15"})
+    @Excel(name = "最高学历", isImportField = "educationBg",replace = {"其他_8","初中_9","中专_10","中技_10","高中_11","大专_12","本科_13","硕士_14","博士_15"})
     private Integer educationBg;
     @Excel(name = "应聘职位", isImportField = "applyJob")
     private String applyJob;
-    @Excel(name = "标签名称", isImportField = "license")
+    @Excel(name = "应聘公司", isImportField = "license")
     private String license;
     @Excel(name = "目前居住地", isImportField = "liveAddress")
     private String liveAddress;

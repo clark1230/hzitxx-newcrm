@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="/assets/themes/layui/css/layui.css">
+</head>
+<body>
+    <div style="width:80%;margin:10px auto;">
+        <form id="allotForm" class="layui-form " method="post">
+            <span th:each="customerId:${customerIds}">
+                <input  th:value="${customerId}" type="hidden" name="customerId" >
+            </span>
+
+            <div class="layui-form-item" style="text-align: left;">
+                <label class="layui-form-label label-font">邀约人:<i style="color:orange;" class="layui-icon"></i></label>
+                <div class="layui-input-inline">
+                    <select name="userId" id="userId" >
+                        <option value="">请选择邀约人!</option>
+                        <option th:each="introducer,introducerStat:${introdecerList}"
+                                th:text="${introducer.name}" th:value="${introducer.userId}"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label label-font"></label>
+                <span><input id="add" type="button" class="layui-btn layui-btn-small" lay-submit="" lay-filter="add" value="保存"></span>
+                <span><input type="reset" class="layui-btn layui-btn-danger layui-btn-small" value="重置"></span>
+                <span><input type="button" id="close" class="layui-btn layui-btn-warm layui-btn-small" value="关闭"/> </span>
+            </div>
+        </form>
+    </div>
+</body>
+<script src="/assets/js/jquery-2.0.0.js"></script>
+<script src="/assets/themes/layui/lay/dest/layui.all.js"></script>
+<script type="text/javascript">
+    $(function(){
+        var index = parent.layer.getFrameIndex(window.name); //获取当前窗体索引
+        $("#add").click(function(){
+            var userId = $("#userId").val();
+            if(userId === '' || userId  == null){
+                layer.msg("请选择邀约人!");
+                return false;
+            }
+
+            $.post("/import/allotIntroducer",$("#allotForm").serialize(),function(result){
+                if (result.code == 200) {
+                    layer.msg('保存成功!');
+                    setTimeout(function () {
+                        parent.layer.close(index);//关闭层
+                    }, 1500);
+                } else {
+                    layer.msg('保存失败!');
+                    layer.close(index); //关闭当前弹层
+                }
+            },"JSON");
+        });
+
+    });
+</script>
+</html>

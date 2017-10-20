@@ -24,7 +24,7 @@ public class BaixingCustomerVo {
     private String applyJob;
     @Excel(name = "联系方式", isImportField = "tel")
     private String tel;
-    @Excel(name = "学历", isImportField = "educationBg",replace = {"小学_8","初中_9","中专/技校_10","高中_11","大专_12","本科_13","硕士_14","博士_15"})
+    @Excel(name = "学历", isImportField = "educationBg",replace = {"小学_8","初中及以下_9","初中_9","中专/技校_10","高中_11","大专_12","本科_13","硕士_14","硕士及以上_14","博士_15"})
     private Integer educationBg;
     @Excel(name = "工作年限", isImportField = "workAge")
     private String workAge;
@@ -36,6 +36,8 @@ public class BaixingCustomerVo {
     private String sendTime;
     @Excel(name = "目前居住地", isImportField = "liveAddress")
     private String liveAddress;
+    @Excel(name = "应聘公司", isImportField = "license")
+    private String license;
     /**
      * 推荐人（创量部电话邀约）
      */
@@ -160,6 +162,14 @@ public class BaixingCustomerVo {
         this.liveAddress = liveAddress;
     }
 
+    public String getLicense() {
+        return license;
+    }
+
+    public void setLicense(String license) {
+        this.license = license;
+    }
+
     private Integer modifyWorkAge(String workAge){
         Integer result = null;
         if(workAge!=null) {
@@ -197,21 +207,27 @@ public class BaixingCustomerVo {
         i.setCreateTime(new Date());
         i.setLiveAddress(bx.getLiveAddress());
         i.setSendTime(DateUtils.parse(bx.getSendTime(),"yyyy年MM月dd日"));
+        i.setLicense(bx.getLicense());
         return i;
     }
 
     @Override
-    public String toString() {
+    public String
+    toString() {
         return "BaixingCustomerVo{" +
                 "realName='" + realName + '\'' +
                 ", recruitChannel=" + recruitChannel +
                 ", sex=" + sex +
+                ", age=" + age +
                 ", applyJob='" + applyJob + '\'' +
                 ", tel='" + tel + '\'' +
                 ", educationBg=" + educationBg +
-                ", workAge=" + workAge +
+                ", workAge='" + workAge + '\'' +
                 ", workExperience='" + workExperience + '\'' +
                 ", educateExperience='" + educateExperience + '\'' +
+                ", sendTime='" + sendTime + '\'' +
+                ", liveAddress='" + liveAddress + '\'' +
+                ", license='" + license + '\'' +
                 ", introducer='" + introducer + '\'' +
                 ", companyId=" + companyId +
                 '}';
