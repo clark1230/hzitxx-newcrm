@@ -64,7 +64,6 @@ public class ExcelUtil {
                     if(z.getTel() != null) {
                         z.setRecruitChannel(recruitChannel);
                         z.setCompanyId(em.getCompanyId());
-                        z.setIntroducer(em.getUserId().toString());
                         ImportInfo i = z.changeToCustomerInfo(z);
                         i.setCvType(cvType);
                         list2.add(i);
@@ -116,7 +115,6 @@ public class ExcelUtil {
                     if (tc.getTel() != null) {
                         tc.setRecruitChannel(recruitChannel);
                         tc.setCompanyId(em.getCompanyId());
-                        tc.setIntroducer(em.getUserId().toString());
                         ImportInfo i = tc.changeToCustomerInfo(tc);
                         i.setCvType(cvType);
                         list2.add(i);
@@ -166,7 +164,6 @@ public class ExcelUtil {
                 for(QianchengCustomerVo qc : list){
                     if(qc.getTel() != null) {
                         qc.setRecruitChannel(recruitChannel);
-                        qc.setIntroducer(em.getUserId().toString());
                         qc.setCompanyId(em.getCompanyId());
                         ImportInfo i = qc.changeToCustomerInfo(qc);
                         i.setCvType(cvType);
@@ -218,7 +215,6 @@ public class ExcelUtil {
                     if (gj.getTel() != null) {
                         gj.setRecruitChannel(recruitChannel);
                         gj.setCompanyId(em.getCompanyId());
-                        gj.setIntroducer(em.getUserId().toString());
                         ImportInfo i = gj.changeToCustomerInfo(gj);
                         i.setCvType(cvType);
                         list2.add(i);
@@ -267,6 +263,8 @@ public class ExcelUtil {
         ImportParams params = new ImportParams();
         params.setTitleRows(0);
         params.setHeadRows(1);
+        params.setStartSheetIndex(0);
+        params.setSheetNum(1);
         List<RencaiCustomerVo> list = null;
         try {
             list = ExcelImportUtil.importExcel(inputStream, RencaiCustomerVo.class, params);
@@ -275,7 +273,6 @@ public class ExcelUtil {
                 for (RencaiCustomerVo rc : list) {
                     if (rc.getTel() != null) {
                         rc.setRecruitChannel(recruitChannel);
-                        rc.setIntroducer(em.getUserId().toString());
                         rc.setCompanyId(em.getCompanyId());
                         ImportInfo i = rc.changeToCustomerInfo(rc);
                         i.setCvType(cvType);
@@ -326,7 +323,6 @@ public class ExcelUtil {
                 for (ZhonghuaCustomerVo zh : list) {
                     if (zh.getTel() != null) {
                         zh.setRecruitChannel(recruitChannel);
-                        zh.setIntroducer(em.getUserId().toString());
                         zh.setCompanyId(em.getCompanyId());
                         ImportInfo i = zh.changeToCustomerInfo(zh);
                         i.setCvType(cvType);
@@ -378,7 +374,6 @@ public class ExcelUtil {
                 for (BaixingCustomerVo bx : list) {
                     if (bx.getTel() != null) {
                         bx.setRecruitChannel(recruitChannel);
-                        bx.setIntroducer(em.getUserId().toString());
                         bx.setCompanyId(em.getCompanyId());
                         ImportInfo i = bx.changeToCustomerInfo(bx);
                         i.setCvType(cvType);

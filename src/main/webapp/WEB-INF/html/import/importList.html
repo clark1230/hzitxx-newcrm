@@ -22,13 +22,41 @@
             <option value="-1">请选择搜索条件!</option>
             <option value="real_name">学员姓名</option>
             <option value="tel">电话号码</option>
+            <option value="introducer">邀约人</option>
+            <option value="education_bg">学历</option>
+            <option value="cvType">简历类型</option>
+            <option value="major_in">专业</option>
+            <option value="memo">备注</option>
         </select>
-        <input type="text"  class="form-control " style="width:130px;" id="searchValue" placeholder="请输入搜索值!">
+        <div style="display: inline-block;border-radius: 5px;" id="border">
+            <select class="form-control" style="width:150px;" id="educationBg">
+                <option value="">请选择学历!</option>
+                <option th:each="educationBg,educationGgStat:${eBgList}"
+                        th:text="${educationBg.name}" th:value="${educationBg.id}"></option>
+            </select>
+            <select class="form-control" style="width:150px;" id="cvType">
+                <option value="">请选择简历类型!</option>
+                <option value="1">投递简历</option>
+                <option value="2">下载简历</option>
+            </select>
+            <select class="form-control" style="width:150px;" id="introducer">
+                <option value="">请选择邀约人!</option>
+                <option th:each="introducer,introducerStat:${introdecerList}"
+                        th:text="${introducer.name}" th:value="${introducer.userId}"></option>
+            </select>
+            <input type="text"  class="form-control" style="width:130px;" placeholder="请输入搜索值!" id="searchValue">
+        </div>
     </form>
     <span ><button id="searchImport" class="layui-btn layui-btn-normal layui-btn-small "><i
             class="layui-icon">&#xe615;</i>搜索</button></span>
     <span class="span-hidden"  id="span-import"><button id="import" class="layui-btn layui-btn-normal layui-btn-small "><i
             class="layui-icon">&#xe61e;</i>报表导入</button></span>
+    <span  id="span-allot" class="span-hidden"><button id="allot" class="layui-btn layui-btn-small " style="background-color: #333399;"><i
+            class="layui-icon">&#xe609;</i>创量分配</button></span>
+    <!--<span id="span-company">
+        <button  class="layui-btn layui-btn-danger layui-btn-small toolbar-refresh">
+            <i class="layui-icon"></i>本公司数据</button>
+    </span>-->
    <span class="span-hidden" id="span-edit" ><button id="edit" class="layui-btn layui-btn-small "><i
            class="layui-icon">&#xe642;</i>修改</button></span>
     <span id="span-remove" class="span-hidden"><button id="remove" class="layui-btn layui-btn-danger  layui-btn-small "><i

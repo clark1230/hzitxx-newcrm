@@ -4,6 +4,9 @@
 
 $(function () {
 
+    $("#introducer").hide();
+    $("#educationBg").hide();
+    $("#cvType").hide();
     //页面加载时根据用户编号获取用户所能访问的按钮,移除隐藏样式
     $.get('/showButton/show?userId='+$("input[name='userId']").val(),function(result){
         var $span ="";
@@ -35,7 +38,7 @@ $(function () {
         idField: 'customerId',
         pageNumber: 1,                       //初始化加载第一页，默认第一页
         pageSize: 20,                       //每页的记录行数（*）
-        pageList: [10, 20, 30, 50, 100],        //可供选择的每页的行数（*）
+        pageList: [5,10,15, 20, 30, 50],        //可供选择的每页的行数（*）
         clickToSelect: true,                //是否启用点击选中行
         smartDisplay: false, // 智能显示 pagination 和 cardview 等
         exportDataType: "basic",              //basic', 'all', 'selected'.
@@ -164,6 +167,13 @@ $(function () {
             title: '编号',
             checkbox: true
         }, {
+            field: 'createTime',
+            title: '录入时间',
+            width: 100,
+            formatter: function (value, row, index) {
+                return new Date(parseInt(row.createTime)).toLocaleString().replace(/年|月/g, "-").replace(/日/g, " ")
+            }
+        }, {
             field: 'realName',
             title: '姓名',
             width: 60
@@ -226,9 +236,15 @@ $(function () {
             visible:false,
             width: 80
         }, {
+            field:'expectSalary',
+            title:'期望薪资',
+            align:'center',
+            width:80
+        }, {
             field: 'graduateFrom',
             title: '毕业学校',
-            width: 110
+            width: 110,
+            visible: false
         }, {
             field: 'majorIn',
             title: '专业',
@@ -294,6 +310,7 @@ $(function () {
         }, {
             field: 'applyJob',
             title: '求职岗位',
+            align:'center',
             width: 110
         }, {
             field: 'introducerMsg',
@@ -303,9 +320,7 @@ $(function () {
             width: 30,
             formatter:function(value,row,index){
                 var name = row.introducerMsg;
-                if(name == $('[name="name"]').val()){
-                    name ='<span style="background-color:orange;color:white;display: block;">'+name+'</span>';
-                }else if(name =='null' || name ==''){
+                if(name =='null' || name ==''){
                     name ='-';
                 }
                 return name;
@@ -322,17 +337,21 @@ $(function () {
             visible: true,
             width: 60
         }, {
-            field: 'createTime',
-            title: '录入时间',
-            width: 150,
+            field:'sendTime',
+            title:'投递时间',
+            align:'center',
+            width:100,
             formatter: function (value, row, index) {
-                return new Date(parseInt(row.createTime)).toLocaleString().replace(/年|月/g, "-").replace(/日/g, " ")
-            },
-            visible: false
+                if(row.sendTime === null || row.sendTime === ""){
+                    return "---";
+                }
+                return new Date(parseInt(row.sendTime)).toLocaleString().replace(/年|月/g, "-").replace(/日/g, " ");
+            }
         }, {
             field: 'lastTime',
             title: '最后跟进时间',
             width: 100,
+            visible: false,
             formatter: function (value, row, index) {
                 if(row.lastTime === null || row.lastTime === ""){
                     return "---";
@@ -383,11 +402,6 @@ $(function () {
             visible: true,
             width:10
         },{
-            field:'expectSalary',
-            title:'期望薪资',
-            align:'center',
-            visible: false
-        },{
             field:'license',
             title:'应聘公司',
             align:'center',
@@ -400,11 +414,6 @@ $(function () {
         },{
             field:'jobStatus',
             title:'求职状态',
-            align:'center',
-            visible: false
-        },{
-            field:'sendTime',
-            title:'投递时间',
             align:'center',
             visible: false
         }],queryParams: function getParams(params){
@@ -423,6 +432,7 @@ $(function () {
 
     }
 
+
     showCustomerInfo();
     function showCustomerInfo() {
         //getUrl();
@@ -437,23 +447,54 @@ $(function () {
 
 
     //****************************搜索*****************************************
+    $("#searchParam").change(function(){
+        var _this = $(this);
+        if(_this.val() === "introducer"){
+            $("#introducer").show();
+            $("#educationBg").hide();
+            $("#cvType").hide();
+            $("#searchValue").hide();
+        }else if(_this.val() === "education_bg"){
+            $("#educationBg").show();
+            $("#introducer").hide();
+            $("#cvType").hide();
+            $("#searchValue").hide();
+        }else if(_this.val() === "cvType"){
+            $("#cvType").show();
+            $("#introducer").hide();
+            $("#educationBg").hide();
+            $("#searchValue").hide();
+        }else{
+            $("#searchValue").show();
+            $("#introducer").hide();
+            $("#educationBg").hide();
+            $("#cvType").hide();
+        }
+    });
+
     $("#searchImport").click(function(){
         var searchParam = $('#searchParam option:selected').val();
-        var searchValue = $("#searchValue").val();
+        var searchValue = "";
 
         if(searchParam=='-1'){
             layer.msg('请选择搜索条件!');
             $('#searchParam').css('border','1px solid red');
             return false;
+        } else if(searchParam === "introducer"){
+            searchValue = $("#introducer").val();
+        }else if(searchParam === "education_bg"){
+            searchValue = $("#educationBg").val();
+        }else if(searchParam === "cvType"){
+            searchValue = $("#cvType").val();
         }else{
-            $('#searchParam').css('border','1px solid lightgrey');
+            searchValue = $("#searchValue").val();
         }
         if(searchValue==''){
             layer.msg('请输入搜索值!');
-            $('#searchValue').css('border','1px solid red');
+            $('#border').css('border','1px solid red');
             return false;
         }else{
-            $('#searchValue').css('border','1px solid lightgrey');
+            $('#border').css('border','1px solid lightgrey');
         }
         var value= url+"?offset="+searchParams.offset+"&limit="+searchParams.limit+"&condition="+searchParam+"&value="+searchValue;
 
@@ -576,9 +617,34 @@ $(function () {
             end:function(layer,index){
                 $("#table").bootstrapTable("refresh"); //刷新
             }
-
         })
     });
 
-
+    /**
+     * 分配创量人员
+     */
+    $("#allot").click(function(){
+        var $selectData = $table.bootstrapTable('getAllSelections');
+        //console.log($selectData);
+        if($selectData.length <= 0 ){
+            layer.msg("请选择要分配的数据!",{icon:3,time:1500});
+            return false;
+        }
+        var ids = new Array();
+        for(var i = 0; i < $selectData.length; i++){
+            ids[i] = $selectData[i].customerId;
+        }
+        layer.open({
+            type:2,
+            title:'分配创量人员',
+            shadeClose:true,
+            shade:0,
+            maxmin:true,
+            area:["500px","450px"],
+            content:['/import/allotIntroducer?customerIds='+ids,'on'],
+            end:function(layer,index){
+                $("#table").bootstrapTable("refresh"); //刷新
+            }
+        })
+    });
 });

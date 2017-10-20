@@ -1,6 +1,5 @@
 package com.hzitshop.web.controllers;
 
-import com.baomidou.mybatisplus.enums.SqlLike;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.Page;
@@ -11,18 +10,16 @@ import com.hzitshop.entity.TbDict;
 import com.hzitshop.service.IEmployeeInfoService;
 import com.hzitshop.service.ImportInfoService;
 import com.hzitshop.service.ITbDictService;
-import com.hzitshop.util.DateUtils;
 import com.hzitshop.vo.BootstrapEntity;
 import com.hzitshop.vo.BootstrapTable;
 import com.hzitshop.vo.ImportInfoVo;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.jeecgframework.poi.excel.entity.ImportParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -34,7 +31,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.*;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 /**
@@ -54,6 +50,7 @@ public class ImportInfoController {
 
     @Autowired
     private IEmployeeInfoService iEmployeeInfoService;
+
 
     private Logger logger = LoggerFactory.getLogger(ImportInfoController.class);
 
@@ -107,7 +104,10 @@ public class ImportInfoController {
     }
 
     @RequestMapping("/import/importList")
-    public String toImportList(){
+    public String toImportList(Model model,HttpSession session){
+        this.getIntroducerList(model,session);
+        List<TbDict> eBgList = this.getTbgDict("7");
+        model.addAttribute("eBgList",eBgList);
         return "/import/importList";
     }
 
@@ -265,15 +265,23 @@ public class ImportInfoController {
         Page<ImportInfo> searchPage = new Page<ImportInfo>(bt.getOffset(), bt.getLimit());
         EmployeeInfo em = (EmployeeInfo) session.getAttribute("employeeInfo");
         Wrapper<ImportInfo> ew = null;
-        if("创量经理".equals(em.getRoleName())){
+
+        if("创量经理".equals(em.getRoleName()) || "管理员".equals(em.getRoleName()) || "总经理".equals(em.getRoleName())){
             ew = new EntityWrapper<ImportInfo>()
                     .where("isDelete=0")
                     .like(bt.getCondition(), bt.getValue())
                     .orderBy("create_time desc");
-        }else{
+        }else if("创量主管".equals(em.getRoleName())){
             //根据当前登录用户所在校区筛选导入列表
              ew = new EntityWrapper<ImportInfo>()
                     .where("company_id="+em.getCompanyId())
+                    .and("isDelete=0")
+                    .like(bt.getCondition(), bt.getValue())
+                    .orderBy("create_time desc");
+        }else{
+            //查询创量人员负责的学员
+            ew = new EntityWrapper<ImportInfo>()
+                    .where("introducer = " +em.getUserId())
                     .and("isDelete=0")
                     .like(bt.getCondition(), bt.getValue())
                     .orderBy("create_time desc");
@@ -356,6 +364,45 @@ public class ImportInfoController {
     }
 
     /**
+     * 分配创量人员
+     * @param userId
+     * @param customerId
+     * @return
+     */
+    @RequestMapping(value = "/import/allotIntroducer",method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String,Object> toAllotIntroducer(Integer userId,Integer ... customerId){
+        Map<String,Object> resultMap = new HashMap<>();
+        boolean result = false;
+        for(Integer id : customerId){
+            ImportInfo info = new ImportInfo();
+            info.setCustomerId(id);
+            info.setIntroducer(userId + "");
+            result = importInfoServiceImpl.updateById(info);
+        }
+        if(result){
+            resultMap.put("code",200);
+            resultMap.put("msg","保存成功!");
+        }else {
+            resultMap.put("code",300);
+            resultMap.put("msg","保存失败,请稍后再试!");
+        }
+        return resultMap;
+    }
+
+    /**
+     * 跳转分配创量人员页面
+     * @param model
+     * @param customerIds
+     * @return
+     */
+    @RequestMapping(value = "/import/allotIntroducer",method = RequestMethod.GET)
+    public String toAllotIntroducer(Model model,HttpSession session,Integer ... customerIds){
+        model.addAttribute("customerIds",customerIds);
+        this.getIntroducerList(model,session);
+        return "/import/allotIntroducer";
+    }
+    /**
      * 跳转到修改数据页面
      * @param importInfo
      * @param modelMap
@@ -417,4 +464,31 @@ public class ImportInfoController {
 
 
 
+
+    /**
+     * 获取创量人员
+     * @param model
+     * @param session
+     */
+    private void getIntroducerList(Model model,HttpSession session){
+        EmployeeInfo user = (EmployeeInfo) session.getAttribute("employeeInfo");
+        List<EmployeeInfo> introdecerList = null;
+        Integer companyId = user.getCompanyId();
+        if("创量经理".equals(user.getRoleName())){
+            introdecerList = iEmployeeInfoService.selectList(new EntityWrapper<EmployeeInfo>().where("role_name like '%创量%'"));
+        }else{
+            if(companyId != null && companyId != 0){
+                //获取登录用户所在公司的创量人员
+                introdecerList = iEmployeeInfoService.selectList(new EntityWrapper<EmployeeInfo>().where("company_id = "+companyId).and("role_name like '%创量%'"));
+            }else {
+                //获取所有公司的创量人员
+                introdecerList = iEmployeeInfoService.selectList(new EntityWrapper<EmployeeInfo>().where("role_name like '%创量%'"));
+            }
+        }
+        for(EmployeeInfo e : introdecerList){
+            TbDict company = iTbDictServiceImpl.selectOne(new EntityWrapper<TbDict>().where("id = " + e.getCompanyId()));
+            e.setName(e.getName()+"——"+company.getName());
+        }
+        model.addAttribute("introdecerList",introdecerList);
+    }
 }

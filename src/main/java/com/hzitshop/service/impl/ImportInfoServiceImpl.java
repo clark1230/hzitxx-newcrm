@@ -33,6 +33,7 @@ import java.util.List;
  * @description
  */
 @Service
+@Transactional
 @EnableConfigurationProperties(ChannelPropertiesVo.class)
 public class ImportInfoServiceImpl extends ServiceImpl<ImportInfoMapper,ImportInfo> implements ImportInfoService {
 
@@ -48,7 +49,6 @@ public class ImportInfoServiceImpl extends ServiceImpl<ImportInfoMapper,ImportIn
     @Autowired
     private EmployeeInfoMapper employeeInfoMapper;
 
-    @Transactional
     @Override
     public boolean importExcel(InputStream is, Integer recruitChannel,Integer cvType,HttpSession session) {
         boolean flag = false;

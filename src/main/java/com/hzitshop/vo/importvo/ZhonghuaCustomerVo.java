@@ -30,8 +30,10 @@ public class ZhonghuaCustomerVo implements Serializable {
     private String tel;
     @Excel(name = "应聘（适合）职位",needMerge = true)
     private String applyJob;
-    @Excel(name = "目前居住地（城市-区）", isImportField = "liveAddress")
+    @Excel(name = "目前居住地（城市-区）", isImportField = "liveAddress",needMerge = true)
     private String liveAddress;
+    @Excel(name = "应聘公司", isImportField = "license",needMerge = true)
+    private String license;
     /**
      * 推荐人（创量部电话邀约）
      */
@@ -154,6 +156,14 @@ public class ZhonghuaCustomerVo implements Serializable {
         this.applyJobVo = applyJobVo;
     }
 
+    public String getLicense() {
+        return license;
+    }
+
+    public void setLicense(String license) {
+        this.license = license;
+    }
+
     /**
      * 工作年限格式化
      * @param workAge
@@ -200,8 +210,10 @@ public class ZhonghuaCustomerVo implements Serializable {
         if(zh.getApplyJobVo() != null && zh.getApplyJobVo().get(0) != null){
             i.setExpectSalary(zh.getApplyJobVo().get(0).getExpectSalary());
         }
+        i.setLicense(zh.getLicense());
         return i;
     }
+
 
     @Override
     public String toString() {
@@ -213,10 +225,13 @@ public class ZhonghuaCustomerVo implements Serializable {
                 ", workAge='" + workAge + '\'' +
                 ", tel='" + tel + '\'' +
                 ", applyJob='" + applyJob + '\'' +
+                ", liveAddress='" + liveAddress + '\'' +
+                ", license='" + license + '\'' +
                 ", introducer='" + introducer + '\'' +
                 ", companyId=" + companyId +
                 ", eduBackgroundVo=" + eduBackgroundVo +
                 ", workExperienceVo=" + workExperienceVo +
+                ", applyJobVo=" + applyJobVo +
                 '}';
     }
 }

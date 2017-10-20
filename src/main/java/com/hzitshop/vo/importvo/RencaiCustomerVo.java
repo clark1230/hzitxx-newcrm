@@ -22,7 +22,7 @@ public class RencaiCustomerVo {
     private Integer age;
     @Excel(name = "手机", isImportField = "tel")
     private String tel;
-    @Excel(name = "学历", isImportField = "educationBg",replace = {"小学_8","初中_9","中专_10","高中_11","大专_12","本科_13","硕士_14","博士_15"})
+    @Excel(name = "学历", isImportField = "educationBg",replace = {"小学_8","初中_9","中技_10","中专_10","高中_11","大专_12","本科_13","硕士_14","博士_15"})
     private Integer educationBg;
     @Excel(name = "学校", isImportField = "graduateFrom")
     private String graduateFrom;
@@ -224,8 +224,10 @@ public class RencaiCustomerVo {
         return i;
     }
 
+
     @Override
-    public String toString() {
+    public String
+    toString() {
         return "RencaiCustomerVo{" +
                 "realName='" + realName + '\'' +
                 ", recruitChannel=" + recruitChannel +

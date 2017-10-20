@@ -26,7 +26,7 @@ public class TongchengCustomerVo {
     private String workAge;
     @Excel(name = "手机", isImportField = "tel")
     private String tel;
-    @Excel(name = "最高学历", isImportField = "educationBg",replace = {"小学_8","初中_9","中专/技校_10","高中_11","大专_12","本科_13","硕士_14","博士_15"})
+    @Excel(name = "最高学历", isImportField = "educationBg",replace = {"高中及以下_11","中专/技校_10","高中_11","大专_12","本科_13","硕士_14","博士_15","MBA/EMBA_15","MBA_15","EMBA_15"})
     private Integer educationBg;
     @Excel(name = "学校名称", isImportField = "graduateFrom")
     private String graduateFrom;
@@ -44,6 +44,8 @@ public class TongchengCustomerVo {
     private String sendTime;
     @Excel(name = "现居住地", isImportField = "liveAddress")
     private String liveAddress;
+    @Excel(name = "应聘公司", isImportField = "license")
+    private String license;
     /**
      * 推荐人（创量部电话邀约）
      */
@@ -192,6 +194,15 @@ public class TongchengCustomerVo {
         this.liveAddress = liveAddress;
     }
 
+    public String getLicense() {
+
+        return license;
+    }
+
+    public void setLicense(String license) {
+        this.license = license;
+    }
+
     public ImportInfo changeToCustomerInfo(TongchengCustomerVo tc){
         ImportInfo i = new ImportInfo();
         i.setRealName(tc.getRealName());
@@ -213,6 +224,7 @@ public class TongchengCustomerVo {
         i.setExpectSalary(tc.getExpectSalary());
         i.setLiveAddress(tc.getLiveAddress());
         i.setSendTime(this.modifySendTime(tc.getSendTime()));
+        i.setLicense(tc.getLicense());
         return i;
     }
 
@@ -259,6 +271,7 @@ public class TongchengCustomerVo {
                 ", expectSalary='" + expectSalary + '\'' +
                 ", sendTime='" + sendTime + '\'' +
                 ", liveAddress='" + liveAddress + '\'' +
+                ", license='" + license + '\'' +
                 ", introducer='" + introducer + '\'' +
                 ", companyId=" + companyId +
                 '}';
