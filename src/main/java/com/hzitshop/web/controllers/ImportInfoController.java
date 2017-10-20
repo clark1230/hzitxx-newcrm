@@ -265,7 +265,7 @@ public class ImportInfoController {
         Page<ImportInfo> searchPage = new Page<ImportInfo>(bt.getOffset(), bt.getLimit());
         EmployeeInfo em = (EmployeeInfo) session.getAttribute("employeeInfo");
         Wrapper<ImportInfo> ew = null;
-        if("创量超级主管".equals(em.getRoleName())){
+        if("创量经理".equals(em.getRoleName())){
             ew = new EntityWrapper<ImportInfo>()
                     .where("isDelete=0")
                     .like(bt.getCondition(), bt.getValue())
@@ -372,7 +372,7 @@ public class ImportInfoController {
         modelMap.addAttribute("targetSkillList", this.getTbgDict("2"));//目标技能
         modelMap.addAttribute("recruitChannelList",this.getTbgDict("21")); //应聘渠道
         Wrapper wrapper = null;
-        if("创量超级主管".equals(em.getRoleName()) || "管理员".equals(em.getRoleName())){
+        if("创量经理".equals(em.getRoleName()) || "管理员".equals(em.getRoleName())){
             wrapper = new EntityWrapper<EmployeeInfo>().like("role_name","创量");
         }else{
             wrapper = new EntityWrapper<EmployeeInfo>().where("company_id=" + em.getCompanyId()).like("role_name","创量");
