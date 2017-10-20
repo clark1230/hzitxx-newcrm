@@ -42,6 +42,8 @@ public class RencaiCustomerVo {
     private String liveAddress;
     @Excel(name = "接收/下载日期", isImportField = "sendTime", format = "yyyy-MM-dd")
     private Date sendTime;
+    @Excel(name = "应聘公司")
+    private String license;
     /**
      * 推荐人（创量部电话邀约）
      */
@@ -190,6 +192,14 @@ public class RencaiCustomerVo {
         this.sendTime = sendTime;
     }
 
+    public String getLicense() {
+        return license;
+    }
+
+    public void setLicense(String license) {
+        this.license = license;
+    }
+
     public ImportInfo changeToCustomerInfo(RencaiCustomerVo rc){
         ImportInfo i = new ImportInfo();
         i.setRealName(rc.getRealName());
@@ -210,6 +220,7 @@ public class RencaiCustomerVo {
         i.setJobStatus(rc.getJobStatus());
         i.setCurIncome(Integer.parseInt(rc.getCurIncome())*12+"");
         i.setSendTime(rc.getSendTime());
+        i.setLicense(rc.getLicense());
         return i;
     }
 

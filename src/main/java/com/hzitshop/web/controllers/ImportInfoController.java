@@ -8,16 +8,19 @@ import com.baomidou.mybatisplus.toolkit.StringUtils;
 import com.hzitshop.entity.EmployeeInfo;
 import com.hzitshop.entity.ImportInfo;
 import com.hzitshop.entity.TbDict;
+import com.hzitshop.service.IEmployeeInfoService;
 import com.hzitshop.service.ImportInfoService;
 import com.hzitshop.service.ITbDictService;
 import com.hzitshop.util.DateUtils;
 import com.hzitshop.vo.BootstrapEntity;
 import com.hzitshop.vo.BootstrapTable;
 import com.hzitshop.vo.ImportInfoVo;
+
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.jeecgframework.poi.excel.entity.ImportParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -31,6 +34,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 /**
@@ -48,12 +52,16 @@ public class ImportInfoController {
     @Autowired
     private ITbDictService iTbDictServiceImpl;
 
+    @Autowired
+    private IEmployeeInfoService iEmployeeInfoService;
+
     private Logger logger = LoggerFactory.getLogger(ImportInfoController.class);
 
 
     /**
      * 导入Excel
      */
+    @RequiresPermissions(value = {"importInfo:import"})
     @RequestMapping(value = "/import", method = RequestMethod.POST)
     @ResponseBody
     public Map<String,Object> importExcel(@RequestParam("excelFile") MultipartFile file,Integer recruitChannel,Integer cvType,HttpServletRequest request,HttpSession session){
@@ -346,6 +354,67 @@ public class ImportInfoController {
         }
         return resultMap;
     }
+
+    /**
+     * 跳转到修改数据页面
+     * @param importInfo
+     * @param modelMap
+     * @return
+     */
+    @RequestMapping("/import/edit")
+    public String toEdit(ImportInfo importInfo,ModelMap modelMap,HttpSession session){
+        EmployeeInfo em = (EmployeeInfo) session.getAttribute("employeeInfo");
+        if(importInfo.getCustomerId() != null){
+             importInfo = importInfoServiceImpl.selectById(importInfo.getCustomerId());
+        }
+        modelMap.addAttribute("educationBgList", this.getTbgDict("7")); //获取学历信息
+        modelMap.addAttribute("customerStateList", this.getTbgDict("27"));//学员状态
+        modelMap.addAttribute("targetSkillList", this.getTbgDict("2"));//目标技能
+        modelMap.addAttribute("recruitChannelList",this.getTbgDict("21")); //应聘渠道
+        Wrapper wrapper = null;
+        if("创量超级主管".equals(em.getRoleName()) || "管理员".equals(em.getRoleName())){
+            wrapper = new EntityWrapper<EmployeeInfo>().like("role_name","创量");
+        }else{
+            wrapper = new EntityWrapper<EmployeeInfo>().where("company_id=" + em.getCompanyId()).like("role_name","创量");
+        }
+        List<EmployeeInfo> yaoyue = iEmployeeInfoService.selectList(wrapper);
+        List<TbDict> companyList = this.getTbgDict("35");
+        for(EmployeeInfo employeeInfo : yaoyue){
+            for(TbDict dict : companyList){
+                if(dict.getId() == employeeInfo.getCompanyId())
+                employeeInfo.setName(employeeInfo.getName()+"---"+dict.getName());
+            }
+        }
+        modelMap.addAttribute("introducerList",yaoyue );//邀约人
+        modelMap.addAttribute("companyList",this.getTbgDict("35") );//校区
+        modelMap.addAttribute("editImportInfo",importInfo);
+        return "/import/edit";
+    }
+
+    /**
+     * 保存修改的数据
+     * @param importInfo
+     * @return
+     */
+    @RequestMapping(value = "/import/editImportInfo", method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, Object> editImportInfo(ImportInfo importInfo){
+        Map<String, Object> resultMap = new HashMap<>();
+        boolean result = false;
+        if(importInfo.getCustomerId() != null){
+            importInfo.setLastTime(new Date());
+            result = importInfoServiceImpl.updateById(importInfo);
+        }
+        if(result){
+            resultMap.put("code", 200);
+            resultMap.put("msg", "操作成功!");
+        }else{
+            resultMap.put("code", 300);
+            resultMap.put("msg", "操作失败!");
+        }
+        return resultMap;
+    }
+
 
 
 }
