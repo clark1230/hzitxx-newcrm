@@ -40,11 +40,11 @@ public class TongchengCustomerVo {
     private String applyJob;
     @Excel(name = "期望薪资", isImportField = "expectSalary")
     private String expectSalary;
-    @Excel(name = "下载日期", isImportField = "sendTime")
+    @Excel(name = "下载日期")
     private String sendTime;
     @Excel(name = "现居住地", isImportField = "liveAddress")
     private String liveAddress;
-    @Excel(name = "应聘公司", isImportField = "license")
+    @Excel(name = "应聘公司")
     private String license;
     /**
      * 推荐人（创量部电话邀约）
@@ -223,7 +223,11 @@ public class TongchengCustomerVo {
         i.setCreateTime(new Date());
         i.setExpectSalary(tc.getExpectSalary());
         i.setLiveAddress(tc.getLiveAddress());
-        i.setSendTime(this.modifySendTime(tc.getSendTime()));
+        if(tc.getSendTime() == null || tc.getSendTime() == ""){
+            i.setSendTime(null);
+        }else{
+            i.setSendTime(this.modifySendTime(tc.getSendTime()));
+        }
         i.setLicense(tc.getLicense());
         return i;
     }

@@ -32,7 +32,7 @@ public class ZhonghuaCustomerVo implements Serializable {
     private String applyJob;
     @Excel(name = "目前居住地（城市-区）", isImportField = "liveAddress",needMerge = true)
     private String liveAddress;
-    @Excel(name = "应聘公司", isImportField = "license",needMerge = true)
+    @Excel(name = "应聘公司",needMerge = true)
     private String license;
     /**
      * 推荐人（创量部电话邀约）

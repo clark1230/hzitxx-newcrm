@@ -42,7 +42,7 @@ public class QianchengCustomerVo {
     private String applyJob;
     @Excel(name = "目前居住地", isImportField = "liveAddress")
     private String liveAddress;
-    @Excel(name = "应聘公司", isImportField = "license")
+    @Excel(name = "应聘公司")
     private String license;
     @Excel(name = "应聘日期", isImportField = "sendTime", format = "yyyy-MM-dd")
     private Date sendTime;

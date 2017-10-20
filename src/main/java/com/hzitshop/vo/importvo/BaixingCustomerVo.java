@@ -36,7 +36,7 @@ public class BaixingCustomerVo {
     private String sendTime;
     @Excel(name = "目前居住地", isImportField = "liveAddress")
     private String liveAddress;
-    @Excel(name = "应聘公司", isImportField = "license")
+    @Excel(name = "应聘公司")
     private String license;
     /**
      * 推荐人（创量部电话邀约）

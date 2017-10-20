@@ -33,7 +33,7 @@ public class GanjiCustomerVo {
     private String expectSalary;
     @Excel(name = "期望工作地点", isImportField = "liveAddress")
     private String liveAddress;
-    @Excel(name = "应聘公司", isImportField = "license")
+    @Excel(name = "应聘公司")
     private String license;
     /**
      * 推荐人（创量部电话邀约）

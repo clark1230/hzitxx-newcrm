@@ -36,7 +36,7 @@ public class ZhilianCustomerVo {
     private Integer educationBg;
     @Excel(name = "应聘职位", isImportField = "applyJob")
     private String applyJob;
-    @Excel(name = "应聘公司", isImportField = "license")
+    @Excel(name = "应聘公司")
     private String license;
     @Excel(name = "目前居住地", isImportField = "liveAddress")
     private String liveAddress;
