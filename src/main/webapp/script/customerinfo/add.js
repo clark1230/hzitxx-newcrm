@@ -103,10 +103,10 @@ $(function(){
                 }
             },
             tel: function (value) {
-                var isMob = /1[2345678]\d{10}$/;
+                var isMob = /^(11|12|13|14|15|16|17|18|19)[0-9]{9}$/;
                 if (value == '') {
                     return '请输入电话号码!'
-                } else if (isMob.test(value)) {
+                } else if (!isMob.test(value)) {
                     return '电话号码格式不正确!'
                 }
             },
@@ -172,7 +172,7 @@ $(function(){
                         layer.close(index2); //关闭当前弹层
                         layer.msg('保存成功!');
                         window.setTimeout(function () {
-                           // parent.layer.close(index);//关闭层
+                           parent.layer.close(index);//关闭层
                         }, 1000);
                     } else {
                         layer.msg('保存失败!');
@@ -182,5 +182,4 @@ $(function(){
             });
         });
     });
-
 });

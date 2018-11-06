@@ -1,0 +1,91 @@
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <title>编辑</title>
+    <link rel="stylesheet" href="/assets/layui/css/layui.css">
+</head>
+<body>
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 0px;">
+    <legend>修改</legend>
+</fieldset>
+<form id="editSignupForm" class="layui-form" action="/signup/editSignup" method="post">
+    <input type="hidden" th:value="${signup.id}" name="id">
+    <div class="layui-form-item">
+        <label class="layui-form-label">学员姓名</label>
+        <div class="layui-input-block">
+            <input type="text"  th:value="${realName}"  readonly class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">状态</label>
+        <div class="layui-input-block">
+            <select name="status" lay-verify="required">
+                <option value=""></option>
+                <option value="0" th:selected="${signup.status ==0}">已报名</option>
+                <option value="1" th:selected="${signup.status ==1}">已退费</option>
+                <option value="2" th:selected="${signup.status ==2}">已退学</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">押金</label>
+        <div class="layui-input-block">
+            <input type="text" name="deposit" th:field="${signup.deposit}" placeholder="请输入" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">到账时间</label>
+        <div class="layui-input-block">
+            <input type="text"  onclick='WdatePicker({skin:"twoer",dateFmt:"yyyy-MM-dd"})' name="accountingDate" th:field="${signup.accountingDate}"
+                   placeholder="请选择到账时间!" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">报名缴费时间</label>
+        <div class="layui-input-block">
+            <input type="text" name="registrationAndPaymentTime"
+                   onclick='WdatePicker({skin:"twoer",dateFmt:"yyyy-MM-dd"})'
+                   th:field="${signup.registrationAndPaymentTime}"
+                   placeholder="请选择报名缴费时间!" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">备注信息</label>
+        <div class="layui-input-block">
+            <textarea  name="memo" th:field="${signup.memo}"  class="layui-textarea"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="formDemo">提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            <button type="button" class="layui-btn layui-btn-warm" id="goback">返回</button>
+        </div>
+    </div>
+</form>
+<script src="/assets/js/jquery-2.0.0.js"></script>
+<script src="/assets/layer/layer.js"></script>
+<script src="/assets/layui/layui.js"></script>
+<script src="/assets/My97DatePicker/WdatePicker.js"></script>
+<script>
+    layui.use('form', 'jquery', 'form', 'layer', function () {
+        var form = layui.form;
+        //监听提交
+        form.on('submit(editSignupForm)', function (data) {
+            layer.msg(JSON.stringify(data.field));
+            return false;
+        });
+
+    });
+</script>
+
+<script>
+    /**
+     * 返回上一页面
+     */
+    $('#goback').click(function () {
+        history.go(-1);
+    });
+</script>
+</body>
+</html>

@@ -1,36 +1,43 @@
 package com.hzitshop.web.controllers;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.baomidou.mybatisplus.toolkit.StringUtils;
 import com.hzitshop.entity.EmployeeInfo;
 import com.hzitshop.entity.ImportInfo;
+import com.hzitshop.entity.Settings;
 import com.hzitshop.entity.TbDict;
 import com.hzitshop.service.IEmployeeInfoService;
+import com.hzitshop.service.ITbSettingsService;
 import com.hzitshop.service.ImportInfoService;
 import com.hzitshop.service.ITbDictService;
-import com.hzitshop.vo.BootstrapEntity;
-import com.hzitshop.vo.BootstrapTable;
-import com.hzitshop.vo.ImportInfoVo;
+import com.hzitshop.util.ServerResponse;
+import com.hzitshop.vo.*;
 
+import com.hzitshop.vo.employeevo.EmployeeVoNameId;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.jeecgframework.poi.excel.ExcelExportUtil;
+import org.jeecgframework.poi.excel.annotation.ExcelEntity;
+import org.jeecgframework.poi.excel.entity.ExportParams;
+import org.jeecgframework.poi.excel.entity.enmus.ExcelType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -51,6 +58,8 @@ public class ImportInfoController {
     @Autowired
     private IEmployeeInfoService iEmployeeInfoService;
 
+    @Autowired
+    private ITbSettingsService settingsService;
 
     private Logger logger = LoggerFactory.getLogger(ImportInfoController.class);
 
@@ -61,48 +70,31 @@ public class ImportInfoController {
     @RequiresPermissions(value = {"importInfo:import"})
     @RequestMapping(value = "/import", method = RequestMethod.POST)
     @ResponseBody
-    public Map<String,Object> importExcel(@RequestParam("excelFile") MultipartFile file,Integer recruitChannel,Integer cvType,HttpServletRequest request,HttpSession session){
+    public Map<String,Object> importExcel(@RequestParam("excelFile") MultipartFile file,
+                                          String recruitChannel,
+                                          Integer cvType,
+                                          HttpServletRequest request,
+                                          HttpSession session) throws IOException {
         Map<String,Object> resultMap = new HashMap<>();
-        try {
-            String path = request.getSession().getServletContext().getRealPath("/");
-            File f = new File(path+"/excel/"+file.getOriginalFilename());
-            if(!f.exists()){
-                try {
-                    File dir = new File(path+"/excel/");
-                    dir.mkdirs();
-                    if(!f.createNewFile()){
-                        resultMap.put("code",300);
-                        resultMap.put("msg","文件导入失败!");
-                        return resultMap;
-                    }
-                } catch (IOException e) {
-                    logger.error("io异常");
-                    resultMap.put("code",300);
-                    resultMap.put("msg","文件导入失败!");
-                }
-            }
-            file.transferTo(f);
-            InputStream is = new FileInputStream(f);
-            boolean result = importInfoServiceImpl.importExcel(is,recruitChannel,cvType,session);
-            if(result){
-                resultMap.put("code",200);
-                resultMap.put("msg","文件导入成功!");
-                return resultMap;
-            }
-            resultMap.put("code", 300);
-            resultMap.put("msg", "文件导入失败!");
-        } catch (FileNotFoundException e) {
-            logger.error("io异常!"+e.getMessage());
-            resultMap.put("code", 300);
-            resultMap.put("msg", "文件导入失败!");
-        } catch (IOException e) {
-            logger.error("io异常!"+e.getMessage());
+        String result = importInfoServiceImpl.importExcel(file.getInputStream(),recruitChannel,cvType,session);
+        if(result != null){
+            resultMap.put("code",200);
+            resultMap.put("msg",result);
+            return resultMap;
+        }else{
             resultMap.put("code", 300);
             resultMap.put("msg", "文件导入失败!");
         }
         return resultMap;
     }
 
+    /**
+     * 跳转到数据导入页面
+     * @param model
+     * @param session
+     * @return
+     */
+    @RequiresPermissions(value={"import:importList"})
     @RequestMapping("/import/importList")
     public String toImportList(Model model,HttpSession session){
         this.getIntroducerList(model,session);
@@ -129,7 +121,7 @@ public class ImportInfoController {
         paramMap.put("pid", pid);
         return iTbDictServiceImpl.selectByMap(paramMap);
     }
-
+    @RequiresPermissions(value={"import:recycleBin"})
     @RequestMapping("/import/recycleBin")
     public String toRecycleBin(){ return "/import/recycleBin"; }
 
@@ -152,7 +144,7 @@ public class ImportInfoController {
         im = importInfoServiceImpl.selectOne(new EntityWrapper<ImportInfo>().where("customer_id=" + importInfo.getCustomerId()));
         im.setMemo(importInfo.getMemo());
         im.setLastTime(new Date());
-        boolean result = importInfoServiceImpl.updateById(im);
+        boolean result = importInfoServiceImpl.updateSelectiveById(im);
         if(result){
             resultMap.put("code",200);
             resultMap.put("msg","备注修改成功!");
@@ -178,6 +170,9 @@ public class ImportInfoController {
         } else {
             bt.setOffset(bt.getOffset() / bt.getLimit());
         }
+        if("create_time".equals(bt.getCondition())){
+            bt.setCondition("DATE_FORMAT(create_time,'%Y-%m-%d')");
+        }
         Page<ImportInfo> searchPage = new Page<ImportInfo>(bt.getOffset(), bt.getLimit());
 
         Wrapper<ImportInfo> ew = new EntityWrapper<ImportInfo>()
@@ -187,6 +182,8 @@ public class ImportInfoController {
         if("-1".equals(bt.getCondition()) ){
             bt.setCondition("");
         }
+
+
         BootstrapTable<ImportInfoVo> bootstrapTable = importInfoServiceImpl.ajaxData(searchPage,ew);
         return bootstrapTable;
     }
@@ -262,29 +259,95 @@ public class ImportInfoController {
         } else {
             bt.setOffset(bt.getOffset() / bt.getLimit());
         }
+        String value = null;
+        if("apply_job".equals(bt.getCondition())){
+            Settings settings =  settingsService.findOne(1);
+            String[] arr= settings.getValue().split(",");
+            StringBuilder sb = new StringBuilder();
+            for(String str: arr){
+                sb.append("'"+str+"',");
+            }
+            value = sb.toString().substring(0,sb.toString().length()-1);
+            //查询数据
+//            if("1".equals(bt.getValue())){
+//                bt.setValue(" "+value+"");
+//            }else if("2".equals(bt.getValue())){
+//                bt.setValue("("+value+")");
+//            }
+        }
+
         Page<ImportInfo> searchPage = new Page<ImportInfo>(bt.getOffset(), bt.getLimit());
         EmployeeInfo em = (EmployeeInfo) session.getAttribute("employeeInfo");
         Wrapper<ImportInfo> ew = null;
-
-        if("创量经理".equals(em.getRoleName()) || "管理员".equals(em.getRoleName()) || "总经理".equals(em.getRoleName())){
-            ew = new EntityWrapper<ImportInfo>()
-                    .where("isDelete=0")
-                    .like(bt.getCondition(), bt.getValue())
-                    .orderBy("create_time desc");
+        if("创量经理".equals(em.getRoleName()) || "管理员".equals(em.getRoleName())
+                || "运营".equals(em.getRoleName())
+                || "总经理".equals(em.getRoleName())){
+            if("apply_job".equals(bt.getCondition())){
+                if("1".equals(bt.getValue())){
+                    ew = new EntityWrapper<ImportInfo>()
+                            .where("isDelete=0")
+                            .in(bt.getCondition(), value)
+                            .orderBy("create_time desc");
+                }else{
+                    ew = new EntityWrapper<ImportInfo>()
+                            .where("isDelete=0")
+                            .notIn(bt.getCondition(), value)
+                            .orderBy("create_time desc");
+                }
+            }else{
+                ew = new EntityWrapper<ImportInfo>()
+                        .where("isDelete=0")
+                        .and((bt.getIntroducer() == null)? "1=1":"introducer="+bt.getIntroducer())
+                        .like(bt.getCondition(), bt.getValue())
+                        .orderBy("create_time desc");
+            }
         }else if("创量主管".equals(em.getRoleName())){
             //根据当前登录用户所在校区筛选导入列表
-             ew = new EntityWrapper<ImportInfo>()
-                    .where("company_id="+em.getCompanyId())
-                    .and("isDelete=0")
-                    .like(bt.getCondition(), bt.getValue())
-                    .orderBy("create_time desc");
+             if("apply_job".equals(bt.getCondition())){
+                 if("1".equals(bt.getValue())){
+                     ew = new EntityWrapper<ImportInfo>()
+                             .where("company_id="+em.getCompanyId())
+                             .and("isDelete=0")
+                             .in(bt.getCondition(), value)
+                             .orderBy("create_time desc");
+                 }else{
+                     ew = new EntityWrapper<ImportInfo>()
+                             .where("company_id="+em.getCompanyId())
+                             .and("isDelete=0")
+                             .notIn(bt.getCondition(), value)
+                             .orderBy("create_time desc");
+                 }
+             }else{
+                 ew = new EntityWrapper<ImportInfo>()
+                         .where("company_id="+em.getCompanyId())
+                         .and("isDelete=0")
+                         .and((bt.getIntroducer() == null)? "1=1":"introducer="+bt.getIntroducer())
+                         .like(bt.getCondition(), bt.getValue())
+                         .orderBy("create_time desc");
+             }
         }else{
             //查询创量人员负责的学员
-            ew = new EntityWrapper<ImportInfo>()
-                    .where("introducer = " +em.getUserId())
-                    .and("isDelete=0")
-                    .like(bt.getCondition(), bt.getValue())
-                    .orderBy("create_time desc");
+            if("apply_job".equals(bt.getCondition())){
+               if("1".equals(bt.getValue())){
+                   ew = new EntityWrapper<ImportInfo>()
+                           .where("introducer = " +em.getUserId())
+                           .and("isDelete=0")
+                           .in(bt.getCondition(), value)
+                           .orderBy("create_time desc");
+               }else{
+                   ew = new EntityWrapper<ImportInfo>()
+                           .where("introducer = " +em.getUserId())
+                           .and("isDelete=0")
+                           .notIn(bt.getCondition(),value)
+                           .orderBy("create_time desc");
+               }
+            }else{
+                ew = new EntityWrapper<ImportInfo>()
+                        .where("introducer = " +em.getUserId())
+                        .and("isDelete=0")
+                        .like(bt.getCondition(), bt.getValue())
+                        .orderBy("create_time desc");
+            }
         }
 
         if("-1".equals(bt.getCondition()) ){
@@ -295,6 +358,11 @@ public class ImportInfoController {
 
     }
 
+    /**
+     * 前台检测是否存在该简历数据
+     * @param importInfo
+     * @return
+     */
     @RequestMapping("/import/checkImportInfo")
     @ResponseBody
     public Map<String,Object> checkImportInfo(ImportInfo importInfo){
@@ -307,7 +375,6 @@ public class ImportInfoController {
             resultMap.put("code",300);
             resultMap.put("msg","系统暂未导入该用户简历,请手动录入!");
         }else {
-            i.setCustomerId(null);
             i.setCreateTime(null);
             resultMap.put("code",200);
             resultMap.put("msg","简历已导入,请核对用户姓名后再录入!");
@@ -378,7 +445,7 @@ public class ImportInfoController {
             ImportInfo info = new ImportInfo();
             info.setCustomerId(id);
             info.setIntroducer(userId + "");
-            result = importInfoServiceImpl.updateById(info);
+            result = importInfoServiceImpl.updateSelectiveById(info);
         }
         if(result){
             resultMap.put("code",200);
@@ -420,9 +487,14 @@ public class ImportInfoController {
         modelMap.addAttribute("recruitChannelList",this.getTbgDict("21")); //应聘渠道
         Wrapper wrapper = null;
         if("创量经理".equals(em.getRoleName()) || "管理员".equals(em.getRoleName())){
-            wrapper = new EntityWrapper<EmployeeInfo>().like("role_name","创量");
+            wrapper = new EntityWrapper<EmployeeInfo>()
+                    .where("isLocked=0")
+                    .like("role_name","创量");
         }else{
-            wrapper = new EntityWrapper<EmployeeInfo>().where("company_id=" + em.getCompanyId()).like("role_name","创量");
+            wrapper = new EntityWrapper<EmployeeInfo>().
+                    where("company_id=" + em.getCompanyId())
+                    .and("isLocked=0")
+                    .like("role_name","创量");
         }
         List<EmployeeInfo> yaoyue = iEmployeeInfoService.selectList(wrapper);
         List<TbDict> companyList = this.getTbgDict("35");
@@ -450,7 +522,7 @@ public class ImportInfoController {
         boolean result = false;
         if(importInfo.getCustomerId() != null){
             importInfo.setLastTime(new Date());
-            result = importInfoServiceImpl.updateById(importInfo);
+            result = importInfoServiceImpl.updateSelectiveById(importInfo);
         }
         if(result){
             resultMap.put("code", 200);
@@ -475,20 +547,171 @@ public class ImportInfoController {
         List<EmployeeInfo> introdecerList = null;
         Integer companyId = user.getCompanyId();
         if("创量经理".equals(user.getRoleName())){
-            introdecerList = iEmployeeInfoService.selectList(new EntityWrapper<EmployeeInfo>().where("role_name like '%创量%'"));
+            introdecerList = iEmployeeInfoService.selectList(new EntityWrapper<EmployeeInfo>()
+                    .where("role_name like '%创量%'").and("isLocked !=1"));
         }else{
             if(companyId != null && companyId != 0){
                 //获取登录用户所在公司的创量人员
-                introdecerList = iEmployeeInfoService.selectList(new EntityWrapper<EmployeeInfo>().where("company_id = "+companyId).and("role_name like '%创量%'"));
+                introdecerList = iEmployeeInfoService.selectList(new EntityWrapper<EmployeeInfo>()
+                        .where("company_id = "+companyId)
+                        .and("role_name like '%创量%'")
+                .and("isLocked !=1"));
             }else {
                 //获取所有公司的创量人员
-                introdecerList = iEmployeeInfoService.selectList(new EntityWrapper<EmployeeInfo>().where("role_name like '%创量%'"));
+                introdecerList = iEmployeeInfoService.selectList(new EntityWrapper<EmployeeInfo>()
+                        .where("role_name like '%创量%'")
+                        .and("isLocked !=1"));
             }
         }
         for(EmployeeInfo e : introdecerList){
-            TbDict company = iTbDictServiceImpl.selectOne(new EntityWrapper<TbDict>().where("id = " + e.getCompanyId()));
-            e.setName(e.getName()+"——"+company.getName());
+            TbDict company = iTbDictServiceImpl.selectOne(new EntityWrapper<TbDict>()
+                    .where("id = " + e.getCompanyId()));
+            e.setName(e.getName());
         }
         model.addAttribute("introdecerList",introdecerList);
+    }
+
+    /**
+     * 跳转到数据去重页面
+     * @return
+     */
+    @GetMapping("/import/filterData")
+    public String filterData(HttpSession httpSession,Model model){
+        EmployeeInfo ei = (EmployeeInfo)httpSession.getAttribute("employeeInfo");
+        Map<String,Object> map = new HashMap<>();
+        map.put("companyId",ei.getCompanyId());
+        List<ImportInfoFilterData> importInfoFilterDataList = importInfoServiceImpl.filterData(map);
+        model.addAttribute("importInfoFilterData",importInfoFilterDataList);
+        return "import/filterData";
+    }
+
+    /**
+     * 逻辑删除数据
+     * @param status
+     * @return
+     */
+    @RequiresPermissions("import:updateByStatus")
+    @GetMapping("/import/updateByStatus")
+    @ResponseBody
+    public Object deleteById(@RequestParam("status")int status,
+                             @RequestParam("customerId") int customerId,
+                             @RequestParam("realName") String realName){
+        Map<String,Object> map = new HashMap<>();
+        map.put("isDelete",status);
+        map.put("customerId",customerId);
+        map.put("realName",realName);
+        Map<String,Object> resultMap  = new HashMap<>();
+        return importInfoServiceImpl.deleteByStatus(map);
+    }
+
+    /**
+     * 数据过滤
+     * @return
+     */
+    @RequiresPermissions("import:filterData")
+    @GetMapping("/import/filterData2")
+    public String filterData2(HttpSession httpSession,Model model){
+        EmployeeInfo employeeInfo = (EmployeeInfo)httpSession.getAttribute("employeeInfo");
+        //获取公司的所有未删除的创量人员信息
+        Map<String,Object> paramMap = new HashMap<>();
+        paramMap.put("companyId",employeeInfo.getCompanyId());
+        paramMap.put("like","创量%");
+        List<EmployeeVoNameId> employeeVoNameIds  = iEmployeeInfoService.selectByRole(paramMap);
+        model.addAttribute("employeeVoNameIds",employeeVoNameIds);
+        return "import/filterData2";
+    }
+
+    /**
+     * 获取最近一周的重复
+     * @return
+     */
+    @GetMapping("/import/checkDailyImportInfo")
+    @ResponseBody
+    public Object checkDailyImportInfo(HttpSession httpSession,
+                                       @RequestParam(value = "page",defaultValue = "1") int page,
+                                       @RequestParam(value = "limit",defaultValue = "20") int limit,
+                                       @RequestParam(value = "introducer",defaultValue = "") String introducer,
+                                       @RequestParam(value = "realName",defaultValue = "") String realName){
+        Map<String,Object> paramMap = new HashMap<>();
+        EmployeeInfo ei = (EmployeeInfo)httpSession.getAttribute("employeeInfo");
+        paramMap.put("companyId",ei.getCompanyId());
+        paramMap.put("offset",(page-1)*limit);
+        paramMap.put("limit",limit);
+        //paramMap.put("c")
+        if(!"".equals(introducer)){
+            paramMap.put("introducer",introducer);
+        }
+        if(!"".equals(realName)){
+            paramMap.put("realName",realName+"%");
+        }
+        JSONObject jsonObjectList = importInfoServiceImpl.checkDailyImportInfo(paramMap);
+        return jsonObjectList;
+    }
+
+    /**
+     * 设置颜色
+     * @param customerId
+     * @param color
+     * @return
+     */
+    @GetMapping("/import/setColor")
+    @ResponseBody
+    public Object setColor(String customerId,String color){
+        String[] customerIdArr = customerId.split(",");
+        List<ImportInfo> importInfoList = new ArrayList<>();
+        for(String id: customerIdArr){
+            ImportInfo importInfo = new ImportInfo();
+            importInfo.setCustomerId(Integer.parseInt(id));
+            importInfo.setColor(color);
+            importInfoList.add(importInfo);
+        }
+        boolean  result= importInfoServiceImpl.updateBatchById( importInfoList);
+        if(result){
+            return ServerResponse.createBySuccessMessage("成功!");
+        }else{
+            return ServerResponse.createByErrorCodeMessage(1,"失败!");
+        }
+
+    }
+    @ExcelEntity
+    private List<ImportInfo> importInfoList;
+    /**
+     *
+     * 批量导出数据
+     */
+    @RequiresPermissions("import:exportExcel")
+    @GetMapping("/import/exportExcel")
+    public void exportExcel(HttpServletResponse resp,@RequestParam(value = "date") String date){
+        OutputStream outputStream = null;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String fileName = date+"--应聘数据.xlsx";
+        Wrapper<ImportInfo> wrapper = new EntityWrapper<ImportInfo>()
+                .where("DATE_FORMAT(create_time,'%Y-%m-%d')='"+date+"'");
+        //List<ImportInfo> importInfoList = importInfoServiceImpl.selectList(wrapper);
+        try{
+            resp.setHeader("Content-disposition", "attachment; filename="+
+                    new String(fileName.getBytes("utf-8"),"ISO-8859-1"));// 设定输出文件头
+            resp.setContentType("application/msexcel");// 定义输出类型
+            outputStream = resp.getOutputStream();
+            Workbook workbook = this.importInfoServiceImpl.exportExcel(wrapper);
+            workbook.write(outputStream);
+//            outputStream.flush();
+//            outputStream.close();
+        }catch (Exception e){
+            e.printStackTrace();
+            System.out.println("创量数量导出失败!"+e.getMessage());
+        }
+    }
+
+    /**
+     * 将创量数据转到运营中
+     * @return
+     */
+    @GetMapping("/import/turnToYunYing")
+    @ResponseBody
+    public Object turnToYunYing(Integer[] customerIdArr,HttpSession httpSession){
+
+        return this.importInfoServiceImpl.turnToYunYing(customerIdArr,
+                (EmployeeInfo)httpSession.getAttribute("employeeInfo"));
     }
 }

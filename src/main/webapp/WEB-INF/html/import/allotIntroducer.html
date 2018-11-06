@@ -35,7 +35,6 @@
 <script src="/assets/themes/layui/lay/dest/layui.all.js"></script>
 <script type="text/javascript">
     $(function(){
-        var index = parent.layer.getFrameIndex(window.name); //获取当前窗体索引
         $("#add").click(function(){
             var userId = $("#userId").val();
             if(userId === '' || userId  == null){
@@ -55,7 +54,11 @@
                 }
             },"JSON");
         });
-
+        var index = parent.layer.getFrameIndex(window.name); //获取当前窗体索引
+        //关闭窗体
+        $('#close').click(function(){
+            parent.layer.close(index);
+        });
     });
 </script>
 </html>

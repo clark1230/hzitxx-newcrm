@@ -6,8 +6,11 @@ import com.hzitshop.entity.EmployeeInfo;
 import com.baomidou.mybatisplus.service.IService;
 import com.hzitshop.vo.BootstrapTable;
 import com.hzitshop.vo.EmployeeInfoVo;
+import com.hzitshop.vo.employeevo.EmployeeVoNameId;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -35,4 +38,11 @@ public interface IEmployeeInfoService extends IService<EmployeeInfo> {
      * @return
      */
     public List<String> getButtonResource(EmployeeInfo employeeInfo);
+
+    /**
+     * 根据角角色名称和公司获取相关人员
+     * @param paramMap
+     * @return
+     */
+    List<EmployeeVoNameId> selectByRole(@Param("map") Map<String,Object> paramMap);
 }

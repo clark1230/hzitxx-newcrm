@@ -33,9 +33,9 @@
     width:400px;
     height:35px;
     padding-left:10px;
-    background-color:#E1E1E2;
+    /*background-color:#E1E1E2;*/
     border-radius: 5px;
-    color: black;
+    /*color: black;*/
     font-size: 16px;
     font-family: 微软雅黑;
     overflow: scroll;
@@ -44,6 +44,7 @@
     cursor:pointer;
 }
 .customerinfo-li:hover{
-    background-color: #C9C8C8;
+    /*background-color: #C9C8C8;*/
     font-size: 17px;
+    color:orangered;
 }

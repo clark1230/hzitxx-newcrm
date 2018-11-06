@@ -3,7 +3,8 @@
  */
 
 $(function(){
-    var url = "/business/getAjaxData";
+    var url = "/business/getAjaxData?common=0&v="+Math.random();
+    var searchParams = null;
     var json ={
         url: url,
         toolbar: '#toolbar',                //工具按钮用哪个容器
@@ -13,6 +14,7 @@ $(function(){
         sortOrder: "desc",                   //排序方式
         sidePagination: "server",           //分页方式：client学员端分页，server服务端分页（*）
         idField: 'customerId',
+        paginationShowPageGo:true,
         pageNumber: 1,                       //初始化加载第一页，默认第一页
         pageSize: 20,                       //每页的记录行数（*）
         pageList: [10, 20, 30, 50, 100],        //可供选择的每页的行数（*）
@@ -24,23 +26,7 @@ $(function(){
        // detailView: true,
         silent: true, // 刷新事件必须设置
         onDblClickRow: function (row, $element) {//双击事件
-            //$('#hiddenCustomerId').val(row.customerId);
-            //创量人员只能修改一次
-            //获取邀约人信息和角色信息
-           // var companyId  =
-            
-            layer.open({
-                type: 2,
-                title: '编辑学员信息',
-                shadeClose: true,
-                shade:0,
-                maxmin: true,
-                area: ['100%', '97%'],
-                content: '/customerInfo/edit?customerId='+row.customerId+"&isYunYing=1",//iframe的url
-                end: function () {
-                    $("#table").bootstrapTable("refresh"); //刷新
-                }
-            });
+            window.location.href='/customerInfo/edit?customerId='+row.customerId+"&isYunYing=1";
 
         },
         columns: [{
@@ -95,17 +81,10 @@ $(function(){
             width:60,
             visible: false
         }, {
-            field: 'educationBgMsg',
+            field: 'educationBg',
             title: '学历',
             width: 50,
-            visible:false,
-            formatter: function (value, row, index) {
-                var educationBgMsg = row.educationBgMsg;
-                /*if(row.educationBgMsg=='数据字典'){
-                 educationBgMsg = '--';
-                 }*/
-                return educationBgMsg;
-            }
+            visible:false
 
         }, {
             field: 'graduateTime',
@@ -141,22 +120,28 @@ $(function(){
             field: 'userIdMsg',
             title: '咨询师',
             width: 80,
-            visible:true
+            visible:false
         }, {
             field: 'educateExperience',
             title: '教育培训经历',
             visible: false,
-            width: 70,
-            width: 60
+            width: 70
         }, {
             field: 'guandaMsg',
             title: '关单人',
-            visible: true,
+            visible: false,
             width: 80
         }, {
             field: 'customerStateMsg',
             title: '学员状态',
-            width: 40
+            width: 40,
+            formatter:function(value,row,index){
+                var customerStateMsg = row.customerStateMsg;
+                if(row.customerStateMsg=='数据字典'){
+                    customerStateMsg = '--';
+                }
+                return customerStateMsg;
+            }
         }, {
             field: 'customerLevelMsg',
             title: '学员级别',
@@ -165,15 +150,13 @@ $(function(){
             formatter:function(value,row,index){
                 var customerLevelMsg =row.customerLevelMsg;
                 if(customerLevelMsg=='数据字典' || customerLevelMsg =='null'){
-                    customerLevelMsg = '--';
+                    customerLevelMsg = '---';
                 }else if(customerLevelMsg =='A'){
-                    customerLevelMsg = '<span style="margin:0 auto;width:30px;height:16px;background-color: #FF0066;display: block">'+row.customerLevelMsg+'</span>';
+                    customerLevelMsg = '<span style="margin:0 auto;width:30px;height:16px;background-color:red;display: block">'+row.customerLevelMsg+'</span>';
                 }else if(customerLevelMsg =='B'){
-                    customerLevelMsg = '<span style="margin:0 auto;width:30px;height:16px;background-color: #FF6666;display: block">'+row.customerLevelMsg+'</span>';
-                }else if(customerLevelMsg == 'C'){
-                    customerLevelMsg = '<span style="margin:0 auto;width:30px;height:16px;background-color: #FF9966;display: block">'+row.customerLevelMsg+'</span>';
-                }else if(customerLevelMsg == 'D'){
-                    customerLevelMsg = '<span style="margin:0 auto;width:30px;height:16px;background-color: #FFCC66;display: block">'+row.customerLevelMsg+'</span>';
+                    customerLevelMsg = '<span style="margin:0 auto;width:30px;height:16px;background-color: #CC9900;display: block">'+row.customerLevelMsg+'</span>';
+                }else{
+                    customerLevelMsg = row.customerLevelMsg;
                 }
                 return customerLevelMsg;
             }
@@ -184,11 +167,11 @@ $(function(){
         }, {
             field: 'introducerMsg',
             title: '邀约人',
-            visible: true,
+            visible: false,
             align:'center',
             width: 80
         }, {
-            field: 'recruitChannelMsg',
+            field: 'recruitChannel',
             title: '应聘渠道',
             visible: true,
             width: 60
@@ -197,7 +180,7 @@ $(function(){
             title: '录入时间',
             width: 150,
             formatter: function (value, row, index) {
-                return new Date(parseInt(row.createTime)).toLocaleString().replace(/年|月/g, "-").replace(/日/g, " ")
+                return row.createTime;
             },
             visible: false
         }, {
@@ -205,12 +188,12 @@ $(function(){
             title: '最后跟进时间',
             width: 150,
             formatter: function (value, row, index) {
-                return new Date(parseInt(row.lastTime)).toLocaleString().replace(/年|月/g, "-").replace(/日/g, " ");
+                return row.lastTime;
             }
         }, {
             field: 'companyIdMsg',
             title: '所属公司',
-            visible: false,
+            visible: true,
             width: 100
         }, {
             field: 'memo',
@@ -218,6 +201,9 @@ $(function(){
             width: 80,
             formatter: function (value, row, index) {
                 var memo = (typeof(row.memo) == 'null') ? "---" : row.memo + "";
+                if(row.memo == null){
+                    return "---";
+                }
                 if (memo.length > 5) {
                     memo = row.memo.substr(0, 5) + "....";
                 }else if(memo == null || memo =='null' || memo ==''){
@@ -234,21 +220,51 @@ $(function(){
             width:20,
             formatter:function(value,row,index){
                 var isMarket = row.isMarket;
-                if(isMarket  == '0'){
-                    isMarket = '<i style="font-size: 16px;color:green;" class="layui-icon"></i>';
-                } else if(isMarket =='1'){
+                if(isMarket  != '0'){
+                    isMarket = '<i style="font-size: 16px;color:green;" class="layui-icon"></i>'+"--"+isMarket;
+                } else if(isMarket =='0'){
                     isMarket ='<i style="font-size: 16px;color:red;" class="layui-icon">ဇ</i>';
-                } else{
-                    isMarket = '---';
                 }
                 return isMarket;
             }
-        }]
+        },{
+            field:'isLearn',
+            title:'试听',
+            align:'center',
+            width:20,
+            formatter:function(value,row,index){
+                var isLearn = row.isLearn;
+                if(isLearn  != '0'){
+                    isLearn = '<i style="font-size: 16px;color:green;" class="layui-icon"></i>'+"--"+isLearn;
+                } else if(isLearn =='0'){
+                    isLearn ='<i style="font-size: 16px;color:red;" class="layui-icon">ဇ</i>';
+                }
+                return isLearn;
+            }
+        }],queryParams: function getParams(params){
+            var  tmp = {
+                offset:(this.pageNumber)*this.pageSize,
+                limit:this.pageSize ,
+                condition: 'real_name',
+                value:$("#searchValue").val()//,//,
+                /*sort:this.sortName,
+                 order:this.sortOrder*/
+            };
+            searchParams =tmp;
+            return tmp;
+        }
     }
-   var  $table = $('#table').bootstrapTable(json);
+
+    showCustomerInfo();
+    function showCustomerInfo() {
+        //getUrl();
+        $("#table").bootstrapTable('destroy');//先要将table销毁，否则会保留上次加载的内容
+        $table = $('#table').bootstrapTable(json);
+    }
+   //var  $table = $('#table').bootstrapTable(json);
 
     $("#span-add").click(function(){
-          common("添加","/customerInfo/add?isYunYing=1",['100%', '95%'])
+        window.location.href='/customerInfo/add?isYunYing=1';
     });
     $("#span-edit").click(function(){
         var $selectData = $table.bootstrapTable('getAllSelections');
@@ -259,7 +275,7 @@ $(function(){
             layer.msg('所选数据大于1条!');
             return false;
         }else{
-            common("编辑",'/customerInfo/edit?customerId='+10+'&isYunYing=1',['100%','95%']);
+            common("编辑",'/customerInfo/edit?customerId='+$selectData[0].customerId+'&isYunYing=1',['100%','95%']);
         }
     });
      function common(title,content,area){
@@ -276,6 +292,8 @@ $(function(){
              }
          });
      }
+
+
     $("#span-grant").click(function(){
         var $selectData = $table.bootstrapTable('getAllSelections');
         if($selectData.length <1){
@@ -283,5 +301,155 @@ $(function(){
             return false;
         }
         common("分配咨询师","/business/grant?companyId="+$('[name="companyId"]').val()+"&customerId="+$selectData[0].customerId,['500px', '400px']);
-    });                                                                                                   
+    });
+    /**
+     * 学员跟进
+     */
+    $('#follow').click(function () {
+        var $selectData = $table.bootstrapTable('getAllSelections');
+        var customerIdArr = [];
+        if ($selectData.length < 1) {
+            layer.msg('请选择要跟进的学员!');
+        } else if ($selectData.length > 1) {
+            layer.msg('所选数据大于1条!');
+        } else { //跳转到跟进页面
+            window.location.href = '/customerInfo/follow?customerId=' + $selectData[0].customerId+"&isYunYing=1" ;
+        }
+    });
+    /**
+     * 还原
+     */
+    $('#recover').click(function(){
+        var $selectData = $table.bootstrapTable('getAllSelections');
+        var customerIdArr = [];
+        if ($selectData.length < 1) {
+            layer.msg('请选择要还原的学员!');
+        } else{
+            $.each($selectData,function(index,value){
+                customerIdArr.push(value.customerId);
+            });
+
+            layer.confirm('是否要把所选数据进行还原了?', {
+                btn: ['确定','取消'] //按钮
+            }, function(){
+                var index2 = layer.load(1, {
+                    shade: [0.1, '#fff'] //0.1透明度的白色背景
+                });
+                $.ajax({
+                    type:'post',
+                    url:'/business/recover',
+                    data: 'customerIdArr='+customerIdArr,
+                    success:function(resp){
+                        if(resp.status === 0){
+                            layer.close(index2); //关闭当前弹层
+                            layer.msg('还原成功!',{icon:1});
+                            reload();
+                        }else{
+                            layer.close(index2); //关闭当前弹层
+                            layer.msg('还原失败!',{icon:2});
+                        }
+                    },error: function (error) {
+                        if(error.status === 404){
+                            layer.msg('请求路径不正确!');
+                        }else if(error.status === 401){
+                            layer.msg('对不起，您没有权限进行该操作!');
+                        }else if(error.status === 500){
+                            layer.msg('服务器内部错误!');
+                        }
+                    }
+                });
+            }, function(){
+            });
+            console.log(customerIdArr);
+        }
+    });
+    /**
+     * 数据放入公共库
+     */
+    $('#common').click(function(){
+        var $selectData = $table.bootstrapTable('getAllSelections');
+        var customerIdArr = [];
+        if ($selectData.length < 1) {
+            layer.msg('请选择要放入公共库的学员!');
+        } else{
+            $.each($selectData,function(index,value){
+                customerIdArr.push(value.customerId);
+            });
+            layer.confirm('是否要把所选数据放入公共库?', {
+                btn: ['确定','取消'] //按钮
+            }, function(){
+                var index2 = layer.load(1, {
+                    shade: [0.1, '#fff'] //0.1透明度的白色背景
+                });
+                $.ajax({
+                    type:'post',
+                    url:'/business/trurnToCommon',
+                    data: 'customerIdArr='+customerIdArr,
+                    success:function(resp){
+                        if(resp.status === 0){
+                            layer.close(index2); //关闭当前弹层
+                            layer.msg(resp.msg,{icon:1});
+                            reload();
+                        }else{
+                            layer.close(index2); //关闭当前弹层
+                            layer.msg(resp.msg,{icon:2});
+                        }
+                    },error: function (error) {
+                        if(error.status === 404){
+                            layer.msg('请求路径不正确!');
+                        }else if(error.status === 401){
+                            layer.msg('对不起，您没有权限进行该操作!');
+                        }else if(error.status === 500){
+                            layer.msg('服务器内部错误!');
+                        }
+                    }
+                });
+            }, function(){
+            });
+            console.log(customerIdArr);
+        }
+    });
+    /**
+     * 搜索信息
+     */
+    $('#searchCustomerInfo').click(function(){
+        var searchValue = $('#searchValue').val();
+        if(searchValue === ''){
+            layer.msg('请输入搜索值!',{icon:2});
+            return false;
+        }
+
+        var value =url+'&offset=0'+'&limit='+searchParams.limit+
+            '&condition=real_name&value='+$("#searchValue").val();
+        $.get(value,function(result){
+            $table.bootstrapTable('load', result);
+            var tmp = {
+                offset:searchParams.offset,
+                limit:searchParams.limit,
+                condition:'real_name',
+                value:$("#searchValue").val() //,
+                /* sort:"",
+                order:""*/
+            };
+            searchParams = tmp;
+        });
+
+    });
+    /**
+     * 刷新数据
+     */
+    $('#searchRefresh').click(function(){
+        reload();
+    });
+
+    function reload(){
+        $.get(url,function(result){
+            if(typeof(result)=='object'){
+                //清空查询条件
+                $('#searchValue').val('');
+                $table.bootstrapTable('load', result);
+                layer.msg('已重新获取数据!');
+            }
+        });
+    }
 });

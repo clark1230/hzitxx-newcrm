@@ -10,6 +10,7 @@ import com.hzitshop.util.Md5Util;
 import com.hzitshop.vo.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.jeecgframework.poi.excel.annotation.Excel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -51,7 +52,7 @@ public class EmployeeInfoController {
      */
     @RequiresPermissions(value={"employeeInfo:index"})
     @RequestMapping("/employeeInfo/index")
-    protected String index(Model model){
+    public String index(Model model){
         //获取公司信息
         List<TbDict> tbDictList = iTbDictService.selectList(new EntityWrapper<TbDict>().where("pid=35"));
         model.addAttribute("tbDictList",tbDictList);
@@ -65,7 +66,7 @@ public class EmployeeInfoController {
     @RequiresPermissions(value={"employeeInfo:getAjaxData"})
     @RequestMapping("/employeeInfo/getAjaxData")
     @ResponseBody
-    protected BootstrapTable<EmployeeInfoVo> getAjaxData(BootstrapEntity bt,EmployeeInfo ei){
+    public BootstrapTable<EmployeeInfoVo> getAjaxData(BootstrapEntity bt,EmployeeInfo ei){
         if (bt.getOffset() == null || bt.getLimit() == null) {
             bt.setOffset(1);
             bt.setLimit(20);
@@ -111,15 +112,14 @@ public class EmployeeInfoController {
 
     /**
      * 跳转到个人信息修改页
-     * @param employeeInfo
+     * @param httpSession
      * @param model
      * @return
      */
     @RequiresPermissions(value={"employeeInfo:personInfo"})
     @RequestMapping(value="/employeeInfo/personInfo",method=RequestMethod.GET)
-    protected String personInfo(EmployeeInfo employeeInfo, Model model){
-       employeeInfo =iEmployeeInfoService.selectOne(new EntityWrapper<EmployeeInfo>().
-               where("user_id="+employeeInfo.getUserId()));
+    public String personInfo(Model model,HttpSession httpSession){
+       EmployeeInfo employeeInfo = (EmployeeInfo)httpSession.getAttribute("employeeInfo");
        model.addAttribute("employeeInfo",employeeInfo);
        List<TbDict> companyList = iTbDictService.selectList(new EntityWrapper<TbDict>().where("pid=35"));
        model.addAttribute("companyList",companyList);
@@ -134,9 +134,11 @@ public class EmployeeInfoController {
      */
     @RequiresPermissions(value = {"employeeInfo:edit"})
     @RequestMapping(value="/employeeInfo/edit",method = RequestMethod.GET)
-    protected String edit(String userId,Model model){
+    public String edit(String userId,Model model){
         //根据id找到该用户的数据并显示在页面中
-        EmployeeInfo employeeInfo = iEmployeeInfoService.selectOne(new EntityWrapper<EmployeeInfo>().where("user_id="+userId));
+        EmployeeInfo employeeInfo = iEmployeeInfoService.selectOne(
+                new EntityWrapper<EmployeeInfo>()
+                        .where("user_id="+userId));
         model.addAttribute("employeeInfo",employeeInfo);
         //获取公司信息
         Map<String,Object> paramMap = new HashMap<>();
@@ -217,31 +219,39 @@ public class EmployeeInfoController {
     @RequiresPermissions(value="employeeInfo:add")
     @RequestMapping(value="/employeeInfo/add",method=RequestMethod.POST)
     @ResponseBody
-    protected Map<String,Object> add(EmployeeInfo employeeInfo, HttpServletRequest request){
+    public Map<String,Object> add(EmployeeInfo employeeInfo, HttpServletRequest request){
         Map<String,Object> resultMap = new HashMap<>();
         HttpSession httpSession = request.getSession();
         EmployeeInfo employeeInfo1 = (EmployeeInfo) httpSession.getAttribute("employeeInfo");
         Random random = new Random();
         int randomValue = random.nextInt(1000000);
-        String sendEmilMsg ="";
+        String sendEmailMsg ="";
         try {
             employeeInfo.setPassword(Md5Util.getMD5(Md5Util.getMD5("hzit#"+randomValue)));
             //发送邮件!!
-            sendEmilMsg = EmailUtil.sendEmail("","",employeeInfo.getEmail(),
-                    "合众艾特咨询系统登录用户名:"+employeeInfo.getName()+" 密码:"+randomValue);//发送随机密码
+            try{
+                sendEmailMsg = EmailUtil.sendEmail("","",employeeInfo.getEmail(),
+                        "合众艾特咨询系统登录账号为您的中文名,密码为:"+randomValue+"");
+            }catch (Exception e){
+                sendEmailMsg = "失败";
+                employeeInfo.setPassword(Md5Util.getMD5(Md5Util.getMD5("hzit#hzit")));
+            }
             //employeeInfo.setRoleIds("");
             employeeInfo.setCreateBy(employeeInfo1.getName());//录入人
             employeeInfo.setCreateTime(new Date());
-            if("成功".equals(sendEmilMsg)){
+            if("成功".equals(sendEmailMsg)){
                 employeeInfo.setIsEmailActive("1");
+            }else{
+                employeeInfo.setPassword("hzit#hzit"); //邮件发送失败，密码默认为hzit
+                sendEmailMsg = "失败!";
             }
             iEmployeeInfoService.insert(employeeInfo);
             resultMap.put("code",200);
-            resultMap.put("msg","保存成功!+发送邮件:"+sendEmilMsg);
+            resultMap.put("msg","保存成功!+发送邮件:"+sendEmailMsg);
         } catch (Exception e){
             e.printStackTrace();
             resultMap.put("code",300);
-            resultMap.put("msg","保存失败!+发送邮件"+sendEmilMsg);
+            resultMap.put("msg","保存失败!+发送邮件"+sendEmailMsg);
         }
         return resultMap;
     }
@@ -253,7 +263,7 @@ public class EmployeeInfoController {
     @RequiresPermissions(value = {"employeeInfo:locked"})
     @RequestMapping("/employeeInfo/locked")
     @ResponseBody
-    protected  Map<String,Object> locked(String userIdArr,String isLocked){
+    public  Map<String,Object> locked(String userIdArr,String isLocked){
         List<EmployeeInfo> listId = new ArrayList<>();
         Map<String,Object> resultMap = new HashMap<>();
         if(StringUtils.isNotEmpty(userIdArr)){
@@ -280,15 +290,21 @@ public class EmployeeInfoController {
     @RequiresPermissions(value={"employeeInfo:resetPwd"})
     @RequestMapping("/employeeInfo/resetPwd")
     @ResponseBody
-    protected Map<String,Object> resetPwd(EmployeeInfo employeeInfo){
+    public Map<String,Object> resetPwd(EmployeeInfo employeeInfo){
         Map<String,Object> resultMap = new HashMap<>();
         Random random = new Random();
         int randomValue = random.nextInt(1000000);
         String sendEmailMsg = "";
         try{
-             employeeInfo.setPassword(Md5Util.getMD5(Md5Util.getMD5("hzit#"+randomValue)));
-            sendEmailMsg = EmailUtil.sendEmail("","",employeeInfo.getEmail(),
-                    "合众艾特咨询系统登录账号为您的中文名,密码为:"+randomValue+"");
+            employeeInfo.setPassword(Md5Util.getMD5(Md5Util.getMD5("hzit#"+randomValue)));
+            try{
+                sendEmailMsg = EmailUtil.sendEmail("","",employeeInfo.getEmail(),
+                        "合众艾特咨询系统登录账号为您的中文名,密码为:"+randomValue+"");
+            }catch (Exception e){
+                sendEmailMsg = "失败";
+                employeeInfo.setPassword(Md5Util.getMD5(Md5Util.getMD5("hzit#hzit")));
+            }
+
             iEmployeeInfoService.updateById(employeeInfo);
              resultMap.put("code",200);
              resultMap.put("msg","重置密码成功!发送邮件:"+ sendEmailMsg);
@@ -307,7 +323,7 @@ public class EmployeeInfoController {
      */
     @RequiresPermissions("employeeInfo:grantResouce")
     @RequestMapping(value="/employeeInfo/grantResouce",method = RequestMethod.GET)
-    protected String index(Model model,String userId){
+    public String index(Model model,String userId){
         //保存到域对象中
         model.addAttribute("userId",userId);
         return  "/permission/index";
@@ -315,7 +331,7 @@ public class EmployeeInfoController {
     @RequiresPermissions("employeeInfo:resource")
     @RequestMapping("/employeeInfo/resource")
     @ResponseBody
-    protected  List<TbMenuApp> resource(){
+    public  List<TbMenuApp> resource(){
         //获取权限信息
         //List<TbMenuAppVo> tbMenuAppVoList =iTbMenuAppService.grantRole();
         List<TbMenuApp> tbMenuAppList = iTbMenuAppService.selectList(
@@ -333,7 +349,7 @@ public class EmployeeInfoController {
     @RequiresPermissions(value="employeeInfo:grantResouce")
     @RequestMapping(value="/employeeInfo/grantResouce",method = RequestMethod.POST)
     @ResponseBody
-    protected Map<String,Object> grantResurce(EmployeeInfo employeeInfo,String appids){
+    public Map<String,Object> grantResurce(EmployeeInfo employeeInfo,String appids){
         Map<String,Object> resultMap = new HashMap<>();
         try{
             employeeInfo.setIsPermission("1");//权限授权
@@ -380,7 +396,7 @@ public class EmployeeInfoController {
     @RequiresPermissions("employeeInfo:checkResource")
     @RequestMapping("/employeeInfo/checkResource")
     @ResponseBody
-    protected  String checkResource(EmployeeInfo employeeInfo){
+    public  String checkResource(EmployeeInfo employeeInfo){
         employeeInfo = iEmployeeInfoService.selectById(employeeInfo);
         return employeeInfo.getResourceIds();
     }
@@ -436,7 +452,9 @@ public class EmployeeInfoController {
             }
         }
         String menuAppId = sb.toString();
-        menuAppId = menuAppId.substring(0,menuAppId.length()-1);
+        if(!"".equals(menuAppId.trim())){
+            menuAppId = menuAppId.substring(0,menuAppId.length()-1);
+        }
         //保存或更新tb_meu中的数据
         //employeeInfo = iEmployeeInfoService.selectById(employeeInfo.getUserId());
         TbMenu tbMenu = iTbMenuService.selectOne(new EntityWrapper<TbMenu>().where("user_id="+employeeInfo.getUserId()));
@@ -471,7 +489,7 @@ public class EmployeeInfoController {
      */
     @RequestMapping("/employeeInfo/getDept")
     @ResponseBody
-    protected  List<TbDict> getDept(TbDict tbDict){
+    public  List<TbDict> getDept(TbDict tbDict){
          List<TbDict> tbDictList = iTbDictService.selectList(new EntityWrapper<TbDict>().where("pid="+tbDict.getId()));
         return tbDictList;
     }
@@ -510,7 +528,7 @@ public class EmployeeInfoController {
      * @return
      */
     @RequestMapping("/employeeInfo/changePwd")
-    protected String changePwd(){
+    public String changePwd(){
         return "/employeeInfo/changePwd";
     }
 
@@ -522,7 +540,7 @@ public class EmployeeInfoController {
      */
     @RequestMapping("/employeeInfo/checkPwd")
     @ResponseBody
-    protected Map<String,Object> checkPwd(EmployeeInfo ei) throws Exception {
+    public Map<String,Object> checkPwd(EmployeeInfo ei) throws Exception {
         Map<String,Object> resultMap = new HashMap<>();
         ei = iEmployeeInfoService.selectOne(new EntityWrapper<EmployeeInfo>().
                 where("user_id="+ei.getUserId()).
@@ -544,7 +562,7 @@ public class EmployeeInfoController {
      */
     @RequestMapping("/employeeInfo/checkEmployeeInfo")
     @ResponseBody
-    protected  Map<String,Object> checkEmployeInfo(EmployeeInfo ei){
+    public  Map<String,Object> checkEmployeInfo(EmployeeInfo ei){
         Map<String,Object> resultMap = new HashMap<>();
         ei  =iEmployeeInfoService.selectOne(new EntityWrapper<EmployeeInfo>().where("name='"+ei.getName()+"'"));
         if(ei!=null){
@@ -560,8 +578,5 @@ public class EmployeeInfoController {
     @ResponseBody   List<EmployeeInfo> getConsultant(String companyId){
         return iEmployeeInfoService.selectList(new EntityWrapper<EmployeeInfo>().where("company_id="+companyId).and("dept_id=74"));
     }
-
-    
-
 
 }

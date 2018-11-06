@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="cn">
+<head>
+    <meta charset="UTF-8">
+    <title>手机登陆</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0,viewport-fit=cover">
+    <link rel="stylesheet" href="/assets/weui/weui.css"/>
+</head>
+<body>
+<!--<div class="weui-flex">
+    <div class="weui-flex__item">
+        <div style="text-align: center">
+            <h2 style="text-align: center;color:#0099FF">咨询系统登陆</h2>
+        </div>
+        <form id="loginForm" style="padding:5px;">
+            <div class="weui-cells">
+                <div class="weui-cell">
+                    <div class="weui-cell__bd">
+                        <input class="weui-input" type="text" id="name" name="name" placeholder="请输入用户名!" value="冼耀基">
+                    </div>
+                </div>
+            </div>
+            <div class="weui-cells">
+                <div class="weui-cell">
+                    <div class="weui-cell__bd">
+                        <input class="weui-input" id="password" name="password" type="password" placeholder="请输入密码!" value="clark123016">
+                    </div>
+                </div>
+            </div>
+            <div class="weui-btn-area">
+                <button class="weui-btn weui-btn_primary" type="button" id="login">登陆</button>
+                <button class="weui-btn weui-btn_default" type="reset">重置</button>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="page">
+    &lt;!&ndash;BEGIN toast&ndash;&gt;
+    <div id="loginToast" style="display: none;">
+        <div class="weui-mask_transparent"></div>
+        <div class="weui-toast">
+            <i class="weui-icon-success-no-circle weui-icon_toast"></i>
+            <p class="weui-toast__content">请输入用户名!</p>
+        </div>
+    </div>
+
+    <div id="passwordToast" style="display: none;">
+        <div class="weui-mask_transparent"></div>
+        <div class="weui-toast">
+            <i class="weui-icon-success-no-circle weui-icon_toast"></i>
+            <p class="weui-toast__content">请输入密码!</p>
+        </div>
+    </div>
+    <div id="loginErrorToast" style="display: none;">
+        <div class="weui-mask_transparent"></div>
+        <div class="weui-toast">
+            <i class="weui-icon-success-no-circle weui-icon_toast"></i>
+            <p class="weui-toast__content">登陆失败!</p>
+        </div>
+    </div>
+    &lt;!&ndash;end toast&ndash;&gt;
+
+    &lt;!&ndash; loading toast &ndash;&gt;
+    <div id="loadingToast" style="display:none;">
+        <div class="weui-mask_transparent"></div>
+        <div class="weui-toast">
+            <i class="weui-loading weui-icon_toast"></i>
+            <p class="weui-toast__content">登陆中</p>
+        </div>
+    </div>
+</div>-->
+<script src="/assets/weui/zepto.min.js"></script>
+<script src="http://g.alicdn.com/dingding/open-develop/1.9.0/dingtalk.js"></script>
+<!--<script src="/assets/login/MD5.js"></script>-->
+<script>
+    $(function(){
+        var random = Math.random();
+        $.getJSON('/mobile/getSign?v='+random
+            ,function(resp){
+            ding(resp);
+        });
+    });
+    function ding(data){
+        dd.config({
+            agentId: data.agentId, // 必填，微应用ID
+            corpId: data.corpId,//必填，企业ID
+            timeStamp:data.timeStamp , // 必填，生成签名的时间戳
+            nonceStr: data.nonceStr, // 必填，生成签名的随机串
+            signature: data.signature, // 必填，签名
+            type:0,   //选填，0表示微应用的jsapi，1表示服务窗的jsapi，不填默认为0。该参数从dingtalk.js的0.8.3版本开始支持
+            jsApiList : [ 'runtime.info', 'biz.contact.choose','runtime.permission.requestAuthCode',
+                'runtime.permission.requestOperateAuthCode',
+                'device.notification.confirm', 'device.notification.alert',
+                'device.notification.prompt', 'biz.ding.post',
+                'biz.util.openLink','biz.contact.choose','biz.chat',
+                'biz.user.get','device.geolocation.get','biz.chat.pickConversation','biz.chat.openSingleChat' ] // 必填，需要使用的jsapi列表，注意：不要带dd。
+        });
+        dd.ready(function(){
+            //获取用户基本信息
+            dd.biz.user.get({
+                corpId:'ding8fcc4db885b89ac635c2f4657eb6378f', // 可选参数，如果不传则使用用户当前企业的corpId。
+                onSuccess: function (info) {
+                    //alert(JSON.stringify(info));
+                    $.post('/account/login',
+                        "corpId="+info.corpId+"&emplId="+info.emplId+"&username="+info.nickName,
+                        function(resp){
+                            if(resp.status ==1){
+                                dd.biz.navigation.close({
+                                    onSuccess : function(result) {
+
+                                    },
+                                    onFail : function(err) {}
+                                })
+                            }else if(resp.status ==0){
+                                window.location.href='/mobile/index';
+                            }
+                        });
+
+                },
+                onFail: function (err) {
+                    alert('获取用户信息失败!');
+                }
+            });
+        });
+
+        dd.error(function(err) {
+            alert('dd error: ' + JSON.stringify(err));
+        });
+    }
+</script>
+
+<!--<script src="/script/mobile/token.js"></script><script type="text/javascript">-->
+   <!--/* $(function () {-->
+        <!--var $loadingToast = $('#loadingToast');-->
+        <!--$('#showLoadingToast').on('click', function () {-->
+            <!--if ($loadingToast.css('display') != 'none') return;-->
+            <!--$loadingToast.fadeIn(100);-->
+            <!--setTimeout(function () {-->
+                <!--$loadingToast.fadeOut(100);-->
+            <!--}, 2000);-->
+        <!--});*/-->
+    <!--//});-->
+<!--</script>-->
+<script>
+  /*  $(function () {
+        $('#login').click(function () {
+            var $loginToast = $('#loginToast');
+            var $passwordToast = $('#passwordToast');
+            var $loadingToast = $('#loadingToast');
+            var username = $('#name').val();
+            var password = $('#password').val();
+            if (username === '') {
+                if ($loginToast.css('display') != 'none') return;
+                $loginToast.fadeIn(100);
+                setTimeout(function () {
+                    $loginToast.fadeOut(100);
+                }, 1500);
+                $('#name').focus();//定位焦点
+                return false;
+            }
+            if (password === '') {
+                if ($passwordToast.css('display') != 'none') return;
+                $passwordToast.fadeIn(100);
+                setTimeout(function () {
+                    $passwordToast.fadeOut(100);
+                }, 1500);
+                //passwordToast
+                $('#password').focus();
+                return false;
+            }
+            var url = '/account/login';
+            var data = 'name='+username+'&password='+ MD5("hzit#" + password);
+            //发送数据
+            $.post(url, data, function (resp) {
+                if (resp.status === 200) {
+                    //跳转掉系统主页
+                    //alert('登陆成功');
+                    window.location.href= '/mobile/index';
+                } else {
+                    //登陆失败!
+                    var $loginErrorTocast = $('#loginErrorToast');
+                    if ($loginErrorTocast.css('display') != 'none') return;
+                    $loginErrorTocast.fadeIn(100);
+                    setTimeout(function () {
+                        $loginErrorTocast.fadeOut(100);
+                    }, 1500);
+                }
+            });
+        });
+    });*/
+</script>
+</body>
+</html>

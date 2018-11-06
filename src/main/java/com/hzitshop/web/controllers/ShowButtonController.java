@@ -31,7 +31,7 @@ public class ShowButtonController {
      */
     @RequestMapping(value="/showButton/show",method = RequestMethod.GET)
     @ResponseBody
-    protected List<String> show(EmployeeInfo employeeInfo){
+    public List<String> show(EmployeeInfo employeeInfo){
         List<String> buttonList = iEmployeeInfoService.getButtonResource(employeeInfo);
         return buttonList;
     }

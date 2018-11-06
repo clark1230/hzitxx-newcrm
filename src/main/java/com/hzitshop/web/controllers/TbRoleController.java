@@ -15,6 +15,7 @@ import com.hzitshop.vo.TbRoleVo;
 import com.sun.org.apache.xpath.internal.operations.Mod;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,8 +50,9 @@ public class TbRoleController {
      *
      * @return
      */
+    @RequiresPermissions("role:index")
     @RequestMapping(value = "/role/index")
-    protected String index() {
+    public String index() {
         return "/role/index";
     }
 
@@ -61,7 +63,7 @@ public class TbRoleController {
      */
     @RequestMapping(value = "/role/ajaxData")
     @ResponseBody
-    protected BootstrapTable<TbRoleVo> ajaxData(BootstrapEntity bt) {
+    public BootstrapTable<TbRoleVo> ajaxData(BootstrapEntity bt) {
         if (bt.getOffset() == null || bt.getLimit() == null) {
             bt.setOffset(1);
             bt.setLimit(20);
@@ -115,7 +117,7 @@ public class TbRoleController {
      * @return
      */
     @RequestMapping(value = "/role/edit", method = RequestMethod.GET)
-    protected String edit(Integer id, Model model) {
+    public String edit(Integer id, Model model) {
         TbRole tbRole = iTbRoleService.selectById(id);
         //保存到域对象中
         model.addAttribute("tbRole", tbRole);
@@ -152,7 +154,7 @@ public class TbRoleController {
      */
     @RequestMapping("/role/available")
     @ResponseBody
-    protected Map<String, Object> available(String roleIds, Integer available) {
+    public Map<String, Object> available(String roleIds, Integer available) {
         Map<String, Object> resultMap = new HashMap<>();
         String[] idArr = null;
         if (StringUtils.isNotEmpty(roleIds)) {
@@ -192,7 +194,7 @@ public class TbRoleController {
      */
     @RequestMapping(value = "/role/delete")
     @ResponseBody
-    protected Map<String, Object> delete(String roleIds) {
+    public Map<String, Object> delete(String roleIds) {
         Map<String, Object> resultMap = new HashMap<>();
         if (StringUtils.isEmpty(roleIds)) {
             resultMap.put("code", 300);
@@ -221,7 +223,7 @@ public class TbRoleController {
      * @return
      */
     @RequestMapping(value = "/role/grantResource", method = RequestMethod.GET)
-    protected String grantResource(TbRole tbRole, Model model) {
+    public String grantResource(TbRole tbRole, Model model) {
         model.addAttribute("id", tbRole.getId());//保存角色编号
         return "/role/grantResoruce";
     }
@@ -234,7 +236,7 @@ public class TbRoleController {
      */
     @RequestMapping(value = "/role/grantResource", method = RequestMethod.POST)
     @ResponseBody
-    protected Map<String, Object> grantResource(TbRole tbRole) {
+    public Map<String, Object> grantResource(TbRole tbRole) {
         Map<String, Object> resultMap = new HashMap<>();
         Map<String, Object> paramMap = new HashMap<>();
         //先到tb_role表中查询数据

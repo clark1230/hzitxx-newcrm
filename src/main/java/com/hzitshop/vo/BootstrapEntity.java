@@ -16,6 +16,8 @@ public class BootstrapEntity {
 
     private String company;
     private String companyValue;
+    private String introducer; //邀约人
+
     public BootstrapEntity(){}
 
     public String getOrder() {
@@ -104,6 +106,14 @@ public class BootstrapEntity {
 
     public void setCompanyValue(String companyValue) {
         this.companyValue = companyValue;
+    }
+
+    public String getIntroducer() {
+        return introducer;
+    }
+
+    public void setIntroducer(String introducer) {
+        this.introducer = introducer;
     }
 
     @Override

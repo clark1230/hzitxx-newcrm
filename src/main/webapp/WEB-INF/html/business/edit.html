@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>修改学员信息</title>
+    <link rel="stylesheet" type="text/css" href="/assets/themes/layui/css/layui.css">
+    <style>
+        .zixun-disable{
+            pointer-events: none;
+        }
+        .zixun-enable{
+            ppointer-events: visible;
+        }
+        .chuangliang-disable{
+            pointer-events: none;
+        }
+        .chuangliang-enable{
+            pointer-events: visible;
+        }
+        .huixiao-disable{
+            pointer-events: none;
+        }
+        .teacher-disable{
+            pointer-events: none;
+        }
+        
+    </style>
+</head>
+<body>
+<div style="margin:20px auto;width:1250px;">
+   <!-- <input th:text="${customerInfo}">-->
+    <!--<input type="hidden" name="deptId"  th:value="${session.employeeInfo.deptId}">-->
+    <form  id="editCustomerInfoForm" class="layui-form layui-form-pane"
+           method="post" style="margin-left: 10px;margin-right: 10px;width:1250px;">
+        <input type="hidden" name="yunying" th:value="${customerInfo.yunying}"/>
+        <input type="hidden" th:value="${customerInfo.customerId}"  name="customerId">
+        <input type="hidden" th:value="${customerInfo.companyId}"  name="companyId">
+        <input type="hidden" th:value="${customerInfo.customerType}"  name="customerType">
+        <input type="hidden" th:value="${session.employeeInfo.roleName}" name="roleName">
+        <div>
+            <div class="layui-form-item">
+                <label class="layui-form-label" for="realName" >学员名称</label>
+                <div class="layui-input-inline">
+                    <input name="realName"  id="realName"
+                           th:value="${customerInfo.realName}"   lay-even="" autocomplete="off" placeholder="请输入学员名称!" class="layui-input" type="text">
+                </div>
+                <label class="layui-form-label" for="sex">性别</label>
+                <div class="layui-input-inline">
+                    <div class="layui-input-inline" id="sex">
+                        <input th:checked="${customerInfo.sex==1}" name="sex" value="1" title="男" checked=""  type="radio">
+                        <input th:checked="${customerInfo.sex==2}" name="sex" value="2" title="女" type="radio">
+                    </div>
+                </div>
+                <label class="layui-form-label" for="age">年龄</label>
+                <div class="layui-input-inline">
+                    <input name="age" id="age"  placeholder="请输入年龄!"
+                           th:value="${customerInfo.age}"  autocomplete="off" class="layui-input" type="number">
+                </div>
+                <label class="layui-form-label" for="nativePlace">籍贯</label>
+                <div class="layui-input-inline">
+                    <input name="nativePlace" id="nativePlace" placeholder="请输入籍贯!"
+                           th:value="${customerInfo.nativePlace}"  autocomplete="off" class="layui-input" type="text">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label" for="tel">电话号码</label>
+                <div class="layui-input-inline">
+                    <input name="tel" id="tel" autocomplete="off" placeholder="请输入电话号码!"
+                           th:value="${customerInfo.tel}" class="layui-input"   nativePlaceclass="layui-input" type="text">
+                </div>
+                <label class="layui-form-label">微信/qq</label>
+                <div class="layui-input-inline">
+                    <input name="wechatNo"  placeholder="请输入微信/qq号!"
+                           th:value="${customerInfo.wechatNo}"  autocomplete="off" class="layui-input" type="text"></div>
+                <label class="layui-form-label">身份证号</label>
+                <div class="layui-input-inline">
+                    <input name="qq"  placeholder="请输入身份证号!"
+                           th:value="${customerInfo.qq}"  autocomplete="off" class="layui-input" type="text">
+                </div>
+                <label class="layui-form-label" for="educationBg">学历</label>
+                <div class="layui-input-inline">
+                    <div class="layui-input-inline">
+                        <select name="educationBg" id="educationBg">
+                            <option value="">请选择学历!</option>
+                            <option th:each="educationBg,educationBgStat:${educationBgList}"
+                                    th:selected="${educationBg.name ==customerInfo.educationBg}"
+                                    th:text="${educationBg.name}" th:value="${educationBg.name}"></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">毕业时间</label>
+                <div class="layui-input-inline">
+                    <input name="graduateTime"  autocomplete="off" class="layui-input"
+                           th:value="${customerInfo.graduateTime}"  onClick="WdatePicker({skin:'twoer'})" type="text" placeholder="请输入毕业时间!">
+                </div>
+                <label class="layui-form-label">毕业学校</label>
+                <div class="layui-input-inline">
+                    <input name="graduateFrom" placeholder="请输入毕业学校!"
+                           th:value="${customerInfo.graduateFrom}"   autocomplete="off" class="layui-input" type="text"></div>
+                <label class="layui-form-label">专业</label>
+                <div class="layui-input-inline">
+                    <input name="majorIn"  placeholder="请输入专业!"
+                           th:value="${customerInfo.majorIn}"   autocomplete="off" class="layui-input" type="text">
+                </div>
+                <label class="layui-form-label">工作年限</label>
+                <div class="layui-input-inline">
+                    <input name="workAge" value="0"  placeholder="请输入工作年限!"
+                           th:value="${customerInfo.workAge}"  autocomplete="off" class="layui-input" type="text">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">工作经历</label>
+                <div class="layui-input-inline">
+                    <input name="workExperience" value="无" autocomplete="off" placeholder="请输入工作经历!"
+                           th:value="${customerInfo.workExperience}"   class="layui-input" type="text">
+                </div>
+                <label class="layui-form-label">职位</label>
+                <div class="layui-input-inline">
+                    <input name="job" value="无"  placeholder="请输入职位!"
+                           th:value="${customerInfo.job}" autocomplete="off" class="layui-input" type="text"></div>
+                <label class="layui-form-label">教育培训经历</label>
+                <div class="layui-input-inline">
+                    <input name="educateExperience" value="无"  placeholder="请输入教育培训经历!"
+                           th:value="${customerInfo.educateExperience}" autocomplete="off" class="layui-input" type="text">
+                </div>
+
+                <label class="layui-form-label" for="customerState">学员状态</label>
+                <div class="layui-input-inline">
+                    <select name="customerState" id="customerState" lay-filter="customerState" >
+                        <option value="">请选择学员状态!</option>
+                        <option th:each="customerState,customerStateStat:${customerStateList}"
+                                th:selected="${customerState.id==customerInfo.customerState}"
+                                th:if="${customerState.id!=40}"
+                                th:text="${customerState.name}" th:value="${customerState.id}"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+
+                <label class="layui-form-label" for="customerLevel">学员级别</label>
+                <div class="layui-input-inline">
+                    <select name="customerLevel" id="customerLevel" >
+                        <option value="">请选择学员级别!</option>
+                        <option th:each="customerLevel,customerLevelStat:${customerLevelList}"
+                                th:selected="${customerLevel.id+''  eq customerInfo.customerLevel}"
+                                th:text="${customerLevel.name}" th:value="${customerLevel.id}"></option>
+                    </select>
+                </div>
+                <label class="layui-form-label" for="targetSkill">目标技能</label>
+                <div class="layui-input-inline">
+                    <select name="targetSkill" id="targetSkill">
+                        <option value="">请选择目标技能!</option>
+                        <option th:each="targetSkill,targetSkillStat:${targetSkillList}"
+                                th:selected="${targetSkill.id+'' eq customerInfo.targetSkill}"
+                                th:text="${targetSkill.name}" th:value="${targetSkill.id}"></option>
+                    </select>
+                </div>
+
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <span><input id="edit" lay-submit="" type="button" class="layui-btn layui-btn-small" lay-filter="edit" value="保存"></span>
+            <span><input type="reset" class="layui-btn layui-btn-danger layui-btn-small" value="重置"></span>
+            <span><div id="goback" class="layui-btn layui-btn-warm layui-btn-small" >返回</div></span>
+        </div>
+    </form>
+</div>
+<script src="/assets/js/jquery.min.js"></script>
+<script src="/assets/My97DatePicker/WdatePicker.js"></script>
+<script src="/assets/themes/layui/lay/dest/layui.all.js"></script>
+<script src="/script/business/edit.js"></script>
+<script>
+    var index = parent.layer.getFrameIndex(window.name); //获取当前窗体索引
+    $('#goback').click(function(){
+       history.go(-1);
+    });
+</script>
+</body>
+</html>

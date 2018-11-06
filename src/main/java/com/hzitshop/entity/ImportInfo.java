@@ -8,6 +8,8 @@ import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.annotations.TableName;
 import com.baomidou.mybatisplus.enums.IdType;
+import lombok.Data;
+import org.jeecgframework.poi.excel.annotation.Excel;
 
 import java.io.Serializable;
 
@@ -20,7 +22,8 @@ import java.io.Serializable;
  * @author 冼耀基
  * @since 2017-02-18
  */
-@TableName("import_info")
+@TableName(value = "import_info")
+@Data
 public class ImportInfo extends Model<ImportInfo> {
 
     private static final long serialVersionUID = 1L;
@@ -65,7 +68,7 @@ public class ImportInfo extends Model<ImportInfo> {
      * 学历[1-小学 2-初中 3-高中 4-大专 5-本科 6-研究生 0-其他]
      */
     @TableField("education_bg")
-    private Integer educationBg;
+    private String educationBg;
     /**
      * 毕业时间
      */
@@ -85,7 +88,7 @@ public class ImportInfo extends Model<ImportInfo> {
      * 工作年限
      */
     @TableField("work_age")
-    private Integer workAge;
+    private String workAge;
     /**
      * 工作经历
      */
@@ -104,7 +107,7 @@ public class ImportInfo extends Model<ImportInfo> {
      * 应聘渠道[1-智联 2-前程无忧 3-58同城 4-转介绍 5-中华英才 6-其他待定]
      */
     @TableField("recruit_channel")
-    private Integer recruitChannel;
+    private String recruitChannel;
     /**
      * 客户状态[待定]已报名，已就业，意向[],无效
      */
@@ -190,301 +193,35 @@ public class ImportInfo extends Model<ImportInfo> {
      * 导入的简历类型(1:投递的简历,2:下载的简历)
      */
     private Integer cvType;
-
-
-    public Integer getCustomerId() {
-        return customerId;
-    }
-
-    public void setCustomerId(Integer customerId) {
-        this.customerId = customerId;
-    }
-
-    public String getRealName() {
-        return realName;
-    }
-
-    public void setRealName(String realName) {
-        this.realName = realName;
-    }
-
-    public Integer getSex() {
-        return sex;
-    }
-
-    public void setSex(Integer sex) {
-        this.sex = sex;
-    }
-
-    public Integer getAge() {
-        return age;
-    }
-
-    public void setAge(Integer age) {
-        this.age = age;
-    }
-
-    public String getNativePlace() {
-        return nativePlace;
-    }
-
-    public void setNativePlace(String nativePlace) {
-        this.nativePlace = nativePlace;
-    }
-
-    public String getTel() {
-        return tel;
-    }
-
-    public void setTel(String tel) {
-        this.tel = tel;
-    }
-
-    public String getWechatNo() {
-        return wechatNo;
-    }
-
-    public void setWechatNo(String wechatNo) {
-        this.wechatNo = wechatNo;
-    }
-
-    public String getQq() {
-        return qq;
-    }
-
-    public void setQq(String qq) {
-        this.qq = qq;
-    }
-
-    public Integer getEducationBg() {
-        return educationBg;
-    }
-
-    public void setEducationBg(Integer educationBg) {
-        this.educationBg = educationBg;
-    }
-
-    public String getGraduateTime() {
-        return graduateTime;
-    }
-
-    public void setGraduateTime(String graduateTime) {
-        this.graduateTime = graduateTime;
-    }
-
-    public String getGraduateFrom() {
-        return graduateFrom;
-    }
-
-    public void setGraduateFrom(String graduateFrom) {
-        this.graduateFrom = graduateFrom;
-    }
-
-    public String getMajorIn() {
-        return majorIn;
-    }
-
-    public void setMajorIn(String majorIn) {
-        this.majorIn = majorIn;
-    }
-
-    public Integer getWorkAge() {
-        return workAge;
-    }
-
-    public void setWorkAge(Integer workAge) {
-        this.workAge = workAge;
-    }
-
-    public String getWorkExperience() {
-        return workExperience;
-    }
-
-    public void setWorkExperience(String workExperience) {
-        this.workExperience = workExperience;
-    }
-
-    public String getJob() {
-        return job;
-    }
-
-    public void setJob(String job) {
-        this.job = job;
-    }
-
-    public String getEducateExperience() {
-        return educateExperience;
-    }
-
-    public void setEducateExperience(String educateExperience) {
-        this.educateExperience = educateExperience;
-    }
-
-    public Integer getRecruitChannel() {
-        return recruitChannel;
-    }
-
-    public void setRecruitChannel(Integer recruitChannel) {
-        this.recruitChannel = recruitChannel;
-    }
-
-    public Integer getCustomerState() {
-        return customerState;
-    }
-
-    public void setCustomerState(Integer customerState) {
-        this.customerState = customerState;
-    }
-
-    public String getCustomerLevel() {
-        return customerLevel;
-    }
-
-    public void setCustomerLevel(String customerLevel) {
-        this.customerLevel = customerLevel;
-    }
-
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
-
-    public String getApplyJob() {
-        return applyJob;
-    }
-
-    public void setApplyJob(String applyJob) {
-        this.applyJob = applyJob;
-    }
-
-    public String getIntroducer() {
-        return introducer;
-    }
-
-    public void setIntroducer(String introducer) {
-        this.introducer = introducer;
-    }
-
-    public String getMemo() {
-        return memo;
-    }
-
-    public void setMemo(String memo) {
-        this.memo = memo;
-    }
-
-    public Date getLastTime() {
-        return lastTime;
-    }
-
-    public void setLastTime(Date lastTime) {
-        this.lastTime = lastTime;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Integer getCompanyId() {
-        return companyId;
-    }
-
-    public void setCompanyId(Integer companyId) {
-        this.companyId = companyId;
-    }
-
-    public Integer getIsDelete() {
-        return isDelete;
-    }
-
-    public void setIsDelete(Integer isDelete) {
-        this.isDelete = isDelete;
-    }
-
-    public Integer getGuandan() {
-        return guandan;
-    }
-
-    public void setGuandan(Integer guandan) {
-        this.guandan = guandan;
-    }
-
-    public String getIsMarket() {
-        return isMarket;
-    }
-
-    public void setIsMarket(String isMarket) {
-        this.isMarket = isMarket;
-    }
-
-    @Override
-    protected Serializable pkVal() {
-        return this.customerId;
-    }
-
-    public Integer getCvType() {
-        return cvType;
-    }
-
-    public void setCvType(Integer cvType) {
-        this.cvType = cvType;
-    }
-
-    public String getLiveAddress() {
-        return liveAddress;
-    }
-
-    public void setLiveAddress(String liveAddress) {
-        this.liveAddress = liveAddress;
-    }
-
-    public String getCurIncome() {
-        return curIncome;
-    }
-
-    public void setCurIncome(String curIncome) {
-        this.curIncome = curIncome;
-    }
-
-    public String getLicense() {
-        return license;
-    }
-
-    public void setLicense(String license) {
-        this.license = license;
-    }
-
-    public String getExpectSalary() {
-        return expectSalary;
-    }
-
-    public void setExpectSalary(String expectSalary) {
-        this.expectSalary = expectSalary;
-    }
-
-    public String getJobStatus() {
-        return jobStatus;
-    }
-
-    public void setJobStatus(String jobStatus) {
-        this.jobStatus = jobStatus;
-    }
-
-    public Date getSendTime() {
-        return sendTime;
-    }
-
-    public void setSendTime(Date sendTime) {
-        this.sendTime = sendTime;
-    }
-
+    /**
+     * 录入人
+     */
+    private String createBy;
+    /**
+     * 数据是否重复
+     * 数据是否存在重复,0:不重复,其他重复
+     */
+    private Integer repeatNum;
+    /**
+     * 投递来源
+     */
+    @TableField("source")
+    private String source;
+    /**
+     * 应聘者的状态 0:不做任何操作 1:预约 2.回访,默认0
+     */
+    @TableField("import_status")
+    private Integer importStatus;
+    /**
+     * 颜色
+     */
+    @TableField("color")
+    private String color;
+    /**
+     * 状态
+     */
+    @TableField("status")
+    private String status;
     @Override
     public String toString() {
         return "ImportInfo{" +
@@ -524,6 +261,13 @@ public class ImportInfo extends Model<ImportInfo> {
                 ", guandan=" + guandan +
                 ", isMarket='" + isMarket + '\'' +
                 ", cvType=" + cvType +
+                ", createBy='" + createBy + '\'' +
+                ", repeatNum=" + repeatNum +
                 '}';
+    }
+
+    @Override
+    protected Serializable pkVal() {
+        return this.customerId;
     }
 }

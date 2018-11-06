@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎页</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <!-- load css -->
+    <link rel="stylesheet" type="text/css" href="/css/font/iconfont.css?v=1.0.1" media="all">
+    <link rel="stylesheet" type="text/css" href="/js/layui/css/layui.css?v=2.2.2" media="all">
+    <link rel="stylesheet" type="text/css" href="/css/main.css?v2.0.1-simple" media="all">
+</head>
+
+<body>
+    <blockquote class="layui-elem-quote">演示---还没有实现</blockquote>
+    <div class="layui-fluid larry-wrapper">
+        <div class="layui-row layui-col-space30">
+            <div class="layui-col-xs6 layui-col-sm4 layui-col-md2">
+                <section class="panel">
+                    <div class="symbol bgcolor-blue"> <i class="iconfont">&#xe641;</i>
+                    </div>
+                    <div class="value tab-menu">
+                        <a href="foreground/index" data-url="foreground/index"  data-title="前台录入"><i class="iconfont " data-icon='&#xe672;'></i>
+                            <h1>前台录入</h1>
+                        </a>
+                    </div>
+                </section>
+            </div>
+            <div class="layui-col-xs6 layui-col-sm4 layui-col-md2">
+                <section class="panel">
+                    <div class="symbol bgcolor-blue"> <i class="iconfont">&#xe62b;</i>
+                    </div>
+                    <div class="value tab-menu">
+                        <a href="import/importList" data-url="import/importList"  data-title="文件导入"><i class="iconfont " data-icon='&#xe672;'></i>
+                            <h1>文件导入</h1>
+                        </a>
+                    </div>
+                </section>
+            </div>
+
+            <div class="layui-col-xs6 layui-col-sm4 layui-col-md2">
+                <section class="panel">
+                    <div class="symbol bgcolor-blue"> <i class="iconfont">&#xe672;</i>
+                    </div>
+                    <div class="value tab-menu">
+                        <a href="javascript:;" data-url="user-info.html" data-parent="true" data-title="历史数据"><i class="iconfont " data-icon='&#xe672;'></i>
+                            <h1 th:text="${welcomeVo.total}"></h1>
+                        </a>
+
+                        <a href="javascript:;" data-url="user-info.html" data-parent="true" data-title="历史数据"> <i class="iconfont " data-icon='&#xe672;'></i><span>历史数据</span></a>
+
+                    </div>
+                </section>
+            </div>
+            <div class="layui-col-xs6 layui-col-sm4 layui-col-md2">
+                <section class="panel">
+                    <div class="symbol bgcolor-commred"> <i class="iconfont">&#xe674;</i>
+                    </div>
+                    <div class="value tab-menu">
+                        <a href="javascript:;" data-url="user-info.html" data-parent="true" data-title="今日跟进"> <i class="iconfont " data-icon='&#xe674;'></i>
+                            <h1 th:text="${welcomeVo.recordNum}"></h1>
+                        </a>
+
+                        <a href="javascript:;" data-url="user-info.html" data-parent="true" data-title="今日跟进"> <i class="iconfont " data-icon='&#xe674;'></i><span>今日跟进</span></a>
+
+                    </div>
+                </section>
+            </div>
+
+
+            <div class="layui-col-xs6 layui-col-sm4 layui-col-md2">
+                <section class="panel">
+                    <div class="symbol bgcolor-yellow-green"> <i class="iconfont">&#xe649;</i>
+                    </div>
+                    <div class="value tab-menu">
+                        <a href="javascript:;" data-url="user-info.html" data-parent="true" data-title="今日应聘人数"> <i class="iconfont " data-icon='&#xe649;'></i>
+                            <h1 th:text="${welcomeVo.dailyNum}"></h1>
+                        </a>
+                        <a href="javascript:;" data-url="user-info.html" data-parent="true" data-title="今日应聘人数"> <i class="iconfont " data-icon='&#xe649;'></i><span>应聘人数</span></a>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    </div>
+
+</body>
+<script type="text/javascript" src="/js/layui/layui.js?v=2.2.2"></script>
+<script type="text/javascript" src="/js/version.js?v=2.0.1"></script>
+<script src="/js/common.js?v=2.0.1"></script>
+<script>
+    var global = {};
+    layui.use('index');
+</script>
+</html>

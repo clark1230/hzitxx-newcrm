@@ -31,7 +31,7 @@ public class TbDictController {
     private ITbDictService iTbDictService;
     @RequiresPermissions("dict:index")
     @RequestMapping("/dict/index")
-    protected String index(){
+    public String index(){
         return "/dict/index";
     }
 
@@ -42,7 +42,7 @@ public class TbDictController {
     @RequiresPermissions("dict:getTreeList")
     @RequestMapping("/dict/getTreeList")
     @ResponseBody
-    protected List<TbDict> getTreeList(){
+    public List<TbDict> getTreeList(){
         List<TbDict> tbDictList = iTbDictService.selectList(new EntityWrapper<TbDict>());
         return tbDictList;
     }
@@ -55,7 +55,7 @@ public class TbDictController {
     //@RequiresPermissions("dict:getCustomerState")
     @RequestMapping("/dict/getCustomerState")
     @ResponseBody
-    protected  List<TbDict> getDict(TbDict tbDict){
+    public  List<TbDict> getDict(TbDict tbDict){
         Map<String,Object> paramMap = new HashMap<>();
         paramMap.put("pid",tbDict.getpId());
         return iTbDictService.selectByMap(paramMap);
@@ -67,13 +67,13 @@ public class TbDictController {
      */
     @RequiresPermissions("dict:add")
     @RequestMapping(value="/dict/add",method = RequestMethod.GET)
-    protected String add(TbDict tbDict, ModelMap modelMap){
+    public String add(TbDict tbDict, ModelMap modelMap){
         return "/dict/add";
     }
     @RequiresPermissions("dict:add")
     @RequestMapping(value="/dict/add",method = RequestMethod.POST)
     @ResponseBody
-    protected  Map<String,Object> add(TbDict tbDict){
+    public  Map<String,Object> add(TbDict tbDict){
         Map<String,Object> resultMap = new HashMap<>();
         try{
             iTbDictService.insert(tbDict);
@@ -95,7 +95,7 @@ public class TbDictController {
      */
     @RequiresPermissions("dict:edit")
     @RequestMapping(value="/dict/edit",method = RequestMethod.GET)
-    protected String edit(ModelMap modelMap,TbDict tbDict){
+    public String edit(ModelMap modelMap,TbDict tbDict){
         tbDict = iTbDictService.selectById(tbDict.getId());
         modelMap.addAttribute("tbDict",tbDict);
         List<TbDict> tbDictList = iTbDictService.selectList(new EntityWrapper<TbDict>());
@@ -111,7 +111,7 @@ public class TbDictController {
     @RequiresPermissions("dict:edit")
     @RequestMapping(value="/dict/edit",method=RequestMethod.POST)
     @ResponseBody
-    protected Map<String,Object> edit(TbDict tbDict){
+    public Map<String,Object> edit(TbDict tbDict){
         Map<String,Object> resultMap = new HashMap<>();
         try{
             iTbDictService.updateById(tbDict);
@@ -133,7 +133,7 @@ public class TbDictController {
     @RequiresPermissions("dict:delete")
     @RequestMapping("/dict/delete")
     @ResponseBody
-    protected  Map<String,Object> delete(String ids){
+    public  Map<String,Object> delete(String ids){
         Map<String,Object> reslutMap = new HashMap<>();
         String[] idArr = ids.split(",");
 
@@ -156,7 +156,7 @@ public class TbDictController {
 
     @RequestMapping("/tbDict/getTbDict")
     @ResponseBody
-    protected  List<TbDict> getTbDict(TbDict tbDict){
+    public  List<TbDict> getTbDict(TbDict tbDict){
         List<TbDict> tbDictList = iTbDictService.selectList(new EntityWrapper<TbDict>().where("pid="+tbDict.getpId()));
         return tbDictList;
     }

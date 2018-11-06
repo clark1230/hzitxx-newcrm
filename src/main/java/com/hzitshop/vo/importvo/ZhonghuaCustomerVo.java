@@ -1,9 +1,11 @@
 package com.hzitshop.vo.importvo;
 
 import com.hzitshop.entity.ImportInfo;
+import lombok.Data;
 import org.jeecgframework.poi.excel.annotation.Excel;
 import org.jeecgframework.poi.excel.annotation.ExcelCollection;
 import org.jeecgframework.poi.excel.annotation.ExcelTarget;
+import org.springframework.beans.BeanUtils;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -15,25 +17,30 @@ import java.util.List;
  * @create 2017-09-04 11:47
  * @description 中华英才网转换类
  */
+@Data
 @ExcelTarget("ZhonghuaCustomerVo")
 public class ZhonghuaCustomerVo implements Serializable {
-    @Excel(name = "姓名", isImportField = "true_realName",needMerge = true)
+    @Excel(name = "姓名", isImportField = "realName",needMerge = true)
     private String realName;
-    @Excel(name = "性别", isImportField = "true_sex",replace = {"男_1", "女_2"},needMerge = true)
+    @Excel(name = "性别", isImportField = "sex",replace = {"男_1", "女_2"},needMerge = true)
     private Integer sex;
-    @Excel(name = "年龄（岁）", isImportField = "true_age",suffix = "岁",needMerge = true)
+    @Excel(name = "年龄（岁）", isImportField = "age",suffix = "岁",needMerge = true)
     private Integer age;
-    private Integer recruitChannel;
-    @Excel(name = "工作年限", isImportField = "true_workAge",needMerge = true)
+    //应聘渠道
+    private String recruitChannel;
+
+    @Excel(name = "工作年限", isImportField = "workAge",needMerge = true)
     private String workAge;
-    @Excel(name = "手机", isImportField = "true_tel",needMerge = true)
+    @Excel(name = "手机", isImportField = "tel",needMerge = true)
     private String tel;
-    @Excel(name = "应聘（适合）职位",needMerge = true)
+    @Excel(name = "应聘（适合）职位",isImportField = "applyJob",needMerge = true)
     private String applyJob;
     @Excel(name = "目前居住地（城市-区）", isImportField = "liveAddress",needMerge = true)
     private String liveAddress;
-    @Excel(name = "应聘公司",needMerge = true)
+    @Excel(name = "应聘公司",isImportField = "license",needMerge = true)
     private String license;
+    @Excel(name="后台名称",isImportField = "source")
+    private String source;
     /**
      * 推荐人（创量部电话邀约）
      */
@@ -42,6 +49,13 @@ public class ZhonghuaCustomerVo implements Serializable {
      * 所属校区ID
      */
     private Integer companyId;
+
+//    @Excel(name="最高学历",isImportField = "educationBg")
+//    private String educationBg;
+//    @Excel(name = "最近工作经历",isImportField = "workExperience")
+//    private String workExperience;
+    //@Excel(name = "求职意向",isImportField = "applyJob")
+   // private String applyJob;
     @ExcelCollection(name = "最高学历")
     private List<EduBackgroundVo> eduBackgroundVo;
     @ExcelCollection(name = "最近工作经历")
@@ -50,118 +64,6 @@ public class ZhonghuaCustomerVo implements Serializable {
     private List<ApplyJobVo> applyJobVo;
 
     public ZhonghuaCustomerVo() {
-    }
-
-    public String getRealName() {
-        return realName;
-    }
-
-    public void setRealName(String realName) {
-        this.realName = realName;
-    }
-
-    public Integer getSex() {
-        return sex;
-    }
-
-    public void setSex(Integer sex) {
-        this.sex = sex;
-    }
-
-    public Integer getAge() {
-        return age;
-    }
-
-    public void setAge(Integer age) {
-        this.age = age;
-    }
-
-    public Integer getRecruitChannel() {
-        return recruitChannel;
-    }
-
-    public void setRecruitChannel(Integer recruitChannel) {
-        this.recruitChannel = recruitChannel;
-    }
-
-    public String getWorkAge() {
-        return workAge;
-    }
-
-    public void setWorkAge(String workAge) {
-        this.workAge = workAge;
-    }
-
-    public String getTel() {
-        return tel;
-    }
-
-    public void setTel(String tel) {
-        this.tel = tel;
-    }
-
-    public List<EduBackgroundVo> getEduBackgroundVo() {
-        return eduBackgroundVo;
-    }
-
-    public void setEduBackgroundVo(List<EduBackgroundVo> eduBackgroundVo) {
-        this.eduBackgroundVo = eduBackgroundVo;
-    }
-
-    public List<WorkExperienceVo> getWorkExperienceVo() {
-        return workExperienceVo;
-    }
-
-    public void setWorkExperienceVo(List<WorkExperienceVo> workExperienceVo) {
-        this.workExperienceVo = workExperienceVo;
-    }
-
-    public String getApplyJob() {
-        return applyJob;
-    }
-
-    public void setApplyJob(String applyJob) {
-        this.applyJob = applyJob;
-    }
-
-    public String getIntroducer() {
-        return introducer;
-    }
-
-    public void setIntroducer(String introducer) {
-        this.introducer = introducer;
-    }
-
-    public Integer getCompanyId() {
-        return companyId;
-    }
-
-    public void setCompanyId(Integer companyId) {
-        this.companyId = companyId;
-    }
-
-    public String getLiveAddress() {
-        return liveAddress;
-    }
-
-    public void setLiveAddress(String liveAddress) {
-        this.liveAddress = liveAddress;
-    }
-
-    public List<ApplyJobVo> getApplyJobVo() {
-        return applyJobVo;
-    }
-
-    public void setApplyJobVo(List<ApplyJobVo> applyJobVo) {
-        this.applyJobVo = applyJobVo;
-    }
-
-    public String getLicense() {
-        return license;
-    }
-
-    public void setLicense(String license) {
-        this.license = license;
     }
 
     /**
@@ -185,32 +87,21 @@ public class ZhonghuaCustomerVo implements Serializable {
 
     public ImportInfo changeToCustomerInfo(ZhonghuaCustomerVo zh){
         ImportInfo i = new ImportInfo();
-        i.setRealName(zh.getRealName());
-        i.setSex(zh.getSex());
-        i.setAge(zh.getAge());
-        i.setRecruitChannel(zh.getRecruitChannel());
-        Integer workAge = this.modifyWorkAge(zh.getWorkAge());
-        i.setWorkAge(workAge);
-        i.setTel(zh.getTel());
-        i.setIntroducer(zh.getIntroducer());
-        i.setCompanyId(zh.getCompanyId());
-        if(zh.getEduBackgroundVo() != null && zh.getEduBackgroundVo().get(0) != null){
-            i.setEducationBg(zh.getEduBackgroundVo().get(0).getEducationBg());
-            i.setGraduateFrom(zh.getEduBackgroundVo().get(0).getGraduateFrom());
-            i.setGraduateTime(zh.getEduBackgroundVo().get(0).getGraduateTime());
-            i.setMajorIn(zh.getEduBackgroundVo().get(0).getMajorIn());
+
+        BeanUtils.copyProperties(zh,i);
+        if( zh.getEduBackgroundVo()!= null && zh.getEduBackgroundVo().size() >0){
+            for(EduBackgroundVo ev: zh.getEduBackgroundVo()){
+                i.setEducationBg(ev.getEducationBg());
+                i.setGraduateFrom(ev.getGraduateFrom());
+                i.setMajorIn(ev.getMajorIn());
+                i.setGraduateTime(ev.getGraduateTime());
+            }
         }
-        if(zh.getWorkExperienceVo() != null && zh.getWorkExperienceVo().get(0) != null){
-            i.setJob(zh.getWorkExperienceVo().get(0).getJob());
-            i.setWorkExperience(zh.getWorkExperienceVo().get(0).getWorkExperience());
+        if(zh.getApplyJobVo()!= null && zh.getApplyJobVo().size() >0){
+            for(ApplyJobVo av: zh.getApplyJobVo()){
+                i.setExpectSalary(av.getExpectSalary());
+            }
         }
-        i.setApplyJob(zh.getApplyJob());
-        i.setCreateTime(new Date());
-        i.setLiveAddress(zh.getLiveAddress());
-        if(zh.getApplyJobVo() != null && zh.getApplyJobVo().get(0) != null){
-            i.setExpectSalary(zh.getApplyJobVo().get(0).getExpectSalary());
-        }
-        i.setLicense(zh.getLicense());
         return i;
     }
 
@@ -229,9 +120,6 @@ public class ZhonghuaCustomerVo implements Serializable {
                 ", license='" + license + '\'' +
                 ", introducer='" + introducer + '\'' +
                 ", companyId=" + companyId +
-                ", eduBackgroundVo=" + eduBackgroundVo +
-                ", workExperienceVo=" + workExperienceVo +
-                ", applyJobVo=" + applyJobVo +
                 '}';
     }
 }

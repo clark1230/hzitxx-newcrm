@@ -2,39 +2,171 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.hzitshop.mapper.CustomerInfoMapper">
+	<!--customer_info表中的列-->
+	<sql id="customerInfoBaseColumn">
+		customer_id,
+		real_name,
+		sex,
+		age,
+		native_place,
+		tel,
+		wechat_no,
+		qq,
+		education_bg,
+		graduate_time,
+		graduate_from,
+		major_in,
+		work_age,
+		work_experience,
+		job,
+		educate_experience,
+		recruit_channel,
+		customer_state,
+		customer_level,
+		user_id,
+		target_skill,
+		introducer,
+		memo,
+		last_time,
+		create_time,
+		company_id,
+		isDelete,
+		guandan,
+		isMarket,
+		trace_time,
+		market_memo,
+		learn_memo,
+		isLearn,
+		customer_type,
+		yunying,
+		trace_time
+	</sql>
 
-	<!-- 通用查询映射结果 -->
-	<resultMap id="BaseResultMap" type="com.hzitshop.entity.CustomerInfo">
-		<id column="customer_id" property="customerId" />
-		<result column="real_name" property="realName" />
-		<result column="sex" property="sex" />
-		<result column="age" property="age" />
-		<result column="native_place" property="nativePlace" />
-		<result column="tel" property="tel" />
-		<result column="wechat_no" property="wechatNo" />
-		<result column="qq" property="qq" />
-		<result column="education_bg" property="educationBg" />
-		<result column="graduate_time" property="graduateTime" />
-		<result column="graduate_from" property="graduateFrom" />
-		<result column="major_in" property="majorIn" />
-		<result column="work_age" property="workAge" />
-		<result column="work_experience" property="workExperience" />
-		<result column="job" property="job" />
-		<result column="educate_experience" property="educateExperience" />
-		<result column="recruit_channel" property="recruitChannel" />
-		<result column="customer_state" property="customerState" />
-		<result column="customer_level" property="customerLevel" />
-		<result column="user_id" property="userId" />
-		<result column="target_skill" property="targetSkill" />
-		<result column="introducer" property="introducer" />
-		<result column="memo" property="memo" />
-		<result column="last_time" property="lastTime" />
-		<result column="create_time" property="createTime" />
-		<result column="company_id" property="companyId" />
-		<result column="isDelete" property="isDelete" />
-		<result column="guandan" property="guandan" />
-		<result column="isMarket" property="isMarket" />
-	</resultMap>
+	<!--查询数据-->
+	<select id="searchCustomerInfo" parameterType="map" resultMap="BaseResultMap">
+		SELECT
+		<include refid="customerInfoBaseColumn"/>
+		FROM customer_info
+		<include refid="customerInfoBaseWhereSql"/>
+		limit #{map.offset},#{map.limit}
+	</select>
+	<!--查询数据-->
+	<select id="searchCustomerInfoCount" parameterType="map" resultMap="BaseResultMap">
+		SELECT
+		  count(1)
+		FROM customer_info
+		<include refid="customerInfoBaseWhereSql"/>
+		limit #{map.offset},#{map.limit}
+	</select>
+	<!--基础查询条件-->
+	<sql id="customerInfoBaseWhereSql">
+		<if test="map!=null">
+			<where>
+				<if test="map.customerId !=null">
+					AND customer_id = #{map.customerId}
+				</if>
+				<if test="map.realName !=null">
+					AND real_name = #{map.realName}
+				</if>
+				<if test="map.sex !=null">
+					AND sex = #{map.sex}
+				</if>
+				<if test="map.age !=null">
+					AND age = #{map.age}
+				</if>
+				<if test="map.nativePlace !=null">
+					AND native_place = #{map.nativePlace}
+				</if>
+				<if test="map.tel !=null">
+					AND tel = #{map.tel}
+				</if>
+				<if test="map.wechatNo !=null">
+					AND wechat_no = #{map.wechatNo}
+				</if>
+				<if test="map.qq !=null">
+					AND qq = #{map.qq}
+				</if>
+				<if test="map.educationBg !=null">
+					AND education_bg = #{map.educationBg}
+				</if>
+				<if test="map.graduateTime !=null">
+					AND graduate_time = #{map.graduateTime}
+				</if>
+				<if test="map.graduateFrom !=null">
+					AND graduate_from = #{map.graduateFrom}
+				</if>
+				<if test="map.majorIn !=null">
+					AND major_in = #{map.majorIn}
+				</if>
+				<if test="map.workAge !=null">
+					AND work_age = #{map.workAge}
+				</if>
+				<if test="map.workExperience !=null">
+					AND work_experience = #{map.workExperience}
+				</if>
+				<if test="map.job !=null">
+					AND job = #{map.job}
+				</if>
+				<if test="map.educateExperience !=null">
+					AND educate_experience = #{map.educateExperience}
+				</if>
+				<if test="map.recruitChannel !=null">
+					AND recruit_channel = #{map.recruitChannel}
+				</if>
+				<if test="map.customerState !=null">
+					AND customer_state = #{map.customerState}
+				</if>
+				<if test="map.customerLevel !=null">
+					AND customer_level = #{map.customerLevel}
+				</if>
+				<if test="map.userId !=null">
+					AND user_id = #{map.userId}
+				</if>
+				<if test="map.targetSkill !=null">
+					AND target_skill = #{map.targetSkill}
+				</if>
+				<if test="map.introducer !=null">
+					AND introducer = #{map.introducer}
+				</if>
+				<if test="map.memo !=null">
+					AND memo = #{map.memo}
+				</if>
+				<if test="map.lastTime !=null">
+					AND last_time = #{map.lastTime}
+				</if>
+				<if test="map.createTime !=null">
+					AND create_time = #{map.createTime}
+				</if>
+				<if test="map.companyId !=null">
+					AND company_id = #{map.companyId}
+				</if>
+				<if test="map.isDelete !=null">
+					AND isDelete = #{map.isDelete}
+				</if>
+				<if test="map.guandan !=null">
+					AND guandan = #{map.guandan}
+				</if>
+				<if test="map.isMarket !=null">
+					AND isMarket = #{map.isMarket}
+				</if>
+				<if test="map.traceTime !=null">
+					AND trace_time = #{map.traceTime}
+				</if>
+				<if test="map.marketMemo !=null">
+					AND market_memo = #{map.marketMemo}
+				</if>
+				<if test="map.learnMemo !=null">
+					AND learn_memo = #{map.learnMemo}
+				</if>
+				<if test="map.isLearn !=null">
+					AND isLearn = #{map.isLearn}
+				</if>
+				<if test="map.recordTime !=null">
+					AND record_time = #{map.redcordTime}
+				</if>
+			</where>
+		</if>
+	</sql>
 
 	<!--统计学员感兴趣的技能-->
 	<select id="companyCount" resultType="com.hzitshop.vo.CompanyCount" parameterType="map">
@@ -81,4 +213,431 @@
 	and DATE_FORMAT(ci.create_time,'%Y-%m') =#{map.month}
 	group by di.id ;
 	</select>
+
+	<!--首页统计 sart-->
+	<select id="totalCount" resultType="com.hzitshop.vo.WelcomeVo">
+		SELECT
+		(SELECT COUNT(*) FROM customer_info) AS total,
+		(SELECT COUNT(*) FROM customer_trace_record WHERE TO_DAYS(record_date)= TO_DAYS(NOW())) AS recordNum,
+		(SELECT COUNT(*) FROM customer_info WHERE TO_DAYS(create_time) = TO_DAYS(NOW())) AS dailyNum
+		FROM
+		DUAL
+	</select>
+	<!--首页统计 end-->
+	
+	<select id="traceData" resultMap="traceDataMap" parameterType="map">
+		 SELECT ei.`dingding_id`,COUNT(1) AS COUNT
+		 FROM
+		   customer_info  ci,
+		   employee_info ei
+		 WHERE
+		DATE_FORMAT(ci.trace_time,'%Y-%m-%d') = #{traceTime}
+		AND
+			ci.`user_id` = ei.`user_id`
+		 GROUP BY ci.user_id
+	</select>
+
+	<!--移动端会销-->
+	<select id="mobileHuiXiao" resultType="com.hzitshop.vo.huixiao.MobileHuiXiaoVo" parameterType="map">
+		SELECT
+		 customer_id customerId,
+		 real_name realName,
+		CASE sex
+		WHEN '1' THEN '男'
+		WHEN '2' THEN '女'
+		ELSE '未知' END gender,
+		tel,
+		isMarket FROM
+		customer_info
+		WHERE
+				DATE_FORMAT(create_time,'%Y-%m-%d') = #{date}
+			<if test="userId!=null">
+				AND company_id = #{companyId}
+			</if>
+	</select>
+	<!--非空修改数据-->
+	<update id="updateSelectiveById" parameterType="com.hzitshop.entity.CustomerInfo">
+		UPDATE customer_info
+		<set>
+			<if test="customerId != null">
+				customer_id = #{customerId},
+			</if>
+			<if test="realName != null">
+				real_name = #{realName},
+			</if>
+			<if test="sex != null">
+				sex = #{sex},
+			</if>
+			<if test="age != null">
+				age = #{age},
+			</if>
+			<if test="nativePlace != null">
+				native_place = #{nativePlace},
+			</if>
+			<if test="tel != null">
+				tel = #{tel},
+			</if>
+			<if test="wechatNo != null">
+				wechat_no = #{wechatNo},
+			</if>
+			<if test="qq != null">
+				qq = #{qq},
+			</if>
+			<if test="educationBg != null">
+				education_bg = #{educationBg},
+			</if>
+			<if test="graduateTime != null">
+				graduate_time = #{graduateTime},
+			</if>
+			<if test="graduateFrom != null">
+				graduate_from = #{graduateFrom},
+			</if>
+			<if test="majorIn != null">
+				major_in = #{majorIn},
+			</if>
+			<if test="workAge != null">
+				work_age = #{workAge},
+			</if>
+			<if test="workExperience != null">
+				work_experience = #{workExperience},
+			</if>
+			<if test="job != null">
+				job = #{job},
+			</if>
+			<if test="educateExperience != null">
+				educate_experience = #{educateExperience},
+			</if>
+			<if test="recruitChannel != null">
+				recruit_channel = #{recruitChannel},
+			</if>
+			<if test="customerState != null">
+				customer_state = #{customerState},
+			</if>
+			<if test="customerLevel != null">
+				customer_level = #{customerLevel},
+			</if>
+			<if test="userId != null">
+				user_id = #{userId},
+			</if>
+			<if test="targetSkill != null">
+				target_skill = #{targetSkill},
+			</if>
+			<if test="introducer != null">
+				introducer = #{introducer},
+			</if>
+			<if test="memo != null">
+				memo = #{memo},
+			</if>
+			<if test="lastTime != null">
+				last_time = #{lastTime},
+			</if>
+			<if test="createTime != null">
+				create_time = #{createTime},
+			</if>
+			<if test="companyId != null">
+				company_id = #{companyId},
+			</if>
+			<if test="isDelete != null">
+				isDelete = #{isDelete},
+			</if>
+			<if test="guandan != null">
+				guandan = #{guandan},
+			</if>
+			<if test="isMarket != null">
+				isMarket = #{isMarket},
+			</if>
+			<if test="traceTime != null">
+				trace_time = #{traceTime},
+			</if>
+			<if test="marketMemo != null">
+				market_memo = #{marketMemo},
+			</if>
+			<if test="learnMemo != null">
+				learn_memo = #{learnMemo},
+			</if>
+			<if test="isLearn != null">
+				isLearn = #{isLearn},
+			</if>
+			<if test="customerType != null">
+				customer_type = #{customerType},
+			</if>
+			<if test="yunying != null">
+				yunying = #{yunying},
+			</if>
+			<if test="recordTime != null">
+				record_time = #{recordTime},
+			</if>
+		</set>
+		WHERE
+		customer_id = #{customerId}
+	</update>
+	<!--获取前台导出数据-->
+	<select id="foregroundExportData" resultMap="frontMap" parameterType="map">
+		SELECT
+		tbl.customer_id,
+		tbl.real_name ,
+		ei.`name` AS introducer,
+		tbl.gender,
+		tbl.interviewer,
+		tbl.tel,
+		tbl.education_bg,
+		tbl.job,
+		tbl.create_time,
+		tbl.recruit_channel,
+		tbl.age,
+		tbl.isMarket
+		FROM
+		(
+
+		SELECT
+		ci.customer_id,
+		ci.`real_name`,
+		CASE sex
+		WHEN '1' THEN '男'
+		WHEN '2' THEN '女'
+		ELSE '未知' END gender,
+		ei.`name` AS interviewer,
+		ci.`tel`,
+		ci.`education_bg`,
+		ci.`recruit_channel`,
+		ci.`job`,
+		ci.age,
+		ci.`introducer`,
+		ci.create_time,
+		CASE ci.isMarket
+		WHEN '0' THEN '无'
+		ELSE ci.isMarket END isMarket
+		FROM
+		customer_info ci,
+		employee_info ei
+		<where>
+			<if test="date!= null">
+				DATE_FORMAT(ci.create_time,'%Y-%m-%d') = #{date}
+			</if>
+		</where>
+		AND ci.`user_id` = ei.`user_id`
+
+		)  tbl
+		LEFT JOIN
+		employee_info ei
+
+		ON tbl.introducer =ei.`user_id`
+		<if test="offset!= null">
+			LIMIT #{offset},#{limit}
+		</if>
+	</select >
+	<!--前台数据导出沟统计-->
+	<select id="foregroundExportDataCount" resultType="long" parameterType="map">
+		SELECT
+		 count(1)
+		FROM
+			(
+
+				SELECT
+				  ci.customer_id,
+				  ci.`real_name`,
+				  CASE sex
+				  WHEN '1' THEN '男'
+				  WHEN '2' THEN '女'
+				  ELSE '未知' END gender,
+				  ei.`name` AS interviewer,
+				  ci.`tel`,
+				  ci.`education_bg`,
+				  ci.`recruit_channel`,
+				  ci.`job`,
+				  ci.age,
+				  ci.`introducer`,
+				  ci.create_time,
+				  CASE ci.isMarket
+				  WHEN '0' THEN '无'
+				  ELSE ci.isMarket END isMarket
+				FROM
+					 customer_info ci,
+					 employee_info ei
+					<where>
+						<if test="date!= null">
+							DATE_FORMAT(ci.create_time,'%Y-%m-%d') = #{date}
+						</if>
+					</where>
+					AND ci.`user_id` = ei.`user_id`
+
+			)  tbl
+			LEFT JOIN
+			employee_info ei
+
+		ON tbl.introducer =ei.`user_id`
+
+	</select>
+
+	<select id="selectByForeground" resultMap="BaseResultMap" parameterType="map">
+
+	</select>
+
+	<!--根据客户级别查询没有进行跟进的咨询师-->
+	<select id="selectByRecordTimeAndLevel" resultMap="NotFollowUpMap"  parameterType="map">
+		SELECT
+		ci.customer_id,ci.real_name,
+		CASE ci.sex WHEN
+		1 THEN '男'
+		WHEN 2 THEN '女'
+		END sex
+		,ei.name
+		,ci.tel
+		,dic.name as company
+		,ci.memo
+		,ci.create_time
+		FROM
+		customer_info ci ,
+		employee_info ei,
+		tb_dict dic
+		WHERE
+		 ci.user_id = ei.user_id
+		 AND  dic.id = ci.company_id
+		 AND ci.record_time IS   NULL
+		 AND TO_DAYS(NOW()) - TO_DAYS(ci.create_time) >= #{timeCount}
+		 AND ci.customer_level = #{recordLevel}
+		 AND ci.customer_type = 0
+		 AND ci.isDelete = 0
+		 AND ei.isLocked = 0
+		 <if test="companyId != null">
+			 AND ci.company_id = #{companyId}
+		 </if>
+		<if test="realName!= null">
+			AND ci.real_name like  concat(#{realName},"%")
+		</if>
+		<if test="name!= null">
+			AND ei.name like concat(#{name},"%")
+		</if>
+		 ORDER BY ci.create_time DESC
+		  LIMIT  #{offset},#{limit}
+	</select>
+	<select id="selectByRecordTimeAndLevelCount" resultType="int"  parameterType="map">
+		SELECT
+			count(1)
+		FROM
+		customer_info ci ,
+		employee_info ei,
+		tb_dict dic
+		WHERE
+		ci.user_id = ei.user_id
+		AND  dic.id = ci.company_id
+		AND ci.record_time IS   NULL
+		AND TO_DAYS(NOW()) - TO_DAYS(ci.create_time) >= #{timeCount}
+		AND ci.customer_level = #{recordLevel}
+		AND ci.customer_type = 0
+		AND ci.isDelete = 0
+		AND ei.isLocked = 0
+		<if test="realName!= null">
+			AND ci.real_name like concat(#{realName},"%")
+		</if>
+		<if test="name!= null">
+			AND ei.name  like concat(#{name},"%")
+		</if>
+		<if test="companyId != null">
+			AND ci.company_id = #{companyId}
+		</if>
+		ORDER BY ci.create_time DESC
+	</select>
+	<!--定时每天查询没有跟进的信息-->
+	<select id="selectByRecordTime" resultMap="NotFollowUpMap" parameterType="map">
+		SELECT
+		ci.customer_id,ci.real_name,ci.company_id,ei.name
+		FROM
+		customer_info ci ,
+		employee_info ei,
+		tb_dict dic
+		WHERE
+		ci.user_id = ei.user_id
+		AND  dic.id = ci.company_id
+		AND ci.record_time IS   NULL
+		AND TO_DAYS(NOW()) - TO_DAYS(ci.create_time) =  #{countTime}
+		AND ci.customer_level = #{level}
+		AND ci.customer_type = 0
+		AND ci.isDelete = 0
+		AND ei.isLocked = 0
+		AND ci.company_id=#{companyId}
+	</select>
+
+	<update id="updateByLevelAndCountTime">
+		UPDATE customer_info SET customer_type = 1 WHERE
+		 record_time IS   NULL
+		 AND TO_DAYS(NOW()) - TO_DAYS(create_time) <![CDATA[ >=]]> #{countTime}
+		 AND customer_level = #{level}
+		 AND customer_type = 0
+		 AND isDelete = 0
+	</update>
+	<!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultMap" type="com.hzitshop.entity.CustomerInfo">
+		<id column="customer_id" property="customerId" />
+		<result column="real_name" property="realName" />
+		<result column="sex" property="sex" />
+		<result column="age" property="age" />
+		<result column="native_place" property="nativePlace" />
+		<result column="tel" property="tel" />
+		<result column="wechat_no" property="wechatNo" />
+		<result column="qq" property="qq" />
+		<result column="education_bg" property="educationBg" />
+		<result column="graduate_time" property="graduateTime" />
+		<result column="graduate_from" property="graduateFrom" />
+		<result column="major_in" property="majorIn" />
+		<result column="work_age" property="workAge" />
+		<result column="work_experience" property="workExperience" />
+		<result column="job" property="job" />
+		<result column="educate_experience" property="educateExperience" />
+		<result column="recruit_channel" property="recruitChannel" />
+		<result column="customer_state" property="customerState" />
+		<result column="customer_level" property="customerLevel" />
+		<result column="user_id" property="userId" />
+		<result column="target_skill" property="targetSkill" />
+		<result column="introducer" property="introducer" />
+		<result column="memo" property="memo" />
+		<result column="last_time" property="lastTime" />
+		<result column="create_time" property="createTime" />
+		<result column="company_id" property="companyId" />
+		<result column="isDelete" property="isDelete" />
+		<result column="guandan" property="guandan" />
+		<result column="isMarket" property="isMarket" />
+		<result column="market_memo" property="marketMemo" />
+		<result column="learn_memo" property="learnMemo" />
+		<result column="isLearn" property="isLearn" />
+		<result column="customer_type" property="customerType" />
+		<result column="yunying" property="yunying" />
+		<result column="record_time" property="recordTime" />
+	</resultMap>
+
+	<resultMap id="frontMap" type="com.hzitshop.vo.front.FrontVo">
+		<id property="customerId" column="customer_id"></id>
+		<result property="realName" column="real_name"></result>
+		<result property="gender" column="gender"></result>
+		<result property="age" column="age"></result>
+		<result property="education" column="education_bg"></result>
+		<result property="job" column="job"></result>
+		<result property="introducer" column="introducer"></result>
+		<result property="interviewer" column="interviewer"></result>
+		<result property="market" column="isMarket"></result>
+		<result property="recruitChannel" column="recruit_channel"></result>
+		<result property="createTime" column="create_time"></result>
+
+	</resultMap>
+
+	<resultMap id="traceDataMap" type="hashmap">
+		<result property="userId" column="dingding_id"></result>
+		<result property="count" column="count"></result>
+	</resultMap>
+
+	<resultMap id="recordTimeDataMap" type="hashmap">
+		<result property="name" column="name"></result>
+		<result property="companyId" column="company_id"></result>
+	</resultMap>
+
+	<resultMap id="NotFollowUpMap" type="com.hzitshop.vo.customerinfovo.NotFollowUpVo">
+		<id column="customer_id" property="customerId"></id>
+		<result column="real_name" property="realName"></result>
+		<result column="sex" property="sex"></result>
+		<result column="name" property="name"></result>
+		<result column="company" property="company"></result>
+		<result column="tel" property="tel"></result>
+		<result column="create_time" property="createTime"></result>
+		<result column="memo" property="memo"></result>
+	</resultMap>
 </mapper>

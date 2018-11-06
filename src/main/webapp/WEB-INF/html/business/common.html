@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>公共库</title>
+    <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/bootstrap-table-master/dist/bootstrap-table.css">
+    <link rel="stylesheet" href="/assets/bootstrap-table-master/dist/extensions/page-jump/bootstrap-table-pagejump.css">
+    <link rel="stylesheet" type="text/css" href="/assets/themes/layui/css/layui.css">
+    <link rel="stylesheet" type="text/css" href="/style/hzitshop.css">
+</head>
+<body>
+<input type="hidden" name="companyId" th:value="${session.employeeInfo.companyId}">
+<div id="toolbar" style="margin-left:20px;">
+    <span  id="span-grant" ><button id="grant" class="layui-btn layui-btn-small layui-btn-normal"><i class="layui-icon"></i>分配</button></span>
+    <span  id="span-recover" ><button id="recover" class="layui-btn layui-btn-small " style="background-color:orange;color:white;">
+        <i class="layui-icon"></i>还原</button></span>
+    <div style="display: inline-block;">
+        <input type="text"   class="form-control " style="width:230px;display: inline-block;"
+               id="searchValue" placeholder="请输入学员姓名!">
+        <button id="searchCustomerInfo" class="layui-btn layui-btn-normal layui-btn-small "><i
+                class="layui-icon">&#xe615;</i>搜索</button>
+        <button id="searchRefresh" class="layui-btn layui-btn-danger layui-btn-small toolbar-refresh"><i
+                class="layui-icon">&#xe63d;</i>刷新</button>
+    </div>
+</div>
+<table id="table">
+</table>
+<div style="display: none;padding: 20px 20px 0px 20px;" id="grantDiv">
+    <form class="layui-form" action="">
+        <div class="layui-form-item">
+            <label class="layui-form-label">选择框</label>
+            <div class="layui-input-block">
+                <select name="useId" id="userId" lay-filter="useId">
+                    <option value="-1">请选择运营人员!</option>
+                </select>
+            </div>
+        </div>
+    </form>
+</div>
+<script src="/assets/js/jquery.min.js"></script>
+<script src="/assets/bootstrap/js/bootstrap.min.js"></script>
+<script src="/assets/bootstrap-table-master/dist/bootstrap-table.js"></script>
+<script src="/assets/bootstrap-table-master/dist/locale/bootstrap-table-zh-CN.js"></script>
+<script src="/assets/bootstrap-table-master/dist/extensions/page-jump/bootstrap-table-pagejump.js"></script>
+<script src="/assets/layui/layui.js"></script>
+<script src="/script/business/common.js"></script>
+<script>
+    layui.use('form', function(){
+        var form = layui.form;
+        $("#span-grant").click(function () {
+            var $selectData = $table.bootstrapTable('getAllSelections');
+            if ($selectData.length < 1) {
+                layer.msg('请选择要分配的数据!', {icon: 2});
+                return false;
+            }
+            var customerIdArr = [];
+            $.each($selectData,function(key,value){
+                customerIdArr.push(value.customerId);
+            });
+            //异步加载运营人员信息
+            $.ajax({
+                type: 'GET',
+                url: '/business/getEmployee',
+                success: function (resp) {
+                    if (resp.status === 0) {
+                        var data = resp.data;
+                        var $userId = $('#userId');
+                        $.each(data,function(key,value){
+                            var $option = $('<option value="'+value.userId+'">'+value.name+'</option>');
+                            $userId.append($option);
+                        });
+                        form.render('select');//重新渲染
+                    }else{
+                        layer.msg("操作失败!",{icon:2});
+                    }
+                },
+                error: function (error) {
+                    showError(error);
+                }
+            });
+            layer.open({
+                type: 1,
+                title: "分配数据",
+                shadeClose: true,
+                shade: 0,
+                maxmin: false,
+                area: ["500px", "350px"],
+                content: $('#grantDiv'),
+                btn: ['确定', '取消'],
+                yes: function (index, layero) {
+                   var value = $('#userId option:selected').val();
+                   if(value == -1){
+                       layer.msg('请选择运营人员!',{icon:2});
+                       return false;
+                   }
+                   //提交数据
+                   $.ajax({
+                       type:"POST",
+                       url:'/business/grant',
+                       data:'customerIdArr='+customerIdArr+"&userId="+value,
+                       success:function(resp){
+                           if(resp.status === 0){
+                               layer.msg('操作成功!',{icon:1});
+                               setTimeout(function(){
+                                   layer.close(index);
+                                   $("#table").bootstrapTable("refresh"); //刷新
+                               },1000);
+                           }else{
+                               layer.msg('操作失败!',{icon:2});
+                           }
+                       },error:function(error){
+                            showError(error);
+                       }
+                   });
+                },
+                end: function (layer, index) {
+                    $("#table").bootstrapTable("refresh"); //刷新
+                }
+            });
+        });
+
+
+        function showError(error){
+            if (error.status === 500) {
+                layer.msg('服务器内部异常!', {icon: 2});
+            } else if (error.status === 404) {
+                layer.msg('请求路径错误!', {icon: 2});
+            } else if (error.status === 401) {
+                layer.msg('对不起，您没有权限进行该操作!');
+            }
+        }
+
+    });
+</script>
+</body>
+</html>

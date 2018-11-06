@@ -26,6 +26,7 @@
     <input type="hidden" name="roleName" th:value="${session.employeeInfo.roleName}">
     <form id="addCustomerInfoForm" class="layui-form layui-form-pane"
           method="post" style="margin-left: 10px;margin-right: 10px;width:1250px;">
+        <input type="hidden" name="customerType" value="0"/>
         <input type="hidden" name="isYunYing" value="0">
         <input type="hidden" th:value="${session.employeeInfo.companyId}" name="companyId">
         <div class="layui-form-item" style="text-align: left;">
@@ -58,12 +59,12 @@
                 <input name="tel" id="tel"  autocomplete="off" placeholder="请输入电话号码!" class="layui-input"
                        type="text">
             </div>
-            <label class="layui-form-label label-font">微信号</label>
+            <label class="layui-form-label label-font">微信/qq</label>
             <div class="layui-input-inline">
-                <input name="wechatNo" placeholder="请输入微信号!" autocomplete="off" class="layui-input" type="text"></div>
-            <label class="layui-form-label label-font">qq号</label>
+                <input name="wechatNo" placeholder="请输入微信/qq号!" autocomplete="off" class="layui-input" type="text"></div>
+            <label class="layui-form-label label-font">身份证号</label>
             <div class="layui-input-inline">
-                <input name="qq" placeholder="请输入qq号!" autocomplete="off" class="layui-input" type="text">
+                <input name="qq" placeholder="请输入身份证号!" autocomplete="off" class="layui-input" type="text">
             </div>
             <label class="layui-form-label label-font" for="educationBg">学历</label>
             <div class="layui-input-inline">
@@ -71,7 +72,7 @@
                     <select  class="form-control" id="educationBg" name="educationBg">
                         <option value="" selected="selected">请选择学历!</option>
                         <option th:each="educationBg,educationBgStat:${educationBgList}"
-                                th:text="${educationBg.name}" th:value="${educationBg.id}"></option>
+                                th:text="${educationBg.name}" th:value="${educationBg.name}"></option>
                     </select>
                 </div>
             </div>
@@ -102,9 +103,9 @@
                 <input name="workExperience" value="无" autocomplete="off" placeholder="请输入工作经历!" class="layui-input"
                        type="text">
             </div>
-            <label class="layui-form-label label-font">职业</label>
+            <label class="layui-form-label label-font">职位</label>
             <div class="layui-input-inline">
-                <input name="job" value="无" placeholder="请输入职业!" autocomplete="off" class="layui-input" type="text">
+                <input name="job" value="无" placeholder="请输入职位!" autocomplete="off" class="layui-input" type="text">
             </div>
             <label class="layui-form-label label-font" >教育培训经历</label>
             <div class="layui-input-inline">
@@ -151,8 +152,10 @@
             <label class="layui-form-label label-font" for="isMarket">会销</label>
             <div class="layui-input-inline">
                 <div class="layui-input-inline" id="isMarket">
-                    <input name="isMarket" value="0" title="是" checked="" type="radio">
-                    <input name="isMarket" value="1" title="否" type="radio">
+                    <!--<input name="isMarket" value="0" title="是" checked="" type="radio">-->
+                    <!--<input name="isMarket" value="1" title="否" type="radio">-->
+                    <input name="isMarket"  placeholder="请输入会销讲师!" autocomplete="off"
+                           class="layui-input" type="text">
                 </div>
             </div>
             <!--<label class="layui-form-label label-font">关单人<i style="color:orange;" class="layui-icon"></i></label>
@@ -170,7 +173,7 @@
                 <select name="recruitChannel"  id="recruitChannel" >
                     <option value="">请选择应聘渠道!</option>
                     <option th:each="recruitChannel,recruitChannelStat:${recruitChannelList}"
-                            th:text="${recruitChannel.name}" th:value="${recruitChannel.id}"></option>
+                            th:text="${recruitChannel.name}" th:value="${recruitChannel.name}"></option>
                 </select>
             </div>
 
@@ -181,6 +184,11 @@
                     <option th:each="introducer,introducerStat:${introducerList}"
                     th:text="${introducer.name}" th:value="${introducer.userId}"></option>
                 </select>
+            </div>
+            <label class="layui-form-label label-font" for="traceTime">回访时间</label>
+            <div class="layui-input-inline ">
+                <input name="traceTime" id="traceTime" class="layui-input" onClick="WdatePicker({skin:'twoer',dateFmt:'yyyy-MM-dd HH:mm:ss'})" type="text"
+                       placeholder="请输入回访时间!">
             </div>
         </div>
         <div class="layui-form-item layui-form-text">

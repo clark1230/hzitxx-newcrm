@@ -8,8 +8,10 @@ import com.hzitshop.entity.TbDict;
 import com.hzitshop.service.ICustomerInfoService;
 import com.hzitshop.service.IEmployeeInfoService;
 import com.hzitshop.service.ITbDictService;
+import com.hzitshop.service.ImportInfoService;
 import com.hzitshop.vo.CustomerInfoVo;
 import com.hzitshop.vo.EmployeeInfoVo;
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +42,9 @@ public class ForegroundController {
     private ICustomerInfoService iCustomerInfoService;
 
     @Autowired
+    private ImportInfoService importInfoService;
+
+    @Autowired
     private ITbDictService iTbDictService;
 
     private Logger logger = LoggerFactory.getLogger(ForegroundController.class);
@@ -49,9 +54,9 @@ public class ForegroundController {
      */
     @RequiresPermissions("foreground:index")
     @RequestMapping("/foreground/index")
-    protected  String index(Model model){
+    public  String index(Model model){
         //获取所有的校区
-        List<TbDict> tbDictList = iTbDictService.selectList(new EntityWrapper<TbDict>().where("pid=35"));//获取所有的校区
+        List<TbDict> tbDictList = iTbDictService.selectList(new EntityWrapper<TbDict>().where("pid=35").and("delete_status != 1"));//获取所有的校区
         model.addAttribute("tbDictList",tbDictList);
         return "/foreground/index";
     }
@@ -65,7 +70,7 @@ public class ForegroundController {
     @RequiresPermissions("foreground:consultantData")
     @RequestMapping("/foreground/consultantData")
     @ResponseBody
-    protected List<EmployeeInfoVo> consultantData(EmployeeInfo employeeInfo){
+    public List<EmployeeInfoVo> consultantData(EmployeeInfo employeeInfo){
        List<EmployeeInfoVo> bt = iEmployeeInfoService.consultantData(employeeInfo);
         return bt;
     }
@@ -78,28 +83,22 @@ public class ForegroundController {
     @RequiresPermissions("foreground:addCustomerInfo")
     @RequestMapping("/foreground/addCustomerInfo")
     @ResponseBody
-    protected Map<String,Object> addCustomerInfo(ImportInfo i){
+    public Map<String,Object> addCustomerInfo(ImportInfo i,int userId){
         Map<String,Object> resultMap = new HashMap<>();
         CustomerInfo customerInfo = new CustomerInfo();
         try{
-            customerInfo.setRealName(i.getRealName());
-            customerInfo.setSex(i.getSex());
-            customerInfo.setAge(i.getAge());
-            customerInfo.setNativePlace(i.getNativePlace());
-            customerInfo.setTel(i.getTel());
-            customerInfo.setEducationBg(i.getEducationBg());
-            customerInfo.setGraduateTime(i.getGraduateTime());
-            customerInfo.setGraduateFrom(i.getGraduateFrom());
-            customerInfo.setMajorIn(i.getMajorIn());
-            customerInfo.setWorkAge(i.getWorkAge());
-            customerInfo.setWorkExperience(i.getWorkExperience());
-            customerInfo.setJob(i.getJob());
-            customerInfo.setEducateExperience(i.getEducateExperience());
-            customerInfo.setRecruitChannel(i.getRecruitChannel());
-            customerInfo.setIntroducer(i.getIntroducer());
-            customerInfo.setCompanyId(i.getCompanyId());
+            i.setStatus("0");
+            List<ImportInfo> importInfoList = this.importInfoService.checkRealName(i);
+            if(importInfoList != null && importInfoList.size() >0){
+               i.setStatus("已上门");
+               boolean result= this.importInfoService.updateSelectiveById(i);
+            }
+            BeanUtils.copyProperties(customerInfo,i);
+            customerInfo.setCustomerState(28);//未面试
+            customerInfo.setJob(i.getApplyJob());
+            customerInfo.setIsLearn("0");
+            customerInfo.setIsMarket("0");
             customerInfo.setCreateTime(new Date());
-            customerInfo.setCustomerState(28);
             iCustomerInfoService.insert(customerInfo);
             resultMap.put("code",200);
             resultMap.put("msg","保存成功!");
@@ -120,21 +119,22 @@ public class ForegroundController {
     @RequiresPermissions("foreground:customerInfoWaitList")
     @RequestMapping("/foreground/customerInfoWaitList")
     @ResponseBody
-    protected  List<CustomerInfoVo> customerInfoWaitList(CustomerInfo ci,EmployeeInfo ei){
+    public  List<CustomerInfoVo> customerInfoWaitList(CustomerInfo ci,EmployeeInfo ei){
        // Wrapper<CustomerInfo> wrapper = new EntityWrapper<>();
+        ci.setCustomerType(0);
         List<CustomerInfoVo> customerInfoVoList = iCustomerInfoService.customerInfoWaitList(ci,ei);
         return customerInfoVoList;
     }
 
     /**
-     * 前天编辑学员信息
+     * 编辑学员信息
      * @param ci
      * @param  ei
      * @return
      */
     @RequiresPermissions("foreground:editCustomerInfo")
     @RequestMapping(value ="/foreground/editCustomerInfo",method = RequestMethod.GET)
-    protected String editCustomerInfo(CustomerInfo ci, EmployeeInfo ei, Model model){
+    public String editCustomerInfo(CustomerInfo ci, EmployeeInfo ei, Model model){
         ci = iCustomerInfoService.selectById(ci.getCustomerId());
         ei.setCompanyId(ci.getCompanyId());
         //获取咨询师信息
@@ -153,10 +153,9 @@ public class ForegroundController {
     @RequiresPermissions("foreground:editCustomerInfo")
     @RequestMapping(value="/foreground/editCustomerInfo",method= RequestMethod.POST)
     @ResponseBody
-    protected  Map<String,Object> editCustomerInfo(CustomerInfo customerInfo){
+    public  Map<String,Object> editCustomerInfo(CustomerInfo customerInfo){
         Map<String,Object> resultMap = new HashMap<>();
         try{
-            //Thread.sleep(20*1000);  //模拟网络延时
             iCustomerInfoService.updateById(customerInfo);
             resultMap.put("code",200);
             resultMap.put("msg","保存成功!");

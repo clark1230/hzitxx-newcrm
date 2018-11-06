@@ -29,6 +29,7 @@ public class TbDict extends Model<TbDict> {
 	private Integer id;
 	private String code;
 	private Integer num;
+
     /**
      * 父级id
      */
@@ -42,6 +43,7 @@ public class TbDict extends Model<TbDict> {
      * 提示
      */
 	private String tips;
+
 	private Integer version;
     /**
      * 图标
@@ -51,8 +53,16 @@ public class TbDict extends Model<TbDict> {
      * 该节点是否打开
      */
 	private String open;
+	/**
+	 * 勾选状态
+	 */
 	private String checked;
 
+	/**
+	 * 删除状态  删除状态,0表示未删除  1:删除  默认为 0
+	 */
+	@TableField(value = "delete_status")
+	private int deleteStatus;
 
 	public Integer getId() {
 		return id;
@@ -132,6 +142,14 @@ public class TbDict extends Model<TbDict> {
 
 	public void setChecked(String checked) {
 		this.checked = checked;
+	}
+
+	public int getDeleteStatus() {
+		return deleteStatus;
+	}
+
+	public void setDeleteStatus(int deleteStatus) {
+		this.deleteStatus = deleteStatus;
 	}
 
 	@Override

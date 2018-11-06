@@ -43,9 +43,10 @@ $(function(){
                     layer.msg(result.msg);
                 }else{
                     layer.msg(result.msg);
-                    parent.document.getElementById('hiddenIframeCloseState').text='1';
+                     parent.document.getElementById('hiddenIframeCloseState').text='1';
                     window.setTimeout(function(){
-                        parent.layer.close(index);//关闭层
+                      parent.layer.close(index);//关闭层
+                      //  history.go(-1);
                     },2000);
 
                 }
@@ -56,6 +57,7 @@ $(function(){
             }
         })
     });
+
     /**
      * 让所有的select标签与input标签的长度一致
      */
@@ -65,5 +67,6 @@ $(function(){
     //关闭iframe窗口
     $("#btnClose").click(function(){
         parent.layer.close(index);//关闭层
+        //history.go(-1);
     });
 });

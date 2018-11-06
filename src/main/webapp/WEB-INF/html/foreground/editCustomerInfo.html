@@ -48,6 +48,46 @@
                         th:text="${employeeInfoVo.name}" th:value="${employeeInfoVo.userId}"></option>
             </select>
         </div>
+        <div class="am-form-group">
+            <label for="sex">性别:</label>
+            <div id="sex" style="margin-left: 50px;">
+                <label class="am-radio" style="margin-top: -7px;margin-right: 14px;">
+                    <input th:checked="${customerInfo.sex==1}" name="sex" value="1" title="男"  type="radio" data-am-ucheck>男
+                </label>
+                <label class="am-radio" style="margin-top: -7px;margin-right: 14px;">
+                    <input th:checked="${customerInfo.sex==2}" name="sex" value="2" title="女" type="radio" data-am-ucheck>女
+                </label>
+            </div>
+        </div>
+
+        <div class="am-form-group">
+            <label for="age" style="position: absolute;left: 7px;">年龄:</label>
+            <br/>
+           <input type="text" name="age" id="age"
+                   th:value="${customerInfo.age}"  class="am-form-field am-radius"  placeholder="请输入年龄!">
+        </div>
+        <div class="am-form-group">
+            <label for="educationBg">学历:</label>
+            <input type="text" name="educationBg" id="educationBg"
+                   th:value="${customerInfo.educationBg}"  class="am-form-field am-radius"  placeholder="请输入学历!">
+        </div>
+        <div class="am-form-group">
+            <label for="recruitChannel">应聘渠道:</label>
+            <input type="text" name="recruitChannel" id="recruitChannel"
+                   th:value="${customerInfo.recruitChannel}"  class="am-form-field am-radius"  placeholder="应聘渠道!">
+        </div>
+        <div class="am-form-group">
+            <label for="job">应聘职位:</label>
+            <input type="text" name="job" id="job"
+                   th:value="${customerInfo.job}"  class="am-form-field am-radius"  placeholder="请输入应聘职位!">
+
+        </div>
+        <div class="am-form-group">
+            <label for="memo">备注:</label>
+            <!--<input type="text" name="memo" id="memo"
+                     class="am-form-field am-radius"  placeholder="请输入备注!">-->
+            <textarea id="memo" name="memo" placeholder="请输入备注!" th:text="${customerInfo.memo}" class="form-control" rows="4"></textarea>
+        </div>
         <div  style="width:100%;height:60px;margin-top:34px;">
             <span>
                 <label class="am-radio" style="margin-top: -7px;margin-right: 14px;">

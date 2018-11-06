@@ -23,7 +23,7 @@ public class TbMenuController {
     private ITbMenuService iTbMenuService;
     @RequestMapping("/Menu/list")
     @ResponseBody
-    protected List<TbMenu> list() {
+    public List<TbMenu> list() {
         return iTbMenuService.selectByMap(null);
     }
 }

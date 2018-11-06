@@ -13,6 +13,7 @@ import com.hzitshop.service.IEmployeeInfoService;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import com.hzitshop.vo.BootstrapTable;
 import com.hzitshop.vo.EmployeeInfoVo;
+import com.hzitshop.vo.employeevo.EmployeeVoNameId;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,10 @@ public class EmployeeInfoServiceImpl extends ServiceImpl<EmployeeInfoMapper, Emp
     private TbDictMapper tbDictMapper;
     @Autowired
     private TbMenuAppMapper tbMenuAppMapper;
+
+    @Autowired
+    private EmployeeInfoMapper employeeInfoMapper;
+
     @Override
     public BootstrapTable<EmployeeInfoVo> ajaxData(Page<EmployeeInfo> page, Wrapper<EmployeeInfo> wrapper) {
         Page<EmployeeInfo> resultPage = this.selectPage(page,wrapper);
@@ -112,5 +117,19 @@ public class EmployeeInfoServiceImpl extends ServiceImpl<EmployeeInfoMapper, Emp
         }
         return stringList;
     }
-//	       @Override
+
+    /**
+     * 根据角色和公司获取相关人员信息
+     * @param paramMap
+     * @return
+     */
+    @Override
+    public List<EmployeeVoNameId> selectByRole(Map<String, Object> paramMap) {
+        List<EmployeeVoNameId> employeeVoNameIds = employeeInfoMapper.selectByRole(paramMap);
+        for(EmployeeVoNameId employeeVoNameId : employeeVoNameIds){
+            employeeVoNameId.setTemplet("'#isDelete"+employeeVoNameId.getUserId()+"'");
+            employeeVoNameId.setUserId("id"+employeeVoNameId.getUserId()+"");
+        }
+        return  employeeVoNameIds;
+    }
 }

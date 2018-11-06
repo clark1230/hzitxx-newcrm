@@ -1,0 +1,373 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hzitshop.mapper.SignupMapper">
+    <!--tb_signup表中的列-->
+    <sql id="signupBaseColumn">
+         id,
+         customer_id,
+         is_delete,
+         create_time,
+         memo,
+         status,
+         deposit,
+         company_id,
+         accounting_date,
+         registration_and_payment_time
+    </sql>
+
+    <!--添加-->
+    <insert id="addSignup" parameterType="com.hzitshop.entity.Signup">
+        INSERT INTO tb_signup(
+            <include refid="signupBaseColumn"/>
+        ) VALUES(
+                #{id},
+                #{customerId},
+                #{isDelete},
+                #{createTime},
+                #{memo},
+                #{status},
+                #{deposit},
+                #{company_id},
+                #{accountingDate},
+                #{registrationAndPaymentTime}
+        )
+    </insert>
+    <!--添加-->
+    <insert id="addSignupSelective" parameterType="com.hzitshop.entity.Signup">
+        insert into tb_signup
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="customerId != null">
+                customer_id,
+            </if>
+            <if test="isDelete != null">
+                is_delete,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="memo != null">
+                memo,
+            </if>
+            <if test="status!= null">
+                status,
+            </if>
+            <if test="deposit!= null">
+                deposit,
+            </if>
+            <if test="companyId!= null">
+                company_id,
+            </if>
+            <if test="accountingDate!= null">
+                accounting_date,
+            </if>
+            <if test="registrationAndPaymentTime != null">
+                registration_and_payment_time
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id},
+            </if>
+            <if test="customerId != null">
+                #{customerId},
+            </if>
+            <if test="isDelete != null">
+                #{isDelete},
+            </if>
+            <if test="createTime != null">
+                #{createTime},
+            </if>
+            <if test="memo != null">
+                #{memo},
+            </if>
+            <if test="status != null">
+                #{status},
+            </if>
+            <if test="deposit != null">
+                #{deposit},
+            </if>
+            <if test="companyId != null">
+                #{companyId},
+            </if>
+            <if test="accountingDate != null">
+                #{accountingDate},
+            </if>
+            <if test="registrationAndPaymentTime != null">
+                #{registrationAndPaymentTime}
+            </if>
+        </trim>
+    </insert>
+    <!--根据id删除数据-->
+    <delete id="deleteById" parameterType="integer">
+        DELETE FROM  tb_signup WHERE
+        id = #{id}
+    </delete>
+
+    <!--根据id批量删除数据-->
+    <delete id="deleteByIds" parameterType="java.lang.String">
+          delete FROM  tb_signup WHERE id in
+          <foreach item="idItem" collection="array" open="(" separator="," close=")">
+            #{idItem}
+          </foreach>
+    </delete>
+    <!--根据id修改数据-->
+
+    <!--根据id查询一条数据-->
+    <select id="findOne" resultMap="signupMap" parameterType="integer">
+        select
+        <include refid="signupBaseColumn"/>
+        from
+            tb_signup
+        WHERE
+          id = #{id}
+    </select>
+    <!--根据customerId查询数据-->
+    <select id="findOneByCustomerId" resultMap="signupMap" parameterType="integer">
+        select
+        <include refid="signupBaseColumn"/>
+        from
+        tb_signup
+        WHERE
+        customer_id = #{customerId}
+    </select>
+    <!--查询数据-->
+    <select id="searchSignup" parameterType="map" resultMap="signupMap">
+        SELECT
+        <include refid="signupBaseColumn"/>
+        FROM tb_signup
+        <include refid="signupBaseWhereSql"/>
+    </select>
+    <!--查询报名数据-->
+    <select id="selectSignup" resultMap="signupMap2" parameterType="map">
+        SELECT
+        ei.`name` AS guandan,
+        tbl.id,
+        tbl.`real_name`,
+        tbl.accounting_date,
+        tbl.registration_and_payment_time,
+        tbl.deposit,
+        tbl.status,
+        tbl.company,
+        tbl.sex,
+        tbl.tel,
+        tbl.`name`,
+        tbl.`create_time`,
+        tbl.memo
+        FROM
+        (
+            SELECT
+            sig.id,ci.`real_name`,
+            sig.accounting_date,
+            sig.registration_and_payment_time,
+            sig.deposit,
+            sig.status,
+            ci.guandan,
+            dic.name as company,
+            CASE ci.sex
+            WHEN '1' THEN '男'
+            WHEN '2' THEN '女'
+            ELSE '未知' END sex,
+            ci.tel,ei.`name`,sig.`create_time`,sig.memo
+            FROM
+            tb_signup sig,
+            customer_info ci,
+            employee_info ei,
+            tb_dict dic
+            WHERE sig.customer_id = ci.`customer_id`
+            AND ci.`user_id` = ei.user_id
+            AND dic.id = ci.company_id
+            <if test="realName!=null">
+              AND ci.real_name like CONCAT(#{realName},"%")
+            </if>
+            <if test="companyId!= null">
+              AND  ci.company_id = #{companyId}
+            </if>
+            <if test="userId!= null">
+                AND  ci.user_id = #{userId}
+            </if>
+            <if test="isDelete!= null">
+                AND  sig.is_delete = #{isDelete}
+            </if>
+            <if test="status!= null">
+                AND  sig.status = #{status}
+            </if>
+            <if test="name!= null">
+                AND  ei.name = #{name}
+            </if>
+        )AS tbl
+        LEFT JOIN
+        employee_info ei
+        ON tbl.guandan= ei.`user_id`
+    </select>
+
+    <select id="selectSignupCount" resultType="int" parameterType="map">
+        SELECT
+            count(1)
+        FROM
+        (
+            SELECT
+            sig.id,ci.`real_name`,
+            sig.accounting_date,
+            sig.registration_and_payment_time,
+            sig.deposit,
+            sig.status,
+            ci.guandan,
+            dic.name as company,
+            CASE ci.sex
+            WHEN '1' THEN '男'
+            WHEN '2' THEN '女'
+            ELSE '未知' END sex,
+            ci.tel,ei.`name`,sig.`create_time`,sig.memo
+            FROM
+            tb_signup sig,
+            customer_info ci,
+            employee_info ei,
+            tb_dict dic
+            WHERE sig.customer_id = ci.`customer_id`
+            AND ci.`user_id` = ei.user_id
+            AND dic.id = ci.company_id
+            <if test="realName!=null">
+                AND ci.real_name like CONCAT(#{realName},"%")
+            </if>
+            <if test="companyId!= null">
+                AND  ci.company_id = #{companyId}
+            </if>
+            <if test="userId!= null">
+                AND  ci.user_id = #{userId}
+            </if>
+            <if test="isDelete!= null">
+                AND  sig.is_delete = #{isDelete}
+            </if>
+            <if test="status!= null">
+                AND  sig.status = #{status}
+            </if>
+            <if test="name!= null">
+                AND  ei.name = #{name}
+            </if>
+        )AS tbl
+        LEFT JOIN
+        employee_info ei
+        ON tbl.guandan= ei.`user_id`
+    </select>
+
+    <!--根据id修改数据-->
+    <update id="updateById" parameterType="com.hzitshop.entity.Signup">
+        UPDATE tb_signup
+        <set>
+            id=#{id},
+            customer_id=#{customerId},
+            is_delete=#{isDelete},
+            create_time=#{createTime},
+            memo=#{memo},
+            status=#{status},
+            deposit=#{deposit},
+            accounting_date=#{accountingDate},
+            registration_and_payment_time=#{registrationAndPaymentTime}
+        </set>
+        WHERE
+        id = #{id}
+    </update>
+
+    <update id="updateSelectiveById" parameterType="com.hzitshop.entity.Signup">
+        UPDATE tb_signup
+        <set>
+            <if test="id != null">
+                id = #{id},
+            </if>
+            <if test="customerId != null">
+                customer_id = #{customerId},
+            </if>
+            <if test="isDelete != null">
+                is_delete = #{isDelete},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime},
+            </if>
+            <if test="memo != null">
+                memo = #{memo},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="deposit != null">
+                deposit = #{deposit},
+            </if>
+            <if test="accountingDate!= null">
+                accounting_date=#{accountingDate},
+            </if>
+            <if test="registrationAndPaymentTime!= null">
+                registration_and_payment_time=#{registrationAndPaymentTime}
+            </if>
+        </set>
+        WHERE
+        id = #{id}
+    </update>
+    <!--基础查询条件-->
+    <sql id="signupBaseWhereSql">
+        <if test="map!=null">
+            <where>
+                <if test="id !=null">
+                    AND id = #{id}
+                </if>
+                <if test="customerId !=null">
+                    AND customer_id = #{customerId}
+                </if>
+                <if test="isDelete !=null">
+                    AND is_delete = #{isDelete}
+                </if>
+                <if test="createTime !=null">
+                    AND create_time = #{createTime}
+                </if>
+                <if test="memo !=null">
+                    AND memo = #{memo}
+                </if>
+                <if test="status != null">
+                    AND status = #{status}
+                </if>
+                <if test="deposit != null">
+                    AND deposit = #{deposit}
+                </if>
+                <if test="accountingDate!= null">
+                    AND accounting_date=#{accountingDate}
+                </if>
+                <if test="registrationAndPaymentTime!= null">
+                    AND registration_and_paymentTime=#{registrationAndPaymentTime}
+                </if>
+            </where>
+        </if>
+    </sql>
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="signupMap" type="com.hzitshop.entity.Signup">
+            <id column="id" property="id"/>
+            <result column="customer_id" property="customerId"/>
+            <result column="is_delete" property="isDelete"/>
+            <result column="create_time" property="createTime"/>
+            <result column="memo" property="memo"/>
+            <result column="status" property="status"/>
+            <result column="deposit" property="deposit"/>
+            <result column="company_id" property="companyId"/>
+            <result column="accounting_date" property="accountingDate"/>
+            <result column="registration_and_payment_time" property="registrationAndPaymentTime"/>
+     </resultMap>
+
+    <resultMap id="signupMap2" type="com.hzitshop.vo.signup.SignupVo">
+        <id column="id" property="id"></id>
+        <result column="real_name" property="realName"></result>
+        <result column="sex" property="sex"></result>
+        <result column="tel" property="tel"></result>
+        <result column="name" property="name"></result>
+        <result column="create_time" property="createTime"></result>
+        <result column="memo" property="memo"></result>
+        <result column="status" property="status"/>
+        <result column="deposit" property="deposit"/>
+        <result column="company" property="company"/>
+        <result column="accounting_date" property="accountingDate"/>
+        <result column="registration_and_payment_time" property="registrationAndPaymentTime"/>
+        <result column="guandan" property="guandan"/>
+    </resultMap>
+</mapper>

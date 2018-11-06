@@ -193,7 +193,7 @@ $(function(){
                 if(row.createTime == ''|| row.createTime == null){
                     createTime = '---';
                 }else{
-                     createTime =  new Date(parseInt(row.createTime)).toLocaleString().replace(/年|月/g, "-").replace(/日/g, " ");
+                     createTime =  row.createTime;
                 }
                 return  createTime;
             },
@@ -209,7 +209,7 @@ $(function(){
                 if(row.updateTime == '' || row.updateTime == null){
                     updateTime = "---";
                 } else{
-                    updateTime = new Date(parseInt(row.updateTime)).toLocaleString().replace(/年|月/g, "-").replace(/日/g, " ");
+                    updateTime = row.updateTime;
                 }
                 return   updateTime;
             }

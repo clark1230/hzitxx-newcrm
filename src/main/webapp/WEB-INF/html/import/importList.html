@@ -5,8 +5,11 @@
     <title>文件导入</title>
     <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="/assets/bootstrap-table-master/dist/bootstrap-table.css">
+    <link rel="stylesheet" href="/assets/bootstrap-table-master/dist/extensions/page-jump/bootstrap-table-pagejump.css">
     <link rel="stylesheet" type="text/css" href="/assets/themes/layui/css/layui.css">
+    <!--<link rel="stylesheet" href="/assets/laydate/theme/default/laydate.css">-->
     <link rel="stylesheet" type="text/css" href="/style/hzitshop.css">
+    <!--<link rel="stylesheet" type="text/css" href="/assets/colorpicker/farbtastic.css">-->
     <style>
         .span-hidden{
             display: none;
@@ -20,9 +23,12 @@
     <form class="form-inline" style="display: inline-block;">
         <select class="form-control" style="width:150px;" id="searchParam">
             <option value="-1">请选择搜索条件!</option>
-            <option value="real_name">学员姓名</option>
+            <option value="apply_job">技术/非技术</option>
+            <option value="create_time">导入时间</option>
+            <option value="status">邀约状态</option>
+            <option value="real_name">应聘者姓名</option>
+            <option value="sex">性别</option>
             <option value="tel">电话号码</option>
-            <option value="introducer">邀约人</option>
             <option value="education_bg">学历</option>
             <option value="cvType">简历类型</option>
             <option value="major_in">专业</option>
@@ -32,19 +38,35 @@
             <select class="form-control" style="width:150px;" id="educationBg">
                 <option value="">请选择学历!</option>
                 <option th:each="educationBg,educationGgStat:${eBgList}"
-                        th:text="${educationBg.name}" th:value="${educationBg.id}"></option>
+                        th:text="${educationBg.name}" th:value="${educationBg.name}"></option>
             </select>
             <select class="form-control" style="width:150px;" id="cvType">
                 <option value="">请选择简历类型!</option>
                 <option value="1">投递简历</option>
                 <option value="2">下载简历</option>
             </select>
+
+            <select class="form-control" style="width:150px;display: none;" id="apply_job">
+                <option value="2">技术类</option>
+                <option value="1">非技术类</option>
+            </select>
+            <select class="form-control" style="width:150px;display: none;" id="sex">
+                <option value="1">男</option>
+                <option value="2">女</option>
+            </select>
+            <input type="text"  class="form-control" style="width:130px;" placeholder="请输入搜索值!" id="searchValue">
             <select class="form-control" style="width:150px;" id="introducer">
                 <option value="">请选择邀约人!</option>
                 <option th:each="introducer,introducerStat:${introdecerList}"
                         th:text="${introducer.name}" th:value="${introducer.userId}"></option>
             </select>
-            <input type="text"  class="form-control" style="width:130px;" placeholder="请输入搜索值!" id="searchValue">
+            <select class="form-control" style="width:150px;display: none;"  id="status">
+                <option value="">请选择邀约状态!</option>
+                <option value="没有上门">没有上门</option>
+                <option value="没有报名">没有报名</option>
+                <option value="已上门">已上门</option>
+                <option value="已报名">已报名</option>
+            </select>
         </div>
     </form>
     <span ><button id="searchImport" class="layui-btn layui-btn-normal layui-btn-small "><i
@@ -52,26 +74,99 @@
     <span class="span-hidden"  id="span-import"><button id="import" class="layui-btn layui-btn-normal layui-btn-small "><i
             class="layui-icon">&#xe61e;</i>报表导入</button></span>
     <span  id="span-allot" class="span-hidden"><button id="allot" class="layui-btn layui-btn-small " style="background-color: #333399;"><i
-            class="layui-icon">&#xe609;</i>创量分配</button></span>
-    <!--<span id="span-company">
-        <button  class="layui-btn layui-btn-danger layui-btn-small toolbar-refresh">
-            <i class="layui-icon"></i>本公司数据</button>
-    </span>-->
+            class="layui-icon">&#xe609;</i>分配</button></span>
    <span class="span-hidden" id="span-edit" ><button id="edit" class="layui-btn layui-btn-small "><i
            class="layui-icon">&#xe642;</i>修改</button></span>
     <span id="span-remove" class="span-hidden"><button id="remove" class="layui-btn layui-btn-danger  layui-btn-small "><i
                 class="layui-icon">&#xe640;</i>回收站</button></span>
-    <span ><button id="searchRefresh" class="layui-btn layui-btn-danger layui-btn-small toolbar-refresh"><i
+    <span ><button id="searchRefresh" class="layui-btn layui-btn-primary layui-btn-small"><i
             class="layui-icon">&#xe63d;</i>刷新</button></span>
+    <!--<span id="span-filter"><button id="filter" class="layui-btn layui-btn-warm layui-btn-small " style="background-color: #CC0099"><i-->
+            <!--class="layui-icon">&#xe631;</i>数据去重</button></span>-->
+    <span id="span-tel"><button id="getTel" class="layui-btn layui-btn-warm layui-btn-small " style="background-color: #3399FF"><i
+            class="layui-icon">&#xe641;</i>获取手机号码</button></span>
+    <span id="span-email"><button id="getEmail" class="layui-btn layui-btn-warm layui-btn-small " style="background-color: #3399FF"><i
+            class="layui-icon">&#xe641;</i>获取邮箱号</button></span>
+    <span id="span-color"><button id="color"  class="layui-btn layui-btn-warm layui-btn-small " style="background-color:green;"><i
+            class="layui-icon">&#xe62e;</i>标记</button></span>
+    <span id="span-exportExcel"><button id="exportExcel"  class="layui-btn layui-btn-warm layui-btn-small "
+                                        style="background-color:#663300;"><i
+            class="layui-icon">&#xe62c;</i>导出</button></span>
+    <span id="span-yunying"><button id="yunying"  class="layui-btn layui-btn-warm layui-btn-small "><i
+            class="layui-icon">&#xe64c;</i>转运营</button></span>
+
+</div>
+<div id="showData" style="display:none;height:500px;width:300px;font-size: 20px;color:#3399FF;text-align: center" >
+
 </div>
 
 <table id="table">
 </table>
+<div id="colorDiv" style="display: none">
+    <!--<div style="width: 195px;height: 250px; margin: 0 auto;">-->
+        <!--<input type="text" id="showColor" name="color" value="#123456" />-->
+        <!--<div id="colorpicker"></div>-->
+    <!--</div>-->
+    <form  class="layui-form" >
+        <table style="padding: 5px;">
+            <tr>
+                <td>
+                    <input type="radio" name="color" value="CC0000" title="红色">
+                </td>
+                <td>
+                    <div style="width:280px;height: 30px;background-color: #CC0000;border-radius: 5px;"></div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="radio" name="color" value="CC9900" title="深黄色">
+
+                </td>
+                <td>
+                    <div style="width:280px;height: 30px;background-color: #CC9900;border-radius: 5px;"></div>
+                </td>
+            </tr><tr>
+            <td>
+                <input type="radio" name="color" value="333" title="无">
+            </td>
+            <td>
+                <div style="width:280px;height: 30px;background-color: #333;border-radius: 5px;"></div>
+            </td>
+        </tr>
+
+        </table>
+    </form>
+</div>
+<div id="exportExcelDiv" style="display: none;">
+    <input id="exportExcelDate" type="text" lay-verify="date" readonly="readonly" class="layui-input"
+           onClick="WdatePicker({skin:'twoer',dateFmt:'yyyy-MM-dd'})"
+           placeholder="请选择日期!" style="cursor:pointer;">
+</div>
 <script src="/assets/js/jquery.min.js"></script>
 <script src="/assets/bootstrap/js/bootstrap.min.js"></script>
 <script src="/assets/bootstrap-table-master/dist/bootstrap-table.js"></script>
+<script src="/assets/bootstrap-table-master/dist/extensions/page-jump/bootstrap-table-pagejump.js"></script>
 <script src="/assets/bootstrap-table-master/dist/locale/bootstrap-table-zh-CN.js"></script>
 <script src="/assets/themes/layui/lay/dest/layui.all.js"></script>
+<script src="/assets/My97DatePicker/WdatePicker.js"></script>
+<!--<script src="/assets/laydate/laydate.js"></script>-->
 <script src="/script/import/importList.js"></script>
+<!--<script src="/assets/colorpicker/farbtastic.js"></script>-->
+<script>
+   /* $(document).ready(function() {
+        $('#colorpicker').farbtastic('#showColor');
+
+    });*/
+   layui.use('form', function(){
+       var form = layui.form;
+
+       //监听提交
+       /*form.on('submit(formDemo)', function(data){
+           layer.msg(JSON.stringify(data.field));
+           return false;
+       });*/
+   });
+</script>
+
 </body>
 </html>

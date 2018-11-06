@@ -37,14 +37,14 @@ public class TbMenuAppController {
      * @return
      */
     @RequestMapping("/menuApp/list")
-    protected String list() {
+    public String list() {
         return "/menuapp/list";
     }
 
 
     @RequestMapping("/menuApp/getPageData")
     @ResponseBody
-    protected BootstrapTable<TbMenuApp> getPageData(BootstrapEntity bootstrapEntity) {
+    public BootstrapTable<TbMenuApp> getPageData(BootstrapEntity bootstrapEntity) {
         Page<TbMenuApp> page = iTbMenuAppService.selectPage(new Page<TbMenuApp>(bootstrapEntity.getOffset()/bootstrapEntity.getLimit()+1,
                         bootstrapEntity.getLimit()), new EntityWrapper<TbMenuApp>().where("appid like'm%'"));
 
@@ -60,12 +60,12 @@ public class TbMenuAppController {
      * @return
      */
     @RequestMapping(value = "/menuApp/addMenuApp",method = RequestMethod.GET)
-    protected String addMenuApp(){
+    public String addMenuApp(){
         return "/menuapp/addMenuApp";
     }
     @RequestMapping(value="/menuApp/addMenuApp",method = RequestMethod.POST)
     @ResponseBody
-    protected Map<String,Object> addMenuApp(TbMenuApp tbMenuApp){
+    public Map<String,Object> addMenuApp(TbMenuApp tbMenuApp){
         Map<String,Object> resultMap = new HashedMap();
         try{
             iTbMenuAppService.insert(tbMenuApp);

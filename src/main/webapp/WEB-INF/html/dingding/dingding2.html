@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>钉钉</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0,viewport-fit=cover">
+    <link rel="stylesheet" href="/assets/weui/weui.css"/>
+</head>
+<body>
+<h1>js api调试</h1>
+rer
+<h2>呜呜</h2>
+<script src="http://g.alicdn.com/dingding/open-develop/1.9.0/dingtalk.js"></script>
+<script>
+//    dd.config({
+//        agentId: '163860100', // 必填，微应用ID
+//        corpId: 'ding8fcc4db885b89ac635c2f4657eb6378f',//必填，企业ID
+//        timeStamp:6600001 , // 必填，生成签名的时间戳
+//        nonceStr: 'he', // 必填，生成签名的随机串
+//        signature: 'bf444ed332b83a824a7835ad62818ad8a04bf764', // 必填，签名
+//        type:0,   //选填，0表示微应用的jsapi，1表示服务窗的jsapi，不填默认为0。该参数从dingtalk.js的0.8.3版本开始支持
+//        jsApiList : [ 'runtime.info', 'biz.contact.choose','runtime.permission.requestAuthCode',
+//            'runtime.permission.requestOperateAuthCode',
+//            'device.notification.confirm', 'device.notification.alert',
+//            'device.notification.prompt', 'biz.ding.post',
+//            'biz.util.openLink','biz.contact.choose','biz.chat','biz.user.get' ] // 必填，需要使用的jsapi列表，注意：不要带dd。
+//    });
+    dd.config({
+        agentId: '',
+        corpId: 'ding8fcc4db885b89ac635c2f4657eb6378f',
+        timeStamp: 1519834476114,
+        nonceStr: 'nonceStr',
+        signature: '4952b1792fd11ccc6cd9d7f9609e442718cdeb8b',
+       // url:'http://xianyaoji.natapp1.cc/index.jsp?corpid=ding8fcc4db885b89ac635c2f4657eb6378f',
+        jsApiList: [
+            'runtime.info',
+            'device.notification.prompt',
+            'biz.chat.pickConversation',
+            'device.notification.confirm',
+            'device.notification.alert',
+            'device.notification.prompt',
+            'biz.chat.open',
+            'biz.util.open',
+            'biz.user.get',
+            'biz.contact.choose',
+            'biz.telephone.call',
+            'biz.ding.post'],
+            onFail: function() {
+                    alert('配置失败!')
+            }
+    });
+    dd.userid=0;
+
+    dd.ready(function(){
+
+        //下来刷新
+        dd.ui.pullToRefresh.enable({
+            onSuccess: function() {
+            },
+            onFail: function() {
+            }
+        })
+        //获取用户基本信息
+        dd.biz.user.get({
+            corpId:'ding8fcc4db885b89ac635c2f4657eb6378f', // 可选参数，如果不传则使用用户当前企业的corpId。
+            onSuccess: function (info) {
+                logger.e('userGet success: ' + JSON.stringify(info));
+            },
+            onFail: function (err) {
+                logger.e('userGet fail: ' + JSON.stringify(err));
+            }
+        });
+        dd.device.notification.vibrate({
+            duration: 300, //震动时间，android可配置 iOS忽略
+            onSuccess : function(result) {
+                /*
+                {}
+                */
+            },
+            onFail : function(err) {}
+        });
+        dd.biz.chat.pickConversation({
+            corpId: 'ding8fcc4db885b89ac635c2f4657eb6378f', //企业id
+            isConfirm:'true', //是否弹出确认窗口，默认为true
+            onSuccess : function() {
+                //onSuccess将在选择结束之后调用
+                // 该cid和服务端开发文档-普通会话消息接口配合使用，而且只能使用一次，之后将失效
+                /*{
+                    cid: 'xxxx',
+                    title:'xxx'
+                }*/
+                alert('hello');
+            },
+            onFail : function() {}
+        });
+       // alert('呜呜...');
+    });
+
+dd.error(function(err) {
+    alert('dd error: ' + JSON.stringify(err));
+});
+</script>
+</body>
+</html>

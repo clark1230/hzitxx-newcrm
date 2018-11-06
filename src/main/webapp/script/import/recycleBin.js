@@ -55,6 +55,7 @@ $(function () {
             idField: 'customerId',
             pageNumber: 1,                       //初始化加载第一页，默认第一页
             pageSize: 20,                       //每页的记录行数（*）
+            paginationShowPageGo:true,
             pageList: [10, 20, 30, 50, 100],        //可供选择的每页的行数（*）
             clickToSelect: true,                //是否启用点击选中行
             smartDisplay: false, // 智能显示 pagination 和 cardview 等
@@ -64,12 +65,13 @@ $(function () {
             showColumns: true,
             detailView: true,
             detailFormatter: function (index, row) {
+                var lastTime;
                 if(row.lastTime === null || row.lastTime === ""){
                     lastTime = "---";
                 }else{
-                    lastTime = new Date(parseInt(row.lastTime)).toLocaleString().replace(/年|月/g, "-").replace(/日/g, " ");
+                    lastTime =row.lastTime;
                 }
-                var createTime = new Date(parseInt(row.lastTime)).toLocaleString().replace(/年|月/g, "-").replace(/日/g, " ");
+                var createTime = row.lastTime;
                 var sex = '';
                 if(row.sex == '1'){
                     sex= '男';
@@ -273,15 +275,13 @@ $(function () {
                 formatter:function(value,row,index){
                     var customerLevelMsg =row.customerLevelMsg;
                     if(customerLevelMsg=='数据字典' || customerLevelMsg =='null'){
-                        customerLevelMsg = '--';
+                        customerLevelMsg = '---';
                     }else if(customerLevelMsg =='A'){
-                        customerLevelMsg = '<span style="margin:0 auto;width:30px;height:16px;background-color: #FF0066;display: block">'+row.customerLevelMsg+'</span>';
+                        customerLevelMsg = '<span style="margin:0 auto;width:30px;height:16px;background-color:red;display: block">'+row.customerLevelMsg+'</span>';
                     }else if(customerLevelMsg =='B'){
-                        customerLevelMsg = '<span style="margin:0 auto;width:30px;height:16px;background-color: #FF6666;display: block">'+row.customerLevelMsg+'</span>';
-                    }else if(customerLevelMsg == 'C'){
-                        customerLevelMsg = '<span style="margin:0 auto;width:30px;height:16px;background-color: #FF9966;display: block">'+row.customerLevelMsg+'</span>';
-                    }else if(customerLevelMsg == 'D'){
-                        customerLevelMsg = '<span style="margin:0 auto;width:30px;height:16px;background-color: #FFCC66;display: block">'+row.customerLevelMsg+'</span>';
+                        customerLevelMsg = '<span style="margin:0 auto;width:30px;height:16px;background-color: #CC9900;display: block">'+row.customerLevelMsg+'</span>';
+                    }else{
+                        customerLevelMsg = row.customerLevelMsg;
                     }
                     return customerLevelMsg;
                 }
@@ -303,20 +303,11 @@ $(function () {
                 field: 'createTime',
                 title: '录入时间',
                 width: 150,
-                formatter: function (value, row, index) {
-                    return new Date(parseInt(row.createTime)).toLocaleString().replace(/年|月/g, "-").replace(/日/g, " ")
-                },
                 visible: false
             }, {
                 field: 'lastTime',
                 title: '最后跟进时间',
-                width: 150,
-                formatter: function (value, row, index) {
-                    if(row.lastTime === null || row.lastTime === ""){
-                        return "---";
-                    }
-                    return new Date(parseInt(row.lastTime)).toLocaleString().replace(/年|月/g, "-").replace(/日/g, " ");
-                }
+                width: 150
             }, {
                 field: 'companyIdMsg',
                 title: '所属公司',
@@ -328,6 +319,9 @@ $(function () {
                 width: 80,
                 formatter: function (value, row, index) {
                     var memo = (typeof(row.memo) == 'null') ? "---" : row.memo + "";
+                    if(row.memo == null){
+                        return "---";
+                    }
                     if (memo.length > 5) {
                         memo = row.memo.substr(0, 5) + "....";
                     }else if(memo == null || memo =='null' || memo ==''){

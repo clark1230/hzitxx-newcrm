@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>客户信息</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0,viewport-fit=cover">
+    <link rel="stylesheet" href="/assets/weui/weui.css"/>
+    <link rel="stylesheet" href="/assets/weui/example.css"/>
+</head>
+<body>
+<div class="page__bd">
+    <div class="weui-cells weui-cells_form">
+        <div class="weui-cell">
+            <div class="weui-cell__bd">
+                <textarea id="traceMsg" name="traceMsg" class="weui-textarea" placeholder="请输入跟进信息!" rows="4"></textarea>
+            </div>
+        </div>
+        <button class="weui-btn weui-btn_primary weui-btn_mini" type="button" id="addTraceMsg">添加</button>
+        <button class="weui-btn weui-btn_default  weui-btn_mini" type="reset">清除</button>
+        <button class="weui-btn weui-btn_default weui-btn_mini" id="refresh" type="button">刷新</button>
+        <input type="hidden" id="customerId" name="customerId" th:value="${customerId}">
+        <div class="weui-cells" id="traceMsgList">
+            <div  class="weui-cell weui-cell_access"  th:each="traceRecord : ${traceRecords}" >
+                <div class="weui-cell__bd">
+                    <span th:text="${traceRecord.content}"></span>
+                    <p style="position: relative;background-color: #F8F8F8;">
+                        <span style="vertical-align: middle" th:text="${traceRecord.name}"></span>
+                        <span style="vertical-align: middle;position: absolute;right:5px;" th:text="${#dates.format(traceRecord.recordDate,'yyyy-MM-dd HH:mm:ss')}"></span>
+                    </p>
+                </div>
+                <!--<div class="weui-cell__ft"></div>-->
+            </div>
+        </div>
+    </div>
+    <!--BEGIN toast-->
+    <div id="successToast" style="display: none;">
+        <div class="weui-mask_transparent"></div>
+        <div class="weui-toast">
+            <i class="weui-icon-success-no-circle weui-icon_toast"></i>
+            <p class="weui-toast__content">添加成功!</p>
+        </div>
+    </div>
+
+    <div id="errorToast" style="display: none;">
+        <div class="weui-mask_transparent"></div>
+        <div class="weui-toast">
+            <i class="weui-icon-success-no-circle weui-icon_toast"></i>
+            <p class="weui-toast__content">添加失败!</p>
+        </div>
+    </div>
+    <div id="msgToast" style="display: none;">
+        <div class="weui-mask_transparent"></div>
+        <div class="weui-toast">
+            <i class="weui-icon-success-no-circle weui-icon_toast"></i>
+            <p class="weui-toast__content">请输入跟进信息!</p>
+        </div>
+    </div>
+    <!--end toast-->
+
+    <!-- loading toast -->
+    <div id="loadingToast" style="display:none;">
+        <div class="weui-mask_transparent"></div>
+        <div class="weui-toast">
+            <i class="weui-loading weui-icon_toast"></i>
+            <p class="weui-toast__content">登陆中</p>
+        </div>
+    </div>
+</div>
+<script src="/assets/weui/zepto.min.js"></script>
+<!--<script src="http://g.alicdn.com/dingding/open-develop/1.9.0/dingtalk.js"></script>
+<script src="/script/mobile/token.js"></script>-->
+<script>
+   $(function(){
+      $('#addTraceMsg').click(function(){
+            //获取跟进信息
+          var customerId = $('#customerId').val();
+          var traceMsg = $('#traceMsg').val();
+          var data = 'customerId='+customerId+"&content="+traceMsg;
+          if(traceMsg == ''){
+              var $msgToast = $('#msgToast');
+              if ($msgToast.css('display') != 'none') return;
+              $msgToast.fadeIn(100);
+              setTimeout(function () {
+                  $msgToast.fadeOut(100);
+              }, 1500);
+              $('#traceMsg').focus();
+              return false;
+          }
+          $.ajax({
+             type:'POST',
+             url:'/mobile/addTraceMsg',
+              data:data,
+             success:function(resp){
+                 if(resp.status == 0){
+                     //成功!
+                     var $successTocast = $('#successToast');
+                     if ($successTocast.css('display') != 'none') return;
+                     $successTocast.fadeIn(100);
+                     $('#traceMsg').val('');
+                     setTimeout(function () {
+                         $successTocast.fadeOut(100);
+                         window.location.reload();
+                     }, 1500);
+
+                 }else{
+                     //失败!
+                     var $errorTocast = $('#errorToast');
+                     if ($errorTocast.css('display') != 'none') return;
+                     $errorTocast.fadeIn(100);
+                     setTimeout(function () {
+                         $errorTocast.fadeOut(100);
+                     }, 1500);
+                 }
+             },error:function(resp){
+                 if(resp.status == 500){
+                     alert('服务器内部错误!');
+                 }else if(resp.status == 401){
+                     alert('对不起，您没有权限进行该操作!');
+                 }
+              }
+          });
+       });
+      $('#refresh').click(function(){
+          window.location.reload();
+      });
+   });
+</script>
+</body>
+</html>

@@ -18,28 +18,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by 冼耀基 on 2016/9/24.
  */
 public class ExcelUtil {
-
+    private static Logger logger = LoggerFactory.getLogger(ExcelUtil.class);
     @Autowired
     private static ImportInfoService importInfoServiceImpl ;
 
     @Autowired
     private static ImportInfoMapper importInfoMapper;
-
-         public static void test(){
-
-             HSSFWorkbook workbook = new HSSFWorkbook();//创建工作簿对象
-             HSSFSheet sheet = workbook.createSheet();
-             
-             
-         }
-    private static Logger logger = LoggerFactory.getLogger(ExcelUtil.class);
+    public static void test(){
+         HSSFWorkbook workbook = new HSSFWorkbook();//创建工作簿对象
+         HSSFSheet sheet = workbook.createSheet();
+     }
     /**
      * 智联招聘简历模板导入
      * @param inputStream
@@ -49,8 +43,8 @@ public class ExcelUtil {
      * @return
      */
 
-    public static boolean zhilianImport(InputStream inputStream,Integer recruitChannel,Integer cvType,ImportInfoMapper importInfoMapper,HttpSession session){
-        boolean flag = false;
+    public static String zhilianImport(InputStream inputStream,String recruitChannel,Integer cvType,ImportInfoMapper importInfoMapper,HttpSession session){
+        String msg = null;
         EmployeeInfo em = (EmployeeInfo) session.getAttribute("employeeInfo");
         ImportParams params = new ImportParams();
         params.setTitleRows(0);
@@ -62,33 +56,20 @@ public class ExcelUtil {
             if(list.size() != 0 && list != null){
                 for(ZhilianCustomerVo z : list){
                     if(z.getTel() != null) {
-                        z.setRecruitChannel(recruitChannel);
-                        z.setCompanyId(em.getCompanyId());
                         ImportInfo i = z.changeToCustomerInfo(z);
-                        i.setCvType(cvType);
-                        list2.add(i);
+                        commons(recruitChannel, cvType, em, list2, i);
                     }
                 }
             }
             //插入去重过滤
-            if(insertFilter(list2,importInfoMapper)){
-                flag = true;
-            }else{
-                flag = false;
-            }
+            msg = insertFilter(list2,importInfoMapper);
         } catch (Exception e) {
             logger.error(e.getMessage());
-            flag = false;
-            return flag;
+
         } finally {
-            if (inputStream!=null)
-                try {
-                    inputStream.close();
-                } catch (IOException e) {
-                    logger.error("流关闭异常!"+e.getMessage());
-                }
+            commonClose(inputStream);
         }
-        return flag;
+        return msg;
     }
 
 
@@ -100,8 +81,8 @@ public class ExcelUtil {
      * @param session
      * @return
      */
-    public static boolean tongchengImport(InputStream inputStream,Integer recruitChannel,Integer cvType,ImportInfoMapper importInfoMapper,HttpSession session){
-        boolean flag = false;
+    public static String tongchengImport(InputStream inputStream,String recruitChannel,Integer cvType,ImportInfoMapper importInfoMapper,HttpSession session){
+        String msg  = null;
         EmployeeInfo em = (EmployeeInfo) session.getAttribute("employeeInfo");
         ImportParams params = new ImportParams();
         params.setTitleRows(0);
@@ -113,33 +94,29 @@ public class ExcelUtil {
             if(list.size() != 0 && list != null) {
                 for (TongchengCustomerVo tc : list) {
                     if (tc.getTel() != null) {
-                        tc.setRecruitChannel(recruitChannel);
-                        tc.setCompanyId(em.getCompanyId());
                         ImportInfo i = tc.changeToCustomerInfo(tc);
-                        i.setCvType(cvType);
-                        list2.add(i);
+                        commons(recruitChannel, cvType, em, list2, i);
                     }
                 }
             }
             //插入去重过滤
-            if(insertFilter(list2,importInfoMapper)){
-                flag = true;
-            }else{
-                flag = false;
-            }
+            msg = insertFilter(list2,importInfoMapper);
         } catch (Exception e) {
             logger.error(e.getMessage());
-            flag = false;
-            return flag;
+
         } finally {
-            if (inputStream!=null)
-                try {
-                    inputStream.close();
-                } catch (IOException e) {
-                    logger.error("流关闭异常!"+e.getMessage());
-                }
+            commonClose(inputStream);
         }
-        return flag;
+        return msg;
+    }
+
+    private static void commonClose(InputStream inputStream) {
+        if (inputStream!=null)
+            try {
+                inputStream.close();
+            } catch (IOException e) {
+                logger.error("流关闭异常!"+e.getMessage());
+            }
     }
 
     /**
@@ -150,8 +127,8 @@ public class ExcelUtil {
      * @param session
      * @return
      */
-    public static boolean qianchengImport(InputStream inputStream,Integer recruitChannel,Integer cvType,ImportInfoMapper importInfoMapper,HttpSession session){
-        boolean flag = false;
+    public static String qianchengImport(InputStream inputStream,String recruitChannel,Integer cvType,ImportInfoMapper importInfoMapper,HttpSession session){
+        String msg = null;
         EmployeeInfo em = (EmployeeInfo) session.getAttribute("employeeInfo");
         ImportParams params = new ImportParams();
         params.setTitleRows(0);
@@ -163,33 +140,20 @@ public class ExcelUtil {
             if(list.size() != 0 && list != null){
                 for(QianchengCustomerVo qc : list){
                     if(qc.getTel() != null) {
-                        qc.setRecruitChannel(recruitChannel);
-                        qc.setCompanyId(em.getCompanyId());
                         ImportInfo i = qc.changeToCustomerInfo(qc);
-                        i.setCvType(cvType);
-                        list2.add(i);
+                        commons(recruitChannel, cvType, em, list2, i);
                     }
                 }
             }
             //插入去重过滤
-            if(insertFilter(list2,importInfoMapper)){
-                flag = true;
-            }else{
-                flag = false;
-            }
+            msg = insertFilter(list2,importInfoMapper);
         }  catch (Exception e) {
             logger.error(e.getMessage());
-            flag = false;
-            return flag;
+
         }finally {
-            if (inputStream!=null)
-                try {
-                    inputStream.close();
-                } catch (IOException e) {
-                    logger.error("流关闭异常!"+e.getMessage());
-                }
+            commonClose(inputStream);
         }
-        return flag;
+        return msg;
     }
 
     /**
@@ -200,8 +164,8 @@ public class ExcelUtil {
      * @param session
      * @return
      */
-    public static boolean ganjiImport(InputStream inputStream,Integer recruitChannel,Integer cvType,ImportInfoMapper importInfoMapper,HttpSession session){
-        boolean flag = false;
+    public static String ganjiImport(InputStream inputStream,String recruitChannel,Integer cvType,ImportInfoMapper importInfoMapper,HttpSession session){
+        String msg = null;
         EmployeeInfo em = (EmployeeInfo) session.getAttribute("employeeInfo");
         ImportParams params = new ImportParams();
         params.setTitleRows(0);
@@ -213,58 +177,40 @@ public class ExcelUtil {
             if(list.size() != 0 && list != null) {
                 for (GanjiCustomerVo gj : list) {
                     if (gj.getTel() != null) {
-                        gj.setRecruitChannel(recruitChannel);
-                        gj.setCompanyId(em.getCompanyId());
                         ImportInfo i = gj.changeToCustomerInfo(gj);
-                        i.setCvType(cvType);
-                        list2.add(i);
+                        commons(recruitChannel, cvType, em, list2, i);
                     }
                 }
             }
             //插入去重过滤
-            if(insertFilter(list2,importInfoMapper)){
-                flag = true;
-            }else{
-                flag = false;
-            }
+            msg = insertFilter(list2,importInfoMapper);
         } catch (Exception e) {
             logger.error(e.getMessage());
-            flag = false;
-            return flag;
+
         }finally {
-            if (inputStream!=null)
-                try {
-                    inputStream.close();
-                } catch (IOException e) {
-                    logger.error("流关闭异常!"+e.getMessage());
-                }
+            commonClose(inputStream);
         }
-        return flag;
+        return msg;
     }
 
 
     /**
      * 人才热线简历模板导入
-     *
-     * 姓名字段导入时有bug
-     * 人才热线网址导出的模板中姓名字段会存在下划线，
-     * 会导致数据无法导入
-     *
      * @param inputStream
      * @param recruitChannel
      * @param importInfoMapper
      * @param session
      * @return
      */
-
-    public static boolean rencaiImport(InputStream inputStream,Integer recruitChannel,Integer cvType,ImportInfoMapper importInfoMapper,HttpSession session){
-        boolean flag = false;
+    public static String rencaiImport(InputStream inputStream,String recruitChannel,Integer cvType,
+                                      ImportInfoMapper importInfoMapper,HttpSession session){
+        String msg = null;
         EmployeeInfo em = (EmployeeInfo) session.getAttribute("employeeInfo");
         ImportParams params = new ImportParams();
-        params.setTitleRows(0);
-        params.setHeadRows(1);
+        //params.setTitleRows(0);
+        //params.setHeadRows(1);
         params.setStartSheetIndex(0);
-        params.setSheetNum(1);
+       // params.setSheetNum(1);
         List<RencaiCustomerVo> list = null;
         try {
             list = ExcelImportUtil.importExcel(inputStream, RencaiCustomerVo.class, params);
@@ -272,33 +218,21 @@ public class ExcelUtil {
             if(list.size() != 0 && list != null) {
                 for (RencaiCustomerVo rc : list) {
                     if (rc.getTel() != null) {
-                        rc.setRecruitChannel(recruitChannel);
-                        rc.setCompanyId(em.getCompanyId());
                         ImportInfo i = rc.changeToCustomerInfo(rc);
-                        i.setCvType(cvType);
-                        list2.add(i);
+                        commons(recruitChannel, cvType, em, list2, i);
                     }
                 }
             }
             //插入去重过滤
-            if(insertFilter(list2,importInfoMapper)){
-                flag = true;
-            }else{
-                flag = false;
-            }
+           msg = insertFilter(list2,importInfoMapper);
         } catch (Exception e) {
+            e.printStackTrace();
             logger.error(e.getMessage());
-            flag = false;
-            return flag;
+
         }finally {
-            if (inputStream!=null)
-                try {
-                    inputStream.close();
-                } catch (IOException e) {
-                    logger.error("流关闭异常!"+e.getMessage());
-                }
+            commonClose(inputStream);
         }
-        return flag;
+        return msg;
     }
 
     /**
@@ -310,8 +244,8 @@ public class ExcelUtil {
      * @return
      */
 
-    public static boolean zhonghuaImport(InputStream inputStream,Integer recruitChannel,Integer cvType,ImportInfoMapper importInfoMapper,HttpSession session){
-        boolean flag = false;
+    public static String zhonghuaImport(InputStream inputStream,String recruitChannel,Integer cvType,ImportInfoMapper importInfoMapper,HttpSession session){
+        String msg = null;
         EmployeeInfo em = (EmployeeInfo) session.getAttribute("employeeInfo");
         ImportParams params = new ImportParams();
         params.setHeadRows(2);
@@ -322,33 +256,21 @@ public class ExcelUtil {
             if(list.size() != 0 && list != null) {
                 for (ZhonghuaCustomerVo zh : list) {
                     if (zh.getTel() != null) {
-                        zh.setRecruitChannel(recruitChannel);
-                        zh.setCompanyId(em.getCompanyId());
                         ImportInfo i = zh.changeToCustomerInfo(zh);
-                        i.setCvType(cvType);
-                        list2.add(i);
+                        commons(recruitChannel, cvType, em, list2, i);
                     }
                 }
             }
             //插入去重过滤
-            if(insertFilter(list2,importInfoMapper)){
-                flag = true;
-            }else{
-                flag = false;
-            }
+            msg = insertFilter(list2,importInfoMapper);
         } catch (Exception e) {
+            e.printStackTrace();
             logger.error(e.getMessage());
-            flag = false;
-            return flag;
+
         }finally {
-            if (inputStream!=null)
-                try {
-                    inputStream.close();
-                } catch (IOException e) {
-                    logger.error("流关闭异常!"+e.getMessage());
-                }
+            commonClose(inputStream);
         }
-        return flag;
+       return msg;
     }
 
     /**
@@ -360,8 +282,8 @@ public class ExcelUtil {
      * @return
      */
 
-    public static boolean baixingImport(InputStream inputStream,Integer recruitChannel,Integer cvType,ImportInfoMapper importInfoMapper,HttpSession session){
-        boolean flag = false;
+    public static String baixingImport(InputStream inputStream,String recruitChannel,Integer cvType,ImportInfoMapper importInfoMapper,HttpSession session){
+        String msg = null;
         EmployeeInfo em = (EmployeeInfo) session.getAttribute("employeeInfo");
         ImportParams params = new ImportParams();
         params.setTitleRows(0);
@@ -373,33 +295,28 @@ public class ExcelUtil {
             if(list.size() != 0 && list != null) {
                 for (BaixingCustomerVo bx : list) {
                     if (bx.getTel() != null) {
-                        bx.setRecruitChannel(recruitChannel);
-                        bx.setCompanyId(em.getCompanyId());
                         ImportInfo i = bx.changeToCustomerInfo(bx);
-                        i.setCvType(cvType);
-                        list2.add(i);
+                        commons(recruitChannel, cvType, em, list2, i);
                     }
                 }
             }
             //插入去重过滤
-            if(insertFilter(list2,importInfoMapper)){
-                flag = true;
-            }else{
-                flag = false;
-            }
+            msg = insertFilter(list2,importInfoMapper);
         } catch (Exception e) {
             logger.error(e.getMessage());
-            flag = false;
-            return flag;
         }finally {
-            if (inputStream!=null)
-                try {
-                    inputStream.close();
-                } catch (IOException e) {
-                    logger.error("流关闭异常!"+e.getMessage());
-                }
+            commonClose(inputStream);
         }
-        return flag;
+        return msg;
+    }
+
+    private static void commons(String recruitChannel, Integer cvType, EmployeeInfo em, List<ImportInfo> list2, ImportInfo i) {
+        i.setRecruitChannel(recruitChannel);
+        i.setCompanyId(em.getCompanyId());
+        i.setCvType(cvType);
+        i.setIntroducer(em.getUserId()+"");
+        i.setCreateBy(em.getName());
+        list2.add(i);
     }
 
     /**
@@ -408,26 +325,56 @@ public class ExcelUtil {
      * @param importInfoMapper
      * @return
      */
-    private static boolean insertFilter(List<ImportInfo> list,ImportInfoMapper importInfoMapper){
+    private static String insertFilter(List<ImportInfo> list,ImportInfoMapper importInfoMapper){
+        String msg = null;
+        int result = 0;
+        int repreat = 0;
         for(ImportInfo i : list){
             if(!"".equals(i.getTel()) && i.getTel() != null){
-                int result = 0;
+                result = 0;
                 ImportInfo im = new ImportInfo();
                 im.setCompanyId(i.getCompanyId());
+                i.setCreateTime(new Date());
                 im.setTel(i.getTel());
-                //如果存在CompanyId、Tel相同的记录，则覆盖，否则则新增一条记录
-                if((im = importInfoMapper.selectOne(im)) != null){
-                    result = importInfoMapper.update(i, new EntityWrapper<ImportInfo>()
-                            .where("customer_id=" + im.getCustomerId()));
-                }else {
-                    result = importInfoMapper.insert(i);
-                }
-                if(result == 0){
-                    return false;
+                //判断数据的重复 当天  同一个邀约人
+                Map<String,Object> paramMap = new HashMap<>();
+                paramMap.put("realName",i.getRealName());
+                paramMap.put("introducer",i.getIntroducer());//录入人
+                List<Integer> checkResult = importInfoMapper.checkPersonalRepreat(paramMap);
+                if(checkResult == null || checkResult.size() <1){ //判断当日统一录入人数据是否重复
+                    //判断次数
+                    paramMap.remove("introducer");
+                    Integer checkInportCount = importInfoMapper.checkCount(paramMap);
+                    if(checkInportCount >0){  //判断当日其他人导入的重复数据量
+                        i.setRepeatNum(checkInportCount+1);
+                        i.setStatus("未上门");
+                        //更新其他数据
+                        paramMap.put("repeatNum",i.getRepeatNum());
+                        importInfoMapper.updateCheckNum(paramMap);
+                        result = importInfoMapper.insert(i); //插入数据
+                    }else{
+                        i.setRepeatNum(0);
+                        result = importInfoMapper.insert(i);
+                    }
+                }else{
+                    repreat++;
                 }
             }
         }
-        return true;
+        if(result ==0){
+            if(repreat ==0){
+                msg = "导入失败!";
+            }else{
+                msg ="excel文件数据全部重复!";
+            }
+        }else{
+            if(repreat!= 0){
+                msg = "导入成功,已过滤重复的数据!";
+            }else{
+                msg = "导入成功!";
+            }
+        }
+        return msg;
     }
 
 }

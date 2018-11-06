@@ -20,6 +20,9 @@
         .huixiao-disable{
             pointer-events: none;
         }
+        .teacher-disable{
+            pointer-events: none;
+        }
         
     </style>
 </head>
@@ -63,13 +66,13 @@
                     <input name="tel" id="tel" autocomplete="off" placeholder="请输入电话号码!"
                            th:value="${customerInfo.tel}" class="layui-input"   nativePlaceclass="layui-input" type="text">
                 </div>
-                <label class="layui-form-label">微信号</label>
+                <label class="layui-form-label">微信/qq</label>
                 <div class="layui-input-inline">
-                    <input name="wechatNo"  placeholder="请输入微信号!"
+                    <input name="wechatNo"  placeholder="请输入微信/qq号!"
                            th:value="${customerInfo.wechatNo}"  autocomplete="off" class="layui-input" type="text"></div>
-                <label class="layui-form-label">qq号</label>
+                <label class="layui-form-label">身份证号</label>
                 <div class="layui-input-inline">
-                    <input name="qq"  placeholder="请输入qq号!"
+                    <input name="qq"  placeholder="请输入身份证号!"
                            th:value="${customerInfo.qq}"  autocomplete="off" class="layui-input" type="text">
                 </div>
                 <label class="layui-form-label" for="educationBg">学历</label>
@@ -78,8 +81,8 @@
                         <select name="educationBg" id="educationBg">
                             <option value="">请选择学历!</option>
                             <option th:each="educationBg,educationBgStat:${educationBgList}"
-                                    th:selected="${educationBg.id==customerInfo.educationBg}"
-                                    th:text="${educationBg.name}" th:value="${educationBg.id}"></option>
+                                    th:selected="${educationBg.name ==customerInfo.educationBg}"
+                                    th:text="${educationBg.name}" th:value="${educationBg.name}"></option>
                         </select>
                     </div>
                 </div>
@@ -111,9 +114,9 @@
                     <input name="workExperience" value="无" autocomplete="off" placeholder="请输入工作经历!"
                            th:value="${customerInfo.workExperience}"   class="layui-input" type="text">
                 </div>
-                <label class="layui-form-label">职业</label>
+                <label class="layui-form-label">职位</label>
                 <div class="layui-input-inline">
-                    <input name="job" value="无"  placeholder="请输入职业!"
+                    <input name="job" value="无"  placeholder="请输入职位!"
                            th:value="${customerInfo.job}" autocomplete="off" class="layui-input" type="text"></div>
                 <label class="layui-form-label">教育培训经历</label>
                 <div class="layui-input-inline">
@@ -172,19 +175,18 @@
                 </div>
             </div>
         </div>
-
         <div class="layui-form-item">
             <div class="huixiao-disable">
                 <label class="layui-form-label" for="isMarket">会销</label>
                 <div class="layui-input-inline" id="isMarket">
                     <div class="layui-input-inline">
-                        <input th:checked="${customerInfo.isMarket eq '0'}" name="isMarket" value="0" title="是" type="radio">
-                        <input th:checked="${customerInfo.isMarket eq '1'}" name="isMarket" value="1" title="否" type="radio">
+                        <input th:checked="${customerInfo.isMarket ne '0'}" name="isMarket" value="1" title="是" type="radio">
+                        <input th:checked="${customerInfo.isMarket eq '0'}" name="isMarket" value="0" title="否" type="radio">
+                       <!-- <input name="isMarket" value=""  placeholder="请输入会销讲师!"
+                               th:value="${customerInfo.isMarket}" autocomplete="off" class="layui-input" type="text">-->
                     </div>
                 </div>
             </div>
-
-
             <!--创量-->
             <div class="chuangliang-disable">
                 <label class="layui-form-label" for="recruitChannel">应聘渠道</label>
@@ -192,8 +194,8 @@
                     <select name="recruitChannel" id="recruitChannel">
                         <option value="">请选择应聘渠道!</option>
                         <option th:each="recruitChannel,recruitChannelStat:${recruitChannelList}"
-                                th:selected="${recruitChannel.id==customerInfo.recruitChannel}"
-                                th:text="${recruitChannel.name}" th:value="${recruitChannel.id}"></option>
+                                th:selected="${recruitChannel.name==customerInfo.recruitChannel}"
+                                th:text="${recruitChannel.name}" th:value="${recruitChannel.name}"></option>
                     </select>
                 </div>
                 <label class="layui-form-label" for="introducer">邀约人</label>
@@ -207,16 +209,57 @@
                 </div>
 
             </div>
-
-        </div>
-        <div  class="zixun-disable">
-            <div class="layui-form-item layui-form-text">
-                <label class="layui-form-label">备注</label>
-                <div class="layui-input-block">
-                <textarea name="memo" placeholder="请输入备注!"
-                          th:text="${customerInfo.memo}" class="layui-textarea"></textarea>
+            <div class="zixun-disable">
+                <label class="layui-form-label label-font" for="traceTime">回访时间</label>
+                <div class="layui-input-inline ">
+                    <input name="traceTime" id="traceTime" th:value="${#dates.format(customerInfo.traceTime,'yyyy-MM-dd HH:mm:ss')}" class="layui-input" onClick="WdatePicker({skin:'twoer',dateFmt:'yyyy-MM-dd HH:mm:ss'})" type="text"
+                           placeholder="请输入回访时间!">
                 </div>
             </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="teacher-disable">
+                <label class="layui-form-label" for="isLearn">试听</label>
+                <div class="layui-input-inline" id="isLearn">
+                    <div class="layui-input-inline">
+                        <input th:checked="${customerInfo.isLearn ne '0'}" name="isLearn" value="1" title="是" type="radio">
+                        <input th:checked="${customerInfo.isLearn eq '0'}" name="isLearn" value="0" title="否" type="radio">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div  class="zixun-disable">
+            <div class="zixun-disable">
+                <div class="layui-form-item layui-form-text">
+                    <label class="layui-form-label" for="memo">咨询备注</label>
+                    <div class="layui-input-block">
+                <textarea name="memo" placeholder="请输入备注!"
+                          id="memo"  th:text="${customerInfo.memo}" class="layui-textarea">暂无!</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div  class="huixiao-disable">
+            <div class="huixiao-disable">
+                <div class="layui-form-item layui-form-text">
+                    <label class="layui-form-label"for="marketMemo">会销备注</label>
+                    <div class="layui-input-block">
+                <textarea name="marketMemo" id="marketMemo" placeholder="请输入会销备注!"
+                          th:text="${customerInfo.marketMemo}" class="layui-textarea" lay-filter="marketMemo"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div  class="teacher-disable">
+           <div class="teacher-disable">
+               <div class="layui-form-item layui-form-text">
+                   <label class="layui-form-label" for="learnMemo">试听备注</label>
+                   <div class="layui-input-block">
+                <textarea name="learnMemo" id="learnMemo" placeholder="请输入试听备注!"
+                          th:text="${customerInfo.learnMemo}" class="layui-textarea" lay-filter="learnMemo"></textarea>
+                   </div>
+               </div>
+           </div>
         </div>
         <div class="layui-form-item">
             <span><input id="edit" lay-submit="" type="button" class="layui-btn layui-btn-small" lay-filter="edit" value="保存"></span>

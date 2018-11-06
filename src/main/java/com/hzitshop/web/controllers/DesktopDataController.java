@@ -35,7 +35,7 @@ public class DesktopDataController {
     //@RequiresPermissions(value = {""})
     @RequestMapping("/getDesktopData")
     @ResponseBody
-    protected DesktpData getDesktopData(HttpServletRequest request) {
+    public DesktpData getDesktopData(HttpServletRequest request) {
         HttpSession httpSession = request.getSession();
         EmployeeInfo employeeInfo = (EmployeeInfo)httpSession.getAttribute("employeeInfo");
         DesktpData desktpData = new DesktpData();

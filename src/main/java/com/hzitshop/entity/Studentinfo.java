@@ -2,7 +2,7 @@ package com.hzitshop.entity;
 
 /**
  * 
- * @author å¼èåº
+ * @author
  */
 public class Studentinfo {
 	/**

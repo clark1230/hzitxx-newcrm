@@ -33,7 +33,7 @@ $(function(){
         //到服务器中获取数据'
         $.get('/statistics/companyCount?companyId='+companyId+"&month="+currentMonth,function(result){
             if(result.length==0){
-                layer.alert('该校区暂无学员目标技能数据!');
+                layer.msg('该校区暂无学员目标技能数据!');
                 $("select[name='company']").children('option[value="-1"]').attr("selected","selected");
                 showCompanyCount(0,0);
                 return false;

@@ -7,13 +7,14 @@
 		<id column="id" property="id" />
 		<result column="code" property="code" />
 		<result column="num" property="num" />
-		<result column="pid" property="pid" />
+		<result column="pid" property="pId" />
 		<result column="name" property="name" />
 		<result column="tips" property="tips" />
 		<result column="version" property="version" />
 		<result column="icon" property="icon" />
 		<result column="open" property="open" />
 		<result column="checked" property="checked" />
+		<result column="delete_status" property="deleteStatus" />
 	</resultMap>
 
 </mapper>

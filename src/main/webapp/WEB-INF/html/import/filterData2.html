@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta charset="UTF-8">
+    <title>数据过滤</title>
+    <link rel="stylesheet" href="/js/layui/css/layui.css">
+</head>
+<body>
+<div class="layui-fluid larry-wrapper">
+    <div class="layui-row">
+        <div class="layui-col-lg12 layui-col-md12 layui-col-sm12 layui-col-xs12">
+            <form class="layui-form" action="" style="display: inline-block;">
+                <div class="layui-input-inline" style="display: inline-block">
+                    <select name="city"  lay-filter="introducerFilter">
+                        <option value=""></option>
+                        <option name="introducer" th:each="employee : ${employeeVoNameIds}" th:value="${employee.userId}" th:text="${employee.name}"></option>
+                    </select>
+                </div>
+                <div class="layui-input-inline" >
+                    <input type="text"   id="value" placeholder="请输入应聘者姓名!" class="layui-input">
+                </div>
+            </form>
+            <div style="display: inline-block">
+                <button id="search" class="layui-btn search_btn layui-btn-normal layui-btn-sm">
+                    <i class="layui-icon">&#xe615;</i>查询</button>
+                <button id="refresh" class="layui-btn search_btn layui-btn-primary layui-btn-sm">
+                    <i class="layui-icon">&#x1002;</i>刷新</button>
+            </div>
+        </div>
+        <div class="layui-col-lg12 layui-col-md12 layui-col-sm12 layui-col-xs12">
+            <form action="">
+                <table class="layui-table" style="color:#000;" lay-data="{url:'/import/checkDailyImportInfo',page:true, limit:20,id:'filterDataTable'}">
+                    <thead>
+                    <tr >
+                        <th lay-data="{checkbox:true, fixed:'left'}" rowspan="2"></th>
+                        <th lay-data="{field:'realName', width:80,style:'color:#000;'}" >应聘者</th>
+                        <th lay-data="{field:'createTime', width:80,style:'color:#000;'}" >录入时间</th>
+                        <th lay-data="{field:'status',title:'预约/回访',width:90,templet:'#statusTpl',style:'color:#000;'}"></th>
+                        <th lay-data="{field:'introducer', width:80,style:'color:#000;'}">邀请人</th>
+                        <th th:each="employee : ${employeeVoNameIds}"
+                            th:lay-data="'{field:\''+|${employee.userId}|+'\',width:220,templet:'+${employee.templet}+'}'"
+                            th:text="${employee.name}"></th>
+                    </tr>
+                    </thead>
+                </table>
+            </form>
+        </div>
+    </div>
+</div>
+<script src="/assets/js/jquery.min.js"></script>
+<script src="/js/layui/layui.js"></script>
+<script type="text/html" id="statusTpl">
+    {{# if(d.status === 0){ }}
+        <span class="layui-badge layui-bg-gray">无</span>
+    {{#  } }}
+    {{#  if(d.status === 1){ }}
+        <span class="layui-badge layui-bg-blue"> 预约</span>
+    {{#  } }}
+    {{#  if(d.status === 2){ }}
+        <span class="layui-badge layui-bg-orange">回访</span>
+    {{#  } }}
+</script>
+
+<script type="text/html" th:inline="javascript" th:id="'isDelete'+|${employee.userId}|"  th:each="employee : ${employeeVoNameIds}">
+    {{# if(d.[[${employee.userId}]] === 0){ }}
+    <span class="layui-badge layui-bg-gray">无</span>
+    {{#  } }}
+    {{# if(d.[[${employee.userId}]] === 1){ }}
+    <span class="layui-badge layui-bg-gray">有</span>
+    {{#  } }}
+</script>
+
+<script >
+    layui.use('table', function() {
+        var table = layui.table,form=layui.form,layer=layui.layer;
+        //监听指定开关
+        form.on('checkbox(filterData)', function(data){
+            //修改今天和昨天的数据
+            var value = $(this).parent().find('input[name="filterData"]').val();
+            var realName = $(this).parent().find('input[name="realName"]').val();
+            //异步提交数据
+
+            var checkStatus = data.elem.checked; //true 表示勾选  false 表示取消勾选
+            var isDelete = 0;
+            if(!checkStatus){
+                isDelete  = 1;
+            }
+            var that = this;
+            $.ajax({
+                url:'/import/updateByStatus?status='+isDelete+'&customerId='+value+'&realName='+realName,
+                type:'GET',
+                success:function(resp){
+                    if(resp.status === 0){
+                        console.log(isDelete);
+                        if(isDelete == 0){//勾选
+                            $(that).parent().find('span:eq(1)').css('color','#0086B1');
+                        }else{  //取消勾选
+                            $(that).parent().find('span:eq(1)').css('color','lightgrey');
+                        }
+                        layer.msg(resp.msg,{icon:1});
+                    }else{
+                        //操作失败
+                        layer.msg(resp.msg,{icon:2});
+                        restore();
+
+                    }
+                },error:function(resp){
+                    layer.msg('对不起，您没有权限修改该数据!',{icon:2});
+                    restore();
+                }
+            });
+            function restore(){
+                if(checkStatus){ //取消勾选
+                    //恢复到未勾选
+                    $(that).parent().find('span:eq(1)').css('color','lightgrey');
+                    $(that).prop('checked',false);
+                    setTimeout(function(){
+                        form.render();
+                        layer.msg('状态已经恢复!');
+                    },1000);
+                }else{
+                    $(that).parent().find('span:eq(1)').css('color','#0086B1');
+                    $(that).prop('checked',true);
+                    setTimeout(function(){
+                        form.render();
+                        layer.msg('状态已经恢复!');
+                    },1000);
+                    //恢复到勾选
+                }
+            }
+        });
+        form.on('select(introducerFilter)', function(data) {
+            //console.log(data.value); //得到被选中的值
+            var userId = data.value;
+            userId = userId.substring(2);
+            console.log(userId);
+            table.reload('filterDataTable',{
+                where:{
+                    introducer:userId
+                }
+            });
+        });
+        //搜索数据
+        $('#search').click(function(){
+            //获取搜索值
+            var value  = $('#value').val();
+            if(value == ''){
+                layer.msg('请输入搜索值!',{icon:2});
+            }else{
+                //获取用户选择的创量人员
+                var introducer = $('option:selected').val();
+                introducer = introducer.substring(2);
+                //表格重载
+                table.reload('filterDataTable',{
+                    where:{
+                        realName:value,
+                        introducer:introducer
+                    }
+                });
+            }
+        });
+        //刷新数据
+        $('#refresh').click(function(){
+            table.reload('filterDataTable',{
+                where:{
+                    introducer:null,
+                    realName:null
+                }
+            });
+            $('#value').val('');
+        });
+    });
+</script>
+</body>
+</html>

@@ -26,6 +26,28 @@
 		<result column="resource_ids" property="resourceIds" />
 		<result column="isPermission" property="isPermission" />
 		<result column="role_name" property="roleName" />
+		<result column="dingding_id" property="dingdingId" />
 	</resultMap>
+	<!--根据公司编号获取创量人员信息-->
+	<select id="selectByCompanyId"  parameterType="map" resultMap="BaseResultMap">
+		SELECT * FROM employee_info WHERE company_id = #{map.companyId} AND isLocked != 1 AND role_name LIKE '创量%';
+	</select>
+	<!--根据角色名称获取信息-->
+	<select id="selectByRole" resultMap="EmployeeVoNameIdMap" parameterType="map">
+        SELECT
+           user_id,name
+        FROM
+             employee_info
+        WHERE
+             company_id = #{map.companyId}
+        AND
+             isLocked = 0
+        AND
+             role_name  LIKE #{map.like};
+	</select>
 
+	<resultMap id="EmployeeVoNameIdMap" type="com.hzitshop.vo.employeevo.EmployeeVoNameId">
+       <id column="user_id" property="userId"></id>
+		<result column="name" property="name"></result>
+	</resultMap>
 </mapper>

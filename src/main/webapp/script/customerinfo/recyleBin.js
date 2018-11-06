@@ -54,6 +54,7 @@ $(function () {
             idField: 'customerId',
             pageNumber: 1,                       //初始化加载第一页，默认第一页
             pageSize: 20,                       //每页的记录行数（*）
+            paginationShowPageGo:true,
             pageList: [10, 20, 30, 50, 100],        //可供选择的每页的行数（*）
             clickToSelect: true,                //是否启用点击选中行
             smartDisplay: false, // 智能显示 pagination 和 cardview 等
@@ -63,8 +64,6 @@ $(function () {
             showColumns: true,
             detailView: true,
             detailFormatter: function (index, row) {
-                var lastTime = new Date(parseInt(row.lastTime)).toLocaleString().replace(/年|月/g, "-").replace(/日/g, " ");
-                var createTime = new Date(parseInt(row.lastTime)).toLocaleString().replace(/年|月/g, "-").replace(/日/g, " ");
                 var sex = '';
                 if(row.sex == '1'){
                     sex= '男';
@@ -80,7 +79,7 @@ $(function () {
                     '<li class="customerinfo-li">籍贯:' + (row.nativePlace==null?'----':row.nativePlace) + '</li>' +
                     '<li class="customerinfo-li">电话号码:' + row.tel + '</li>' +
                     '<li class="customerinfo-li">微信号:' + (row.wechatNo==null ?"----":row.wechatNo) + '</li>' +
-                    '<li class="customerinfo-li">qq号:' + (row.qq==null?'----':row.qq) + '</li>' +
+                    '<li class="customerinfo-li">身份证:' + (row.qq==null?'----':row.qq) + '</li>' +
                     '<li class="customerinfo-li">学历:' + (row.educationBgMsg==null ?'----':row.educationBgMsg) + '</li>' +
                     '<li class="customerinfo-li">毕业时间:' + (row.graduateTime==null?'----':row.graduateTime) + '</li>' +
                     '<li class="customerinfo-li">毕业学校:' + (row.graduateFrom==null ?'----':row.graduateFrom) + '</li>' +
@@ -96,8 +95,8 @@ $(function () {
                     '<li class="customerinfo-li">目标技能:' + (row.targetSkillMsg==null ?'----':row.targetSkillMsg) + '</li>' +
                     '<li class="customerinfo-li">关单人:' + (row.guandaMsg==null?'----':row.guandaMsg) + '</li>' +
                     '<li class="customerinfo-li">邀约人:' + (row.introducerMsg ==null?'----':row.introducerMsg) + '</li>' +
-                    '<li class="customerinfo-li">录入时间:' + (createTime==null ? '----':createTime) + '</li>' +
-                    '<li class="customerinfo-li">最后跟进时间:' + (lastTime==null ?'----':lastTime) + '</li>' +
+                    '<li class="customerinfo-li">录入时间:' + (row.createTime==null ? '----':createTime) + '</li>' +
+                    '<li class="customerinfo-li">最后跟进时间:' + (row.lastTime==null ?'----':lastTime) + '</li>' +
                     '<li class="customerinfo-li">所属公司:' + (row.companyIdMsg==null ?'----':row.companyIdMsg) + '</li>' +
                     '<li class="customerinfo-li">备注:' + (row.memo==null?'----':row.memo) + '</li>' +
                     '</ul>';
@@ -195,7 +194,7 @@ $(function () {
                 visible: false
             }, {
                 field: 'qq',
-                title: 'QQ',
+                title: '身份证',
                 width:60,
                 visible: false
             }, {
@@ -260,7 +259,14 @@ $(function () {
             }, {
                 field: 'customerStateMsg',
                 title: '学员状态',
-                width: 40
+                width: 40,
+                formatter:function(value,row,index){
+                    var customerStateMsg = row.customerStateMsg;
+                    if(row.customerStateMsg=='数据字典'){
+                        customerStateMsg = '--';
+                    }
+                    return customerStateMsg;
+                }
             }, {
                 field: 'customerLevelMsg',
                 title: '学员级别',
@@ -299,17 +305,11 @@ $(function () {
                 field: 'createTime',
                 title: '录入时间',
                 width: 150,
-                formatter: function (value, row, index) {
-                    return new Date(parseInt(row.createTime)).toLocaleString().replace(/年|月/g, "-").replace(/日/g, " ")
-                },
                 visible: false
             }, {
                 field: 'lastTime',
                 title: '最后跟进时间',
-                width: 150,
-                formatter: function (value, row, index) {
-                    return new Date(parseInt(row.lastTime)).toLocaleString().replace(/年|月/g, "-").replace(/日/g, " ");
-                }
+                width: 150
             }, {
                 field: 'companyIdMsg',
                 title: '所属公司',
@@ -321,6 +321,9 @@ $(function () {
                 width: 80,
                 formatter: function (value, row, index) {
                     var memo = (typeof(row.memo) == 'null') ? "---" : row.memo + "";
+                    if(row.memo == null){
+                        return '---';
+                    }
                     if (memo.length > 5) {
                         memo = row.memo.substr(0, 5) + "....";
                     }else if(memo == null || memo =='null' || memo ==''){
@@ -337,12 +340,10 @@ $(function () {
                 width:20,
                 formatter:function(value,row,index){
                     var isMarket = row.isMarket;
-                    if(isMarket  == '0'){
-                        isMarket = '<i style="font-size: 16px;color:green;" class="layui-icon"></i>';
-                    } else if(isMarket == '1'){
+                    if(isMarket  != '0'){
+                        isMarket = '<i style="font-size: 16px;color:green;" class="layui-icon"></i>'+"--"+isMarket;
+                    } else if(isMarket =='0'){
                         isMarket ='<i style="font-size: 16px;color:red;" class="layui-icon">ဇ</i>';
-                    }else{
-                        isMarket = '---';
                     }
                     return isMarket;
                 }

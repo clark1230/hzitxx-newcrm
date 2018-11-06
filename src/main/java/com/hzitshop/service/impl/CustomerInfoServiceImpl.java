@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.hzitshop.entity.CustomerInfo;
 import com.hzitshop.entity.EmployeeInfo;
+import com.hzitshop.entity.LayuiData;
 import com.hzitshop.entity.TbDict;
 import com.hzitshop.mapper.CustomerInfoMapper;
 import com.hzitshop.mapper.CustomerTraceRecordMapper;
@@ -12,10 +13,17 @@ import com.hzitshop.mapper.EmployeeInfoMapper;
 import com.hzitshop.mapper.TbDictMapper;
 import com.hzitshop.service.ICustomerInfoService;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
-import com.hzitshop.vo.BootstrapTable;
-import com.hzitshop.vo.CompanyCount;
-import com.hzitshop.vo.CustomerInfoVo;
+import com.hzitshop.util.LayuiEntity;
+import com.hzitshop.util.ServerResponse;
+import com.hzitshop.vo.*;
+import com.hzitshop.vo.customerinfovo.NotFollowUpVo;
+import com.hzitshop.vo.front.FrontVo;
+import com.hzitshop.vo.huixiao.MobileHuiXiaoVo;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.jeecgframework.poi.excel.ExcelExportUtil;
+import org.jeecgframework.poi.excel.entity.ExportParams;
+import org.jeecgframework.poi.excel.entity.enmus.ExcelType;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,14 +44,16 @@ import java.util.Map;
 @Service
 public class CustomerInfoServiceImpl extends ServiceImpl<CustomerInfoMapper, CustomerInfo> implements ICustomerInfoService {
 
-    @Autowired
+    @Autowired(required = false)
     private CustomerInfoMapper customerInfoMapper;
-    @Autowired
+
+    @Autowired(required = false)
     private TbDictMapper tbDictMapper;
-    @Autowired
+
+    @Autowired(required = false)
     private EmployeeInfoMapper employeeInfoMapper;
 
-    @Autowired
+    @Autowired(required = false)
     private CustomerTraceRecordMapper customerTraceRecordMapper;
 
     /**
@@ -61,6 +71,21 @@ public class CustomerInfoServiceImpl extends ServiceImpl<CustomerInfoMapper, Cus
         List<CustomerInfoVo> customerInfoVos = getCustomerInfoVos(customerInfoList);
         bootstrapTable.setRows(customerInfoVos);
         return bootstrapTable;
+    }
+
+    /**
+     * 获取列表信息
+     * @param paramsMap
+     * @return
+     */
+    @Override
+    public BootstrapTable<CustomerInfoVo> listData(Map<String, Object> paramsMap) {
+        List<CustomerInfo> customerInfoList = this.customerInfoMapper.searchCustomerInfo(paramsMap);
+        BootstrapTable<CustomerInfoVo> bt = new BootstrapTable<>();
+        List<CustomerInfoVo> customerInfoVoList = this.getCustomerInfoVos(customerInfoList);
+        bt.setRows(customerInfoVoList);
+        bt.setTotal(this.customerInfoMapper.searchCustomerInfoCount(paramsMap));
+        return bt;
     }
 
     private List<CustomerInfoVo> getCustomerInfoVos(List<CustomerInfo> customerInfoList) {
@@ -197,6 +222,7 @@ public class CustomerInfoServiceImpl extends ServiceImpl<CustomerInfoMapper, Cus
     public List<CustomerInfoVo> customerInfoWaitList(CustomerInfo ci,EmployeeInfo ei) {
         List<CustomerInfo> customerInfoVoList = this.selectList(new EntityWrapper<CustomerInfo>()
                 .where("company_id="+ei.getCompanyId())
+                .and("customer_type="+ci.getCustomerType())
                 .and("to_days(create_time)= to_days(now())"));
         return this.getCustomerInfoVos(customerInfoVoList);
     }
@@ -228,5 +254,112 @@ public class CustomerInfoServiceImpl extends ServiceImpl<CustomerInfoMapper, Cus
     @Override
     public List<CompanyCount> chuangliangMonthData(Map<String, Object> map) {
         return customerInfoMapper.chuangliangMonthData(map);
+    }
+
+    @Override
+    public WelcomeVo totalCount() {
+        return customerInfoMapper.totalCount();
+    }
+
+    @Override
+    public List<Map<String,Object>> traceData(Map<String, Object> map) {
+        return customerInfoMapper.traceData(map);
+    }
+
+    /**
+     * 移动会销
+     * @param map
+     * @return
+     */
+    @Override
+    public ServerResponse mobileHuiXiao(Map<String, Object> map) {
+        List<MobileHuiXiaoVo> mobileHuiXiaoVos = this.customerInfoMapper.mobileHuiXiao(map);
+        return ServerResponse.createBySuccess(mobileHuiXiaoVos);
+    }
+
+    /**
+     * 修改数据
+     * @param customerInfo
+     * @return
+     */
+    @Override
+    public ServerResponse updateSelectiveById(CustomerInfo customerInfo) {
+        int result = customerInfoMapper.updateSelectiveById(customerInfo);;
+        if(result ==1){
+            return  ServerResponse.createBySuccess();
+        }else{
+            return  ServerResponse.createByError();
+        }
+    }
+
+    /***
+     * 前台展示数据
+     * @param map
+     * @return
+     */
+    @Override
+    public Workbook foregroundExportData(Map<String, Object> map) {
+        List<FrontVo> frontVoList = this.customerInfoMapper.foregroundExportData(map);
+        if(frontVoList != null){
+            for(FrontVo frontVo : frontVoList){
+                if("0".equals(frontVo)){
+                    frontVo.setMarket("无");
+                }
+            }
+        }
+        ExportParams ep = new ExportParams("招聘信息","招聘信息", ExcelType.XSSF);
+        Workbook workbook  = ExcelExportUtil.exportBigExcel(ep,FrontVo.class,frontVoList);
+        return workbook;
+    }
+
+    /**
+     * 前台分页数据
+     * @param map
+     * @return
+     */
+    @Override
+    public LayuiEntity<FrontVo> foregroundPage(Map<String, Object> map) {
+        List<FrontVo>  obj= this.customerInfoMapper.foregroundExportData(map);
+        LayuiEntity<FrontVo> layuiEntity=new LayuiEntity<>();
+        layuiEntity.setCode(0);
+        layuiEntity.setMsg("数据");
+        layuiEntity.setCount(customerInfoMapper.foregroundExportDataCount(map));
+        layuiEntity.setData(obj);
+        return layuiEntity;
+    }
+
+    /**
+     * 获取不跟进的咨询师信息
+     * @param paramsMap
+     * @return
+     */
+    @Override
+    public LayuiEntity<NotFollowUpVo> selectByRecordTimeAndLevel(Map<String, Object> paramsMap) {
+        LayuiEntity<NotFollowUpVo> layuiEntity = new LayuiEntity<>();
+        layuiEntity.setCode(0);
+        layuiEntity.setMsg("消息");
+        layuiEntity.setCount(this.customerInfoMapper.selectByRecordTimeAndLevelCount(paramsMap));
+        layuiEntity.setData(this.customerInfoMapper.selectByRecordTimeAndLevel(paramsMap));
+        return layuiEntity;
+    }
+
+    /**
+     * 定时任务获取每日跟进的信息
+     * @param paramsMap
+     * @return
+     */
+    @Override
+    public List<NotFollowUpVo> selectByRecordTime(Map<String, Object> paramsMap) {
+        return this.customerInfoMapper.selectByRecordTime(paramsMap);
+    }
+
+    /**
+     * 定时把咨询的数据转到运营中
+     * @param paramsMap
+     * @return
+     */
+    @Override
+    public int updateByLevelAndCountTime(Map<String, Object> paramsMap) {
+        return this.customerInfoMapper.updateByLevelAndCountTime(paramsMap);
     }
 }

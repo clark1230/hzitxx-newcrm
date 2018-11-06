@@ -1,6 +1,7 @@
 package com.hzitshop.config;
 
 import com.google.common.collect.Maps;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
@@ -9,6 +10,7 @@ import org.apache.shiro.web.filter.authc.AnonymousFilter;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.web.servlet.DelegatingFilterProxyRegistrationBean;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -24,23 +26,6 @@ import java.util.Set;
 
 @Configuration
 public class ShiroConfig {
-	
-	/**
-	 * FilterRegistrationBean
-	 * @return
-	 */
-/*	@Bean
-	public FilterRegistrationBean filterRegistrationBean() {
-
-
-		FilterRegistrationBean filterRegistration = new FilterRegistrationBean();
-        filterRegistration.setFilter(new DelegatingFilterProxy("shiroFilter"));
-        filterRegistration.setEnabled(true);
-        filterRegistration.addUrlPatterns("*//*");
-        filterRegistration.setDispatcherTypes(DispatcherType.REQUEST);
-    
-        return filterRegistration;
-	}*/
 
 	@Bean
 	public  DelegatingFilterProxyRegistrationBean delegatingFilterProxyRegistrationBean(){
@@ -61,8 +46,8 @@ public class ShiroConfig {
 	 * @return
 	 */
 	@Bean(name = "shiroFilter")
-	public ShiroFilterFactoryBean shiroFilter(){
-		ShiroFilterFactoryBean bean = new ShiroFilterFactoryBean();
+	public MyShiroFilterFactoryBean shiroFilter(){
+		MyShiroFilterFactoryBean bean = new MyShiroFilterFactoryBean();
 		bean.setSecurityManager(securityManager());
 		bean.setLoginUrl("/account/login");
 		bean.setUnauthorizedUrl("/exception/exception");
@@ -78,8 +63,12 @@ public class ShiroConfig {
 		chains.put("/account/login", "anon");
 		chains.put("/account/unauthor", "anon");
 		chains.put("/account/logout", "logout");
+		chains.put("/mobile/getSign", "anon");
 		chains.put("/assets*/**", "anon");
 		chains.put("/static*/**", "anon");
+		chains.put("/css*/**", "anon");
+		chains.put("/js*/**", "anon");
+		chains.put("/images*/**", "anon");
 		chains.put("/**", "authc,perms");
 		bean.setFilterChainDefinitionMap(chains);
 		return bean;
@@ -126,13 +115,10 @@ public class ShiroConfig {
 	public DefaultWebSessionManager defaultWebSessionManager() {
 		DefaultWebSessionManager sessionManager = new DefaultWebSessionManager();
 		sessionManager.setCacheManager(cacheManager());
-		sessionManager.setGlobalSessionTimeout(4*60*60*1000);//4小时
+		sessionManager.setGlobalSessionTimeout(7000*1000);//2小时
 		sessionManager.setDeleteInvalidSessions(true);
 		sessionManager.setSessionValidationSchedulerEnabled(true);
 		sessionManager.setDeleteInvalidSessions(true);
-		//sessionManager.setAttribute();
-		/*SessionKey sessionKey = null;
-		sessionManager.getSessionId(sessionKey);*/
 		return sessionManager;
 	}
 	
@@ -148,10 +134,11 @@ public class ShiroConfig {
 		return userRealm;
 	}
 
-	//  开启 Controller中@RequiresPermissions  start
+
 	/**
+	 *  开启 Controller中@RequiresPermissions start
 	 * <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator"
-	 depends-on="lifecycleBeanPostProcessor" />
+	 * depends-on="lifecycleBeanPostProcessor" />
 	 * @return
 	 */
 	@Bean
@@ -171,17 +158,7 @@ public class ShiroConfig {
 	public AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor(){
 		return new AuthorizationAttributeSourceAdvisor();
 	}
-	//  开启 Controller中@RequiresPermissions  end
 
-
-	/**
-	 * url权限过滤
-	 * @return
-	 */
-	@Bean
-	public URLPermissionsFilter urlPermissionsFilter() {
-		return new URLPermissionsFilter();
-	}
 
 	/**
 	 * 缓存管理

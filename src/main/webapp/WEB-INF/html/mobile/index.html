@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>首页</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0,viewport-fit=cover">
+    <link rel="stylesheet" href="/assets/weui/weui.css"/>
+    <link rel="stylesheet" href="/assets/weui/example.css"/>
+    <style>
+        .weui-cell_access:hover{
+            background-color: #EEEEEE;
+        }
+        .menu{
+            background-color: #EEEEEE;
+        }
+        .data-hide{
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="page tabbar js_show">
+    <input type="hidden" name="menu" th:value="${menu}"/>
+    <div class="page__bd" style="height: 100%;">
+        <div class="weui-tab">
+            <div class="weui-tab__panel">
+                <div class="weui-cells" th:classappend="${menu == 1}? '': 'data-hide'"  id="ziXunDiv">
+                    <div  class="weui-cell weui-cell_access" th:each="traceData : ${traceDataVos}" >
+                        <div class="weui-cell__bd" style="position:relative">
+                            <input type="hidden" name="customerId" th:value="${traceData.customerId}">
+                            <span style="vertical-align: middle" th:text="${traceData.realName}"></span>
+                            <span style="vertical-align: middle;position: absolute;right:5px;" th:text="${traceData.tel}"></span>
+                        </div>
+                        <div class="weui-cell__ft"></div>
+                    </div>
+                </div>
+                <div th:classappend="${menu == 2}? '': 'data-hide'" class="weui-cells" id="huixiaoDiv" >
+                    <div  class="weui-cell weui-cell_access" th:each="huiXiao : ${mobilehuiXiaoVos}">
+                        <div class="weui-cell__bd" style="position:relative">
+                        <input type="hidden" name="customerId" th:value="${huiXiao.customerId}">
+                        <span style="vertical-align: middle" th:text="${huiXiao.realName}"></span>
+                        <span style="vertical-align: middle;position: absolute;right:170px" th:text="${huiXiao.gender}"></span>
+                        &nbsp;&nbsp;<span style="vertical-align: middle;position: absolute;right:40px" th:text="${huiXiao.tel}"></span>
+                        <label style="display: inline;vertical-align: middle;position: absolute;right:5px;">
+                            <input type="checkbox"   name="isMarket" th:checked="${huiXiao.isMarket nq '0'}">
+                        </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="weui-tabbar">
+                <a href="javascript:;" th:classappend="${menu == 1}? 'menu': ''" class="weui-tabbar__item">
+                    <span style="display: inline-block;position: relative;">
+                        <img src="/assets/weui/images/icon_nav_dialog.png" alt="" class="weui-tabbar__icon">
+                        <!--<span class="weui-badge" style="position: absolute;top: -2px;right: -13px;">8</span>-->
+                    </span>
+                    <p class="weui-tabbar__label">学员跟进</p>
+                </a>
+                <a href="javascript:;" th:classappend="${menu == 2}? 'menu': ''"  class="weui-tabbar__item" id="huiXiao">
+                    <img src="/assets/weui/images/icon_nav_tab.png" alt="" class="weui-tabbar__icon">
+                    <p class="weui-tabbar__label">会销</p>
+                </a>
+                <a href="javascript:;" class="weui-tabbar__item" id="exit">
+                    <img src="/assets/weui/images/icon_tabbar.png" alt="" class="weui-tabbar__icon">
+                    <p class="weui-tabbar__label">退出</p>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="successToast" style="display: none;">
+    <div class="weui-mask_transparent"></div>
+    <div class="weui-toast">
+        <i class="weui-icon-success-no-circle weui-icon_toast"></i>
+        <p class="weui-toast__content">操作成功!</p>
+    </div>
+</div>
+
+<div id="errorToast" style="display: none;">
+    <div class="weui-mask_transparent"></div>
+    <div class="weui-toast">
+        <i class="weui-icon-success-no-circle weui-icon_toast"></i>
+        <p class="weui-toast__content">操作失败!</p>
+    </div>
+</div>
+<script src="/assets/weui/zepto.min.js"></script>
+<script src="http://g.alicdn.com/dingding/open-develop/1.9.0/dingtalk.js"></script>
+<script>
+ $(function(){
+     /**
+      * 学员的跟进
+      */
+    $('.weui-cell').click(function(){
+        addMsg($(this));
+    });
+    //事件绑定
+     $('#ziXunDiv').on('click','.weui-cell',function(){
+         addMsg($(this));
+     });
+
+     function addMsg(that){
+         var menu = $('input[name="menu"]').val();
+         if(menu == '2'){
+             return false;
+         }
+         var customerId = that.find('input[name="customerId"]').val();
+         window.location.href = '/mobile/customerInfo?customerId='+customerId;
+     }
+    //事件绑定
+     $('#huixiaoDiv').on('click','.weui-cell',function(){
+         fun($(this));
+     });
+    $('#huixiaoDiv .weui-cell').click(function(){
+        fun($(this));
+    });
+
+    function fun(that){
+        var $market = that.find('input[name="isMarket"]');
+        var isMarket = 0;
+        if($market.prop('checked') ==false){
+            $market.prop('checked',true);
+            isMarket =1;
+            $market.val(1);
+        }else{
+            $market.prop('checked',false);
+            isMarket = 0;
+            $market.val(0);
+        }
+        //异步发送数据
+        //获取id
+        var customerId = that.find('input[name="customerId"]').val();
+        $.ajax({
+            type:'post',
+            url:'/mobile/updateMarket',
+            data:'customerId='+customerId+"&isMarket="+isMarket,
+            success:function(resp){
+                if(resp.status === 0){
+                    //成功!
+                    var $successTocast = $('#successToast');
+                    if ($successTocast.css('display') != 'none') return;
+                    $successTocast.fadeIn(100);
+                    setTimeout(function () {
+                        $successTocast.fadeOut(100);
+                       // huiXiao();
+                    }, 1500);
+                }else{
+                    //失败!
+                    var $errorTocast = $('#errorToast');
+                    if ($errorTocast.css('display') != 'none') return;
+                    $errorTocast.fadeIn(100);
+                    setTimeout(function () {
+                        $errorTocast.fadeOut(100);
+                    }, 1500);
+                }
+            },
+            error:function(resp){
+                if(resp.status ===500){
+                    alert('服务器内部错误!');
+                }else if(resp.status === 403){
+                    alert('您没有权限进行该操作!');
+                }else if(resp.status ===401){
+                    alert('您没有权限进行该操作!');
+                }
+            }
+        });
+    }
+
+     /**
+      * 菜单的选择
+      */
+    $('.weui-tabbar a').click(function(){
+        $(this).css('background','#EEEEEE');
+        $(this).siblings().css('background-color','white');
+        var select = $(this).find('p').text();
+        if(select =='会销'){
+            huiXiao();
+        }else if(select == '学员跟进'){
+            follow();
+        }else{
+            //退出微应用
+            dd.ready(function(){
+                dd.biz.navigation.close({
+                    onSuccess : function(result) {
+                    },
+                    onFail : function(err) {}
+                })
+            });
+        }
+    });
+
+    //咨询跟进
+    function follow(){
+        var $parent = $('#ziXunDiv');
+        $('#huixiaoDiv').css('display','none');
+        $parent.css('display','block');
+        //清空标签内容
+        $parent.html('');
+        $.ajax({
+           type:'get',
+           url:'/mobile/follow',
+           success:function(resp){
+               $.each(resp.data,function(index,item){
+                   var $children =$('<div  class="weui-cell weui-cell_access">' +
+                       '<div class="weui-cell__bd" style="position:relative">' +
+                       '<input type="hidden" name="customerId" value="'+item.customerId+'">' +
+                       '<span style="vertical-align: middle" >'+item.realName+'</span>' +
+                       '<span style="vertical-align: middle;position: absolute;right:5px;" ">'+item.tel+'</span>' +
+                       '</div>\n' +
+                       '<div class="weui-cell__ft"></div>' +
+                       '</div>');
+                   $parent.append($children);
+               });
+           } ,error:function(resp){
+                if(resp.status ==500){
+                    alert('服务器内部错误!');
+                }else if(resp.status ==403){
+                    alert('你没有权限进行该操作!');
+                }else if(resp.status ==401){
+                    alert('你没有权限进行该操作!');
+                }
+           }
+        });
+    }
+    //异步获取会销数据
+    function huiXiao(){
+        //删除咨询数据
+        $('#ziXunDiv').css('display','none');
+        var $parent =$('#huixiaoDiv');
+        $parent.css('display','block');
+        $parent.empty();
+        //异步获取数据
+        $.ajax({
+            type:'GET',
+            url:'/mobile/huiXiao',
+            success:function(resp){
+                $.each(resp.data,function(index,item){
+                    var checked = '';
+                    if(item.isMarket !=0){//是
+                        checked ='checked="checked";'
+                    }
+                    var $children =$(' <div  class="weui-cell weui-cell_access"><div class="weui-cell__bd" style="position:relative">' +
+                        '<input type="hidden" name="customerId" value="'+item.customerId+'" >' +
+                        '<span style="vertical-align: middle" ">'+item.realName+'</span>' +
+                        '&nbsp;&nbsp;<span style="vertical-align: middle;position: absolute;right:170px"" >'+item.gender+'</span>' +
+                        '&nbsp;&nbsp;<span style="vertical-align: middle;position: absolute;right:40px">'+item.tel+'</span>' +
+                        '<label style="display: inline;vertical-align: middle;position: absolute;right:5px;" for="market'+index+'">' +
+                        '<input type="checkbox"  name="isMarket" id="market'+index+'"'+checked+'>' +
+                        '</label>' +
+                        '</div></div>');
+                    $parent.append($children);
+                });
+            },eror:function(resp){
+
+            }
+        });
+    }
+ });
+</script>
+</body>
+</html>

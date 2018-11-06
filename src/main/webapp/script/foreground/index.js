@@ -2,7 +2,6 @@
  * Created by 冼耀基 on 2016/11/10.
  */
 $(function(){
-
     //权限验证 -----start---------------------
     //页面加载时根据用户编号获取用户所能访问的按钮,移除隐藏样式
     var isEditCustomerInfo =false;
@@ -52,11 +51,11 @@ $(function(){
             //获取客户等待列表
             var $customerWaitList = $("#customerWaitList");
             $customerWaitList.html('应聘者等待列表&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+'当前人数<span class="am-badge am-badge-warning am-radius">'+data.length+'</span>人');
-            var currentDate;
-            var hour;
-            var minute;
-            var second;
-            var leftTime="";
+            var currentDate = 0; //当前日期
+            var hour = 0; //小时
+            var minute = 0; //分钟
+            var second = 0;//秒
+            var leftTime="";//剩余时间
             var $showCustomerInfoNum = $("#showCustomerInfoNum");
             $showCustomerInfoNum.html('');
             var $liBasic = $('<li style="height:50px;"><a style="color:purple;" href="#"<span>应聘者姓名</span>' +
@@ -65,6 +64,7 @@ $(function(){
                 '<span style="float: right;margin-right:60px;">应聘者电话</span>' +
                 '<span style="float:right;display:block;width:70px;text-align:left;margin-right:110px;">咨询师</span></a></li>');
             $customerWaitList.append($liBasic);
+
             for(var item in data){
                 //获取展示ul标签
                 //清空数据
@@ -80,23 +80,22 @@ $(function(){
                     '<span style="float:right;margin-right:60px;color:orange"  id="timeSpan'+item+'">等待:'+ myTime()+'</span>'+
                     '<span style="float: right;margin-right:50px;">'+data[item].tel+'</span>'+
                     '<span  style="float:right;display:block;width:70px;text-align:left;margin-right:100px;">'+data[item].userIdMsg+'</span></a></li>');
-                var $hiddenDate = $('<input type="hidden" id="hiddenDate'+item+'" value="'+data[item].createTime+'">');
+                var $hiddenDate = $('<input type="hidden" id="hiddenDate'+item+'" value="'+ Date.parse(new Date(data[item].createTime))+'">');
                 var $hiddenUserId = $('<input type="hidden" id="hiddenUserId'+item+'" value="'+data[item].userId+'">');
                 var $hiddenCustomerId = $('<input type="hidden" id="hiddenCustomerId'+item+'" value="'+data[item].customerId+'">');
-                //$li.append($span);
                 $li.append($hiddenDate);
                 $li.append($hiddenUserId);
                 $li.append($hiddenCustomerId);
 
                 $customerWaitList.append($li);
             }
+
             //显示时间
             function myTime(){
                 for(var item in data){
                     var newDate = new Date();
                     newDate.setTime($("#hiddenDate"+item).val());
                     currentDate = newDate;
-                    
                     hour = Math.floor((new Date().getTime() - currentDate.getTime()) / 1000 / 60 / 60);
                     minute = Math.floor((new Date().getTime() - currentDate.getTime()) / 1000 / 60 - (hour * 60));
                     second = Math.floor((new Date().getTime() - currentDate.getTime()) / 1000 - (hour * 60 * 60 + minute * 60));
@@ -113,6 +112,7 @@ $(function(){
                     $("#timeSpan"+item).html(leftTime);
                 }
             }
+
             window.setInterval(myTime,1000);//每秒执行一次
             //修改客户等待状态
             for(var item in data){
@@ -138,13 +138,14 @@ $(function(){
                     }
                     $hiddenCustomerId = $("#hiddenCustomerId"+aIdValue).val();
                     $("#hiddenIframeCustomerId").val($hiddenCustomerId);
+                   // location.href= '/foreground/editCustomerInfo?customerId='+$hiddenCustomerId;
                     layer.open({
                         type: 2,
                         title: '修改录入信息',
                         shadeClose: true,
                         shade: 0.1,
                         maxmin: false,
-                        area: ['600px;', '500px;'],
+                        area: ['600px;', '760px;'],
                         content: '/foreground/editCustomerInfo?customerId='+$hiddenCustomerId,//iframe的url
                         end:function() {
                             //获取id为hiddenIframeCloseState的值
@@ -152,6 +153,7 @@ $(function(){
 
                             showWaitTime();//重新获取数据
                         }
+
                     });
                 });
             }
@@ -159,7 +161,7 @@ $(function(){
     }
     //window.setTimeout(showWaitTime,1000);
     window.setInterval(function(){
-        layer.msg('页面即将刷新数据!');
+       // layer.msg('页面即将刷新数据!');
         showWaitTime;
     },5*60*1000);//每3分钟刷新一次*/
 
@@ -177,29 +179,49 @@ $(function(){
        }
     });
     $('#tel').blur(function(){
+        $('#applyJobDiv').addClass('hidden-div');
+        $('#sourceFromDiv').addClass('hidden-div');
         return   checUserExists();
     });
 
     //查询导入表中的客户数据
     var importInfo = null;
     function checUserExists(){
-        checkTel();
-        if($('#tel').val() !=''){
+        //checkTel();
+        var tel = $("#tel").val();
+        var isMob =/^(11|12|13|14|15|16|17|18|19)[0-9]{9}$/;
+        if($('#tel').val() !='' && isMob.test(tel)){
             $('#tel').css('border-color','lightgrey');
             //到服务器中检测该用户是否存在!!
-            $.get("/import/checkImportInfo?tel="+$("#tel").val()+"&companyId="+$("input[name='companyId']").val(),function(resp){
+            $.get("/import/checkImportInfo?tel="+tel+"&companyId="+$("input[name='companyId']").val(),function(resp){
                 if(resp.code === 300){
                     layer.msg(resp.msg);
                 }else if(resp.code === 200){
-                    importInfo = resp.importInfo;
+                    var result = resp.importInfo;
+                    delete  result.sendTime;
+                    delete  result.graduateTime;
+                    delete result.createTime;
+                    delete  result.lastTime;
+                    importInfo = result;
                     layer.msg(resp.msg);
                     $('#realName').val(resp.importInfo.realName);
+
+                    //标签的生成
+                    $('#applyJob').val(result.applyJob);
+                    $('#sourceFrom').val(result.source);
+                    $('#applyJobDiv').removeClass('am-form-group hidden-div').addClass('am-form-group');
+                    $('#sourceFromDiv').removeClass('am-form-group hidden-div').addClass('am-form-group');
                     setTimeout(checkTelAndCompanyId,1000);
                 }
             })
+        }else{
+            layer.msg("非法的手机号码!",{icon:2});
         }
     }
 
+    /**
+     * 根据companyId 和电话号码查询数据
+     */
     function checkTelAndCompanyId(){
         $.ajax({
             type:'get',
@@ -229,7 +251,7 @@ $(function(){
         //表单验证
         var $realName = $('#realName');//姓名
         var $tel = $('#tel');//电话号码
-        var isMob =/^0?1[2345678]\d{9}$/;
+        var isMob =/^(11|12|13|14|15|16|17|18|19)[0-9]{9}$/;
         if($tel.val()==''){
             layer.msg('请输入电话!');
             $tel.css('border-color','red');
@@ -264,6 +286,8 @@ $(function(){
         if(importInfo === null){
             data = $("#addCustomerForm").serialize();
         }else{
+            importInfo.userId = $('#userId option:selected').val() ;
+            importInfo.memo = $('#memo').text();
             data = importInfo;
         }
         $.ajax({
@@ -271,6 +295,7 @@ $(function(){
             url:'/foreground/addCustomerInfo',
             data:data,
             success:function(result){
+                importInfo= null;
                 layer.close(index2); //关闭当前弹层
                 if(typeof(result)=='object'){
                     $('#userId').css({'border':'solid 1px lightgrey'});
@@ -282,6 +307,9 @@ $(function(){
                         $("#tel").val('');
                         $('#userId option[value="-1"]').attr("selected", true);
                         $("#consultantTips").html("");
+                        $('#memo').val('');
+                        $('#sourceFrom').val('');
+                        $('#applyJob').val('');
                         layer.msg(result.msg);
                         showWaitTime();//重新获取数据
                     }
@@ -290,6 +318,7 @@ $(function(){
                 }
             },
             error:function(){
+                importInfo= null;
                 layer.close(index2); //关闭当前弹层
                 layer.msg('对不起，您没有权限保存学员信息!');
             }
@@ -313,4 +342,15 @@ $(function(){
         showWaitTime();
     });
 
+    //获取访问地址
+    var url = document.referrer; //获取上一个地址
+    //console.log("地址:"+url);
+    //console.log(url.indexOf("welcome"));
+    if(url.indexOf("welcome")!=-1){
+       //展示回退首页
+        $('#gobahidde-btnck').removeClass("hidde-btn");
+    }
+    $('#goback').click(function(){
+        window.history.go(-1);
+    });
 });

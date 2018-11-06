@@ -18,7 +18,7 @@
                 <select name="recruitChannel" placeholder="请选择导入渠道!" id="selectID">
                     <option value="">请选择导入渠道!</option>
                     <option th:each="recruitChannel:${recruitChannelList}"
-                            th:text="${recruitChannel.name}" th:value="${recruitChannel.id}"></option>
+                            th:text="${recruitChannel.name}" th:value="${recruitChannel.name}"></option>
                 </select>
             </div>
         </div>
@@ -37,27 +37,23 @@
             </div>
 
             <div style="float: right;margin-top: 5px;">
-                <span><input id="import" type="button" class="layui-btn layui-btn-small" value="导入"></span>
-                <span><input type="button" id="close" class="layui-btn layui-btn-warm layui-btn-small" value="关闭"/> </span>
+                <button id="import" type="button" class="layui-btn layui-btn-small" >导入</button>
+                <button type="button" id="close" class="layui-btn layui-btn-warm layui-btn-small"/>关闭</div>
             </div>
-        </div>
-
-
     </form>
 </div>
+</body>
 <script src="/assets/js/jquery.min.js"></script>
 <script src="/assets/themes/layui/lay/dest/layui.all.js"></script>
 <script src="/script/import/custom-file-input.js"></script>
 <script src="/script/import/importPage.js"></script>
 <script>
     $(function(){
-
         var index = parent.layer.getFrameIndex(window.name); //获取当前窗体索引
         $("#close").click(function(){
             parent.layer.close(index);
         });
-    })
-
+    });
 </script>
 </body>
 </html>

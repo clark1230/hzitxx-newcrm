@@ -4,7 +4,7 @@
 
 	<!-- 通用查询映射结果 -->
 	<resultMap id="BaseResultMap" type="com.hzitshop.entity.Studentinfo">
-		<id column="studentID" property="studentID" />
+		<id column="studentID" property="studentId" />
 		<result column="zixunshiName" property="zixunshiName" />
 		<result column="studentName" property="studentName" />
 		<result column="studentSex" property="studentSex" />

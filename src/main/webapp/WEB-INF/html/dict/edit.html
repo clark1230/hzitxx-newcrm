@@ -27,6 +27,15 @@
                 </select>
             </div>
         </div>
+        <div class="layui-form-item" style="text-align: left;">
+            <label class="layui-form-label">状态</label>
+            <div class="layui-input-block">
+                <input type="radio" name="deleteStatus" th:if="${tbDict.deleteStatus ==0}" value="0" title="启用" checked>
+                <input type="radio" name="deleteStatus" th:if="${tbDict.deleteStatus !=0}" value="0" title="启用">
+                <input type="radio" name="deleteStatus" th:if="${tbDict.deleteStatus !=1}" value="1" title="禁用"  >
+                <input type="radio" name="deleteStatus" th:if="${tbDict.deleteStatus ==1}" value="1" title="禁用"  checked>
+            </div>
+        </div>
         <div class="layui-form-item">
             <label class="layui-form-label label-font">操作</label>
             <input id="edit" type="button" class="layui-btn layui-btn-small" lay-submit="" lay-filter="edit" value="保存">

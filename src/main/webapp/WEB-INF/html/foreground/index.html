@@ -14,6 +14,15 @@
     <link rel="stylesheet" href="/assets/amazeui/css/amazeui.datatables.min.css" />
     <link rel="stylesheet" href="/assets/amazeui/css/app.css">
     <script src="/assets/amazeui/js/jquery.min.js"></script>
+    <style>
+        .hidde-btn{
+            display: none;
+        }
+        .hidden-div{
+            display: none;
+        }
+
+    </style>
 </head>
 <body data-type="widgets" style="background-color: white;">
 <script src="/assets/amazeui/js/theme.js"></script>
@@ -23,7 +32,7 @@
    <!-- <div class="tpl-content-wrapper" style="background-color: lightgray;">-->
         <div class="row-content am-cf" style="background-color: lightgrey">
             <div class="row">
-                <div class="am-u-sm-12 am-u-md-12 am-u-lg-5" style="display: none;" id="addCustomerInfoDiv">
+                <div class="am-u-sm-4 am-u-md-4 am-u-lg-4" style="display: none;" id="addCustomerInfoDiv">
                     <div class="widget am-cf">
                         <div class="widget-head am-cf">
                             <div class="widget-title am-fl am-icon-home page-header-heading-icon">
@@ -48,7 +57,18 @@
                                         <input type="text" name="realName" class="am-form-field am-radius" id="realName" placeholder="请输入应聘者姓名!"
                                                required="required"  >
                                     </div>
-
+                                    <div class="am-form-group hidden-div" id="applyJobDiv">
+                                        <label for="applyJob">职位:</label>
+                                        <input type="text"  class="am-form-field am-radius" id="applyJob" readonly="readonly">
+                                    </div>
+                                    <div class="am-form-group hidden-div" id="sourceFromDiv">
+                                        <label for="sourceFrom">后台名称:</label>
+                                        <input type="text"  class="am-form-field am-radius" id="sourceFrom" readonly="readonly">
+                                    </div>
+                                    <div class="am-form-group">
+                                        <label for="memo">备注(可选):</label>
+                                        <textarea class="" name="memo" rows="5" id="memo"></textarea>
+                                    </div>
 
                                     <div class="am-form-group">
                                         <label for="userId">咨询师:</label>
@@ -62,13 +82,14 @@
                                         <button type="button" id="btnAddCustomer" class="am-btn am-btn-primary am-icon-drupal am-radius am-btn-xs">录入</button>
                                         <button type="reset" class="am-btn am-btn-warning am-icon-warning am-radius am-btn-xs">重置</button>
                                         <button type="button" id="btnRefresh" class="am-btn  am-icon-refresh am-radius am-btn-xs" style="background-color:green;color:white;">刷新</button>
+                                        <a  href="javascript:void();" id="goback" class="layui-btn layui-btn-normal hidde-btn"><i class="layui-icon">&#xe65a;</i>返回</a>
                                     </div>
                                 </fieldset>
                             </form>
                         </div>
                     </div>
                 </div>
-                <div class="am-u-sm-12 am-u-md-12 am-u-lg-12" id="showCustomerInfo">
+                <div class="am-u-sm-8 am-u-md-8 am-u-lg-8" id="showCustomerInfo">
                     <div class="widget am-cf">
                         <div class="widget-head am-cf">
                             <span style="color:orange;">请选择校区:</span>

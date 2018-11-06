@@ -7,10 +7,14 @@ import com.baomidou.mybatisplus.plugins.Page;
 import com.baomidou.mybatisplus.toolkit.StringUtils;
 import com.hzitshop.entity.*;
 import com.hzitshop.service.*;
+import com.hzitshop.util.LayuiEntity;
+import com.hzitshop.util.ServerResponse;
 import com.hzitshop.vo.BootstrapTable;
 import com.hzitshop.vo.BootstrapEntity;
 import com.hzitshop.vo.CustomerInfoVo;
 import com.hzitshop.vo.ExportExcelEntity;
+import com.hzitshop.vo.customerinfovo.NotFollowUpVo;
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.jeecgframework.poi.excel.ExcelExportUtil;
@@ -31,6 +35,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -50,15 +55,22 @@ import java.util.regex.Pattern;
 public class CustomerInfoController {
     @Autowired
     private ICustomerInfoService iCustomerInfoService;
+
     @Autowired
     private IEmployeeInfoService iEmployeeInfoService;
+
     @Autowired
     private ITbDictService iTbDictService;
+
+    @Autowired
+    private ImportInfoService importInfoService;
+
     @Autowired
     private ICustomerTraceRecordService iCustomerTraceRecordService;
 
     @Autowired
     private IClassinfoService iClassinfoService;
+
     @Autowired
     private  IStudentinfoService iStudentinfoService;
 
@@ -68,6 +80,8 @@ public class CustomerInfoController {
     @Autowired
     private  ITbMenuAppService iTbMenuAppService;
 
+    @Autowired
+    private ISignupService signupService;
 
     private Logger logger = LoggerFactory.getLogger(CustomerInfoController.class);
 
@@ -76,11 +90,9 @@ public class CustomerInfoController {
      *
      * @return
      */
-   /* @ExceptionHandler({UnauthorizedException.class})
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)*/
     @RequiresPermissions(value="customerInfo:list")
     @RequestMapping("/customerInfo/list")
-    protected String list() {
+    public String list() {
         return "/customerinfo/list";
     }
 
@@ -92,7 +104,9 @@ public class CustomerInfoController {
     @RequiresPermissions(value = {"customerInfo:listData"})
     @RequestMapping("/customerInfo/listData")
     @ResponseBody
-    protected BootstrapTable<CustomerInfoVo> listData(BootstrapEntity bt,CustomerInfo customerInfo,EmployeeInfo ei) {
+    public BootstrapTable<CustomerInfoVo> listData(BootstrapEntity bt,CustomerInfo customerInfo,
+                                                   EmployeeInfo ei,HttpSession session) {
+        EmployeeInfo employeeInfo = (EmployeeInfo)session.getAttribute("employeeInfo");
         if (bt.getOffset() == null || bt.getLimit() == null) {
             bt.setOffset(1);
             bt.setLimit(20);
@@ -102,6 +116,9 @@ public class CustomerInfoController {
         if(customerInfo.getIsDelete() == null){
             customerInfo.setIsDelete(0);   //默认显示非逻辑删除数据
         }
+        if("create_time".equals(bt.getCondition())){
+            bt.setCondition("DATE_FORMAT(create_time,'%Y-%m-%d')");
+        }
         //根据校区名称搜索
         if("company_id".equals(bt.getCondition())){      //所属校区
             TbDict tbDict =  iTbDictService.selectOne(new EntityWrapper<TbDict>().where("").like("name",bt.getValue()));
@@ -110,61 +127,59 @@ public class CustomerInfoController {
             }
         }
         Page<CustomerInfo> searchPage = new Page<CustomerInfo>(bt.getOffset(), bt.getLimit());
-        Wrapper<CustomerInfo> ew = null;
-        if("-1".equals(bt.getCondition()) ){
-            bt.setCondition("");
-        }
-
+        Wrapper<CustomerInfo> ew = new EntityWrapper<>();
+        ew.where("isDelete="+customerInfo.getIsDelete());
+        ew.and("customer_type = 0");
         if(ei.getUserId()!=null){ //咨询师
+            ew.and("(user_id="+ei.getUserId())
+            .or("guandan="+ei.getUserId()+")")
+            .and("customer_state!=40")
+            .and("customer_state!=34");
             if(StringUtils.isNotEmpty(bt.getCondition())&& StringUtils.isNotEmpty(bt.getValue())){
-                ew= new EntityWrapper<CustomerInfo>().
-                         where("isDelete="+customerInfo.getIsDelete())
-                        .and("user_id="+ei.getUserId())
-                        .and("customer_state!=40")
-                        .and("customer_state!=34")
-                        .like(bt.getCondition(),bt.getValue(), SqlLike.RIGHT).
-                        orderBy(" customer_id desc");
-            }else{
-                ew = new EntityWrapper<CustomerInfo>()
-                        .where("isDelete="+customerInfo.getIsDelete())
-                        .and("user_id="+ei.getUserId())
-                        .and("customer_state!=40")
-                        .and("customer_state!=34")
-                        .orderBy("customer_id desc");
+                ew.like(bt.getCondition(),bt.getValue(),SqlLike.DEFAULT);
             }
         }else{ //非咨询师
+
             if(StringUtils.isNotEmpty(bt.getCondition())&& StringUtils.isNotEmpty(bt.getValue())){
                 if(ei.getCompanyId()!=null){
-                    ew= new EntityWrapper<CustomerInfo>().
-                            where("isDelete="+customerInfo.getIsDelete())
-                            .and("company_id="+ei.getCompanyId())
-                            .like(bt.getCondition(),bt.getValue(), SqlLike.RIGHT).
-                                    orderBy(" customer_id desc");
-                } else{
-                    ew= new EntityWrapper<CustomerInfo>().
-                            where("isDelete="+customerInfo.getIsDelete())
-                            .like(bt.getCondition(),bt.getValue(), SqlLike.RIGHT).
-                                    orderBy(" customer_id desc");
+                    ew.and("company_id="+ei.getCompanyId());
                 }
-
+                ew.like(bt.getCondition(),bt.getValue(), SqlLike.DEFAULT);
             }else{
                 if(ei.getCompanyId()!=null){
-                    ew = new EntityWrapper<CustomerInfo>()
-                            .where("isDelete="+customerInfo.getIsDelete())
-                            .and("company_id="+ei.getCompanyId())
-                            .orderBy("customer_id desc");
-                } else{
-                    ew = new EntityWrapper<CustomerInfo>()
-                            .where("isDelete="+customerInfo.getIsDelete())
-                            .orderBy("customer_id desc");
+                    if("市场经理".equals(employeeInfo.getRoleName())){
+                        ew.in("customer_level","17,18,19");
+                    }
+                    ew.and("company_id="+ei.getCompanyId());
                 }
-
+                ew.and("customer_type = 0");
             }
         }
+        ew.orderBy("customer_id desc");
         BootstrapTable<CustomerInfoVo> bootstrapTable = iCustomerInfoService.ajaxData(searchPage,ew);
         return bootstrapTable;
     }
 
+
+    /**
+     * 获取学员数据
+     *
+     * @return
+     */
+   // @RequiresPermissions(value = {"customerInfo:listData"})
+    @RequestMapping("/customerInfo/listData2")
+    @ResponseBody
+    public BootstrapTable<CustomerInfoVo> listData2(BootstrapEntity bt,CustomerInfo customerInfo,EmployeeInfo ei){
+        Map<String,Object> paramsMap = new HashMap<>();
+        paramsMap.put("offset",bt.getOffset());
+        paramsMap.put("limit",bt.getLimit());
+
+        return this.iCustomerInfoService.listData(paramsMap);
+    }
+
+    private void convertMap(Map<String,Object> paramsMap,BootstrapEntity bt,CustomerInfo ci){
+       // paramsMap.put("",bt.)
+    }
     /**
      * 跳转到添加页面
      *
@@ -172,7 +187,7 @@ public class CustomerInfoController {
      */
     @RequiresPermissions(value = {"customerInfo:add"})
     @RequestMapping(value = "/customerInfo/add", method = RequestMethod.GET)
-    protected String add(ModelMap modelMap, EmployeeInfo ei,Integer isYunYing, HttpServletRequest request) {
+    public String add(ModelMap modelMap, EmployeeInfo ei,int isYunYing, HttpServletRequest request) {
         HttpSession httpSession = request.getSession();
         EmployeeInfo employeeInfo = (EmployeeInfo)httpSession.getAttribute("employeeInfo");
         if(ei.getCompanyId()==null){
@@ -180,7 +195,11 @@ public class CustomerInfoController {
         }  else{
             this.modelMap(modelMap,ei.getCompanyId(),isYunYing);
         }
-        return "/customerinfo/add";
+        if(isYunYing == 1){
+            return "business/add";
+        }else{
+            return "/customerinfo/add";
+        }
     }
 
     /**
@@ -193,15 +212,23 @@ public class CustomerInfoController {
     @RequiresPermissions(value = {"customerInfo:add"})
     @RequestMapping(value = "/customerInfo/add", method = RequestMethod.POST)
     @ResponseBody
-    protected Map<String, Object> add(CustomerInfo customerInfo,int  isYunYing) throws InterruptedException {
+    public Map<String, Object> add(CustomerInfo customerInfo,int  isYunYing,HttpSession session) throws InterruptedException {
         Map<String, Object> resultMap = new HashMap<>();
         try {
             if(customerInfo.getCustomerState()==null){
                 customerInfo.setCustomerState(28);//待面试
             }
+            EmployeeInfo ei = (EmployeeInfo)session.getAttribute("employeeInfo");
+            customerInfo.setCompanyId(ei.getCompanyId());//公司编号
             if(isYunYing ==1){
-                customerInfo.setCompanyId(null);
+                if(ei.getRoleName().contains("运营")){
+                    customerInfo.setYunying(ei.getUserId());
+                }else{
+                    customerInfo.setYunying(0);
+                }
+                customerInfo.setCompanyId(ei.getCompanyId());
             }
+
             customerInfo.setCreateTime(new Date());
             customerInfo.setLastTime(new Date());
             iCustomerInfoService.insert(customerInfo);
@@ -223,7 +250,7 @@ public class CustomerInfoController {
      * @param pid
      * @return
      */
-    protected List<TbDict> getTbgDict(String pid) {
+    public List<TbDict> getTbgDict(String pid) {
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("pid", pid);
         return iTbDictService.selectByMap(paramMap);
@@ -235,7 +262,7 @@ public class CustomerInfoController {
      * @param id
      * @return
      */
-    protected List<EmployeeInfo> getEmployeeInfo(String id) {
+    public List<EmployeeInfo> getEmployeeInfo(String id) {
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("dept_id", id);
         return iEmployeeInfoService.selectByMap(paramMap);
@@ -248,11 +275,17 @@ public class CustomerInfoController {
      */
     @RequiresPermissions(value={"customerInfo:edit"})
     @RequestMapping(value = "/customerInfo/edit", method = RequestMethod.GET)
-    protected String edit(ModelMap modelMap, CustomerInfo customerInfo,Integer companyId,Integer isYunYing) {
+    public String edit(ModelMap modelMap, CustomerInfo customerInfo,Integer companyId,Integer isYunYing) {
         //根据customerId获取学员数据
-        customerInfo = iCustomerInfoService.selectOne(new EntityWrapper<CustomerInfo>().where("customer_id=" + customerInfo.getCustomerId()));
+        customerInfo = iCustomerInfoService.selectOne(
+                new EntityWrapper<CustomerInfo>()
+                        .where("customer_id=" + customerInfo.getCustomerId()));
         this.modelMap(modelMap,companyId,isYunYing);
         modelMap.addAttribute("customerInfo", customerInfo);
+        //是否是运营
+        if(isYunYing!= null && isYunYing == 1){
+            return  "business/edit";//跳转到运营编辑页面
+        }
         return "/customerinfo/edit";
     }
 
@@ -271,15 +304,22 @@ public class CustomerInfoController {
         modelMap.addAttribute("customerLevelList", this.getTbgDict("16"));//学员级别
         modelMap.addAttribute("educationBgList", this.getTbgDict("7")); //获取学历信息
         if(companyId !=null  && companyId!=0 ){
-            modelMap.addAttribute("guandanList", this.getEmployeeInfo(new EntityWrapper<EmployeeInfo>()
+            modelMap.addAttribute("guandanList", this.getEmployeeInfo(
+                    new EntityWrapper<EmployeeInfo>()
                     .where("isConsultant=1").
-                            and("company_id="+companyId).and("isLocked='0'")));//获取本公司关单人
+                            and("company_id="+companyId)
+                    .and("isLocked='0'")));//获取本公司关单人
              if(isYunYing!= null && isYunYing ==1){
-                 modelMap.addAttribute("introducerList",this.getEmployeeInfo(new EntityWrapper<EmployeeInfo>().where("dept_id=86")));   //运营部
+                 modelMap.addAttribute("introducerList",this.getEmployeeInfo(
+                         new EntityWrapper<EmployeeInfo>()
+                                 .where("dept_id=86")
+                                 .and("isLocked='0'")));   //运营部
              }else{
                  modelMap.addAttribute("introducerList",
                          this.getEmployeeInfo(new EntityWrapper<EmployeeInfo>()
-                                 .where("dept_id=76").and("company_id="+companyId)));//获取本公司邀约人   创量部
+                                 .where("dept_id=76")
+                                 .and("company_id="+companyId)
+                         .and("isLocked ='0'")));//获取本公司邀约人   创量部
              }
 
         }  else{
@@ -295,10 +335,13 @@ public class CustomerInfoController {
              }
             modelMap.addAttribute("guandanList", employeeInfos);//获取所有关单人
             if(isYunYing!= null && isYunYing ==1){
-               employeeInfos = iEmployeeInfoService.selectList(new EntityWrapper<EmployeeInfo>().where("dept_id=86"));
+               employeeInfos = iEmployeeInfoService.selectList(
+                       new EntityWrapper<EmployeeInfo>()
+                               .where("dept_id=86")
+                               .and("isLocked='0'")); //获取创量数据
             } else{
                 employeeInfos = iEmployeeInfoService.selectList(new EntityWrapper<EmployeeInfo>()
-                        .where("dept_id=76"));
+                        .where("dept_id=76").and("isLocked='0'"));
             }
 
             if(employeeInfos!= null && employeeInfos.size() >0){
@@ -318,6 +361,9 @@ public class CustomerInfoController {
         return iEmployeeInfoService.selectList(wrapper);
     }
 
+
+
+
     /**
      * 保存修改数据
      *
@@ -327,17 +373,39 @@ public class CustomerInfoController {
     @RequiresPermissions(value={"customerInfo:edit"})
     @RequestMapping(value = "/customerInfo/edit", method = RequestMethod.POST)
     @ResponseBody
-    protected Map<String, Object> edit(CustomerInfo customerInfo) {
+    public Map<String, Object> edit(CustomerInfo customerInfo,
+                                    HttpSession  httpSession,
+                                    Integer isYunYing) {
         Map<String, Object> resultMap = new HashMap<>();
-        EmployeeInfo employeeInfo = iEmployeeInfoService.selectById(customerInfo.getUserId());
+        EmployeeInfo employeeInfo = (EmployeeInfo)httpSession.getAttribute("employeeInfo");
         try {
-            if(employeeInfo!= null){
-                customerInfo.setCompanyId(employeeInfo.getCompanyId());//修改所属公司
+            //运营人员保存信息
+            if(isYunYing != null && isYunYing == 1){
+                customerInfo.setCustomerType(1);
             }
-            iCustomerInfoService.update(customerInfo,
-                    new EntityWrapper<CustomerInfo>().where("customer_id=" + customerInfo.getCustomerId()));
-            resultMap.put("code", "200");
-            resultMap.put("msg", "保存成功!");
+            if(org.apache.commons.lang3.StringUtils.isNotEmpty(employeeInfo.getRoleName()) &&
+                    employeeInfo.getRoleName().contains("会销") && "1".equals(customerInfo.getIsMarket())){
+                customerInfo.setIsMarket(employeeInfo.getName());
+                customerInfo.setIsLearn("0");
+            }else if(org.apache.commons.lang3.StringUtils.isNotEmpty(employeeInfo.getRoleName()) &&
+                    employeeInfo.getRoleName().contains("试听") && "1".equals(customerInfo.getIsLearn())){
+                customerInfo.setIsLearn(employeeInfo.getName());
+                customerInfo.setIsMarket("0");
+            }else{
+                customerInfo.setIsLearn("0");
+                customerInfo.setIsMarket("0");
+            }
+            customerInfo.setLastTime(new Date());
+            boolean result = iCustomerInfoService.update(customerInfo,
+                    new EntityWrapper<CustomerInfo>()
+                            .where("customer_id=" + customerInfo.getCustomerId()));
+            if(result){
+                resultMap.put("code", "200");
+                resultMap.put("msg", "保存成功!");
+            }else{
+                resultMap.put("code", "300");
+                resultMap.put("msg", "保存失败!");
+            }
         } catch (Exception e) {
             logger.error("------------咨询师编辑学员信息---------------"+e.getMessage());
             e.printStackTrace();
@@ -355,7 +423,7 @@ public class CustomerInfoController {
     /*@RequiresPermissions(value = {"customerInfo:remove"})
     @RequestMapping(value = "/customerInfo/remove", method = RequestMethod.GET)
     @ResponseBody
-    protected Map<String, Object> remove(String customerIdArr) {
+    public Map<String, Object> remove(String customerIdArr) {
         Map<String, Object> resultMap = new HashMap<>();
         return resultMap;
     }*/
@@ -368,7 +436,7 @@ public class CustomerInfoController {
     @RequiresPermissions(value = {"customerInfo:delete"})
     @RequestMapping(value = "/customerInfo/delete", method = RequestMethod.POST)
     @ResponseBody
-    protected Map<String, Object> delete(String customerIdArr) {
+    public Map<String, Object> delete(String customerIdArr) {
         Map<String, Object> resultMap = new HashMap<>();
         try{
             iCustomerInfoService.deleteCustomerInfo(customerIdArr);
@@ -385,16 +453,44 @@ public class CustomerInfoController {
     }
 
     /**
-     * 批量面试学员
-     *
+     * 学员报名
+     * 报名 成功
+     * 已经存在该数据
+     * 报名失败
      * @return
      */
     @RequiresPermissions(value = "customerInfo:interview")
     @RequestMapping(value = "/customerInfo/interview", method = RequestMethod.POST)
     @ResponseBody
-    protected Map<String, Object> interview(String customerIdArr) {
-        String condition = "customer_sate";
-        return getStringObjectMap(customerIdArr, condition);
+    public Object interview(@RequestParam("customerId") int customerId) throws Exception {
+        Signup signup = new Signup();
+        signup.setCreateTime(new Date());
+        signup.setCustomerId(customerId);
+
+        //修改为报名状态
+        //电话号码和姓名
+        CustomerInfo ci = this.iCustomerInfoService.selectById(customerId);
+        ImportInfo importInfo = new ImportInfo();
+       // BeanUtils.copyProperties(importInfo,ci);
+        BeanUtils.copyProperties(importInfo,ci);
+        importInfo.setStatus("已上门");
+        List<ImportInfo> importInfoList = this.importInfoService.checkRealName(importInfo);
+        if(importInfoList!= null &&importInfoList.size() >0){
+            importInfo = importInfoList.get(0);
+            importInfo.setStatus("已报名");
+            importInfo.setMemo(ci.getMemo());
+           // importInfo.setCustomerId(ci.getCustomerId());
+            boolean result = this.importInfoService.updateSelectiveById(importInfo);
+            System.out.println("报名结果:"+result);
+        }
+        signup.setCompanyId(ci.getCompanyId());
+        int result = this.signupService.addSignupSelective(signup);
+        if(result ==0){
+            return ServerResponse.createByErrorCodeMessage(1,"报名失败!");
+        }else if(result ==3){
+            return ServerResponse.createByErrorCodeMessage(1,"该学员已经报名!");
+        }
+        return  ServerResponse.createBySuccessMessage("报名成功!");
     }
 
     /**
@@ -405,14 +501,15 @@ public class CustomerInfoController {
     @RequiresPermissions(value="customerInfo:remove")
     @RequestMapping(value = "/customerInfo/remove")
     @ResponseBody
-    protected Map<String, Object> remove(String customerIdArr) {
+    public Map<String, Object> remove(String customerIdArr) {
         String condition = "isDelete";
         return getStringObjectMap(customerIdArr, condition);
     }
+
     @RequiresPermissions(value="customerInfo:recover")
     @RequestMapping(value = "/customerInfo/recover",method = RequestMethod.POST)
     @ResponseBody
-    protected  Map<String,Object> recover(String customerIdArr){
+    public  Map<String,Object> recover(String customerIdArr){
         return  getStringObjectMap(customerIdArr,"isDelete=0");
 
     }
@@ -433,7 +530,8 @@ public class CustomerInfoController {
                     }
                     customerInfo.setCustomerId(Integer.parseInt(id));
                     iCustomerInfoService.update(customerInfo,
-                            new EntityWrapper<CustomerInfo>().where("customer_id=" + customerInfo.getCustomerId()));
+                            new EntityWrapper<CustomerInfo>()
+                                    .where("customer_id=" + customerInfo.getCustomerId()));
                 }
             }
             resultMap.put("code", 200);
@@ -455,11 +553,13 @@ public class CustomerInfoController {
      */
     @RequiresPermissions(value="customerInfo:follow")
     @RequestMapping(value = "/customerInfo/follow", method = RequestMethod.GET)
-    protected String follow(CustomerInfo customerInfo, ModelMap modelMap) {
+    public String follow(CustomerInfo customerInfo,Integer isYunYing, ModelMap modelMap) {
         //根据customerId获取学员数据
-        customerInfo = iCustomerInfoService.selectOne(new EntityWrapper<CustomerInfo>().where("customer_id=" + customerInfo.getCustomerId()));
+        customerInfo = iCustomerInfoService.selectOne(new EntityWrapper<CustomerInfo>()
+                .where("customer_id=" + customerInfo.getCustomerId()));
         this.modelMap(modelMap,customerInfo.getCompanyId(),null);
         modelMap.addAttribute("customerInfo", customerInfo);
+        modelMap.addAttribute("isYunYing",isYunYing);//是否是运营
         return "/customerinfo/follow";
     }
 
@@ -473,15 +573,23 @@ public class CustomerInfoController {
     @RequiresPermissions(value="customerInfo:follow")
     @RequestMapping(value = "/customerInfo/follow", method = RequestMethod.POST)
     @ResponseBody
-    protected Map<String, Object> follow(CustomerTraceRecord ctr) {
+    public Map<String, Object> follow(CustomerTraceRecord ctr,Integer isYunYing,HttpSession httpSession) {
+        EmployeeInfo ei = (EmployeeInfo)httpSession.getAttribute("employeeInfo");
         Map<String, Object> resultMap = new HashMap<>();
         ctr.setRecordDate(new Date());
         try {
             //到customer_info中修改最新跟进时间
             CustomerInfo customerInfo = new CustomerInfo() ;
             customerInfo.setCustomerId(ctr.getCustomerId());
-            customerInfo.setLastTime(new Date());
-            iCustomerInfoService.updateById(customerInfo);
+            customerInfo.setRecordTime(new Date());
+            //判断是否是运营
+
+            if(isYunYing!= null && isYunYing ==1){
+                customerInfo.setCustomerType(1);
+            }
+
+            iCustomerInfoService.updateSelectiveById(customerInfo);
+            ctr.setUserId(ei.getUserId());
             iCustomerTraceRecordService.insert(ctr);   //保存跟进记录!!
             resultMap.put("code", 200);
         } catch (Exception e) {
@@ -497,7 +605,7 @@ public class CustomerInfoController {
      */
     @RequiresPermissions(value="customerInfo:multiSearch")
     @RequestMapping(value="/customerInfo/multiSearch",method = RequestMethod.GET)
-    protected String multiSearch(){
+    public String multiSearch(){
         return "/customerinfo/multiSearch";
     }
 
@@ -507,7 +615,7 @@ public class CustomerInfoController {
      */
     @RequiresPermissions(value="customerInfo:export")
     @RequestMapping(value="/customerInfo/export",method=RequestMethod.GET)
-    protected String export(Integer companyId,Model model,HttpServletRequest request){
+    public String export(Integer companyId,Model model,HttpServletRequest request){
         HttpSession session = request.getSession();
         EmployeeInfo employeeInfo = (EmployeeInfo)session.getAttribute("employeeInfo");
         List<EmployeeInfo> employeeInfos = null;
@@ -545,7 +653,7 @@ public class CustomerInfoController {
 
     @RequestMapping(value="/customerInfo/recycleBinAjaxData",method = RequestMethod.GET)
     @ResponseBody
-    protected  BootstrapTable<CustomerInfo> recycleBinAjaxData(BootstrapEntity bt,CustomerInfo customerInfo,EmployeeInfo ei){
+    public  BootstrapTable<CustomerInfo> recycleBinAjaxData(BootstrapEntity bt,CustomerInfo customerInfo,EmployeeInfo ei){
         if (bt.getOffset() == null || bt.getLimit() == null) {
             bt.setOffset(1);
             bt.setLimit(20);
@@ -600,7 +708,7 @@ public class CustomerInfoController {
      */
     @RequiresPermissions(value="customerInfo:searchPage")
     @RequestMapping("/customerInfo/searchPage")
-    protected  String searchPage(ModelMap modelMap,EmployeeInfo ei){
+    public  String searchPage(ModelMap modelMap,EmployeeInfo ei){
         //获取学员状态
         //获取学员级别
         //获取目标技能
@@ -617,7 +725,7 @@ public class CustomerInfoController {
      * @return
      */
     @RequestMapping(value="/customerInfo/enterClass",method = RequestMethod.GET)
-    protected String endterClass(EmployeeInfo employeeInfo,Model model){
+    public String endterClass(EmployeeInfo employeeInfo,Model model){
         //获取班级信息
         List<Classinfo> classinfoList = iClassinfoService.selectClassInfo();
         model.addAttribute("classinfoList",classinfoList);
@@ -650,7 +758,7 @@ public class CustomerInfoController {
     @RequiresPermissions("customerInfo:enterClass")
     @RequestMapping("/customerInfo/enterClass")
     @ResponseBody
-    public Map<String,Object> hello(Integer customerId,Integer stedentClass,
+    public Map<String,Object> enterClass(Integer customerId,Integer stedentClass,
                                     String studentStatus,String studentintime,String studentdes) throws ParseException {
         Studentinfo studentinfo = new Studentinfo();
         studentinfo.setStedentClass(stedentClass);
@@ -733,7 +841,7 @@ public class CustomerInfoController {
      * @return
      */
     @RequestMapping("/customerInfo/exportAllData")
-    protected void exportAllData(HttpServletResponse response,int isDelete) throws IOException {
+    public void exportAllData(HttpServletResponse response,int isDelete) throws IOException {
         String fileName = "学员.xlsx";
         response.setHeader("Content-disposition", "attachment; filename="+
                 new String(fileName.getBytes("utf-8"),"ISO-8859-1"));// 设定输出文件头
@@ -749,9 +857,15 @@ public class CustomerInfoController {
         workbook.write(outputStream); // 写入文件
         outputStream.flush();//刷新缓存
     }
-    
+
+    /**
+     * 导出数据
+     * @param response
+     * @param excelEntity
+     * @throws UnsupportedEncodingException
+     */
     @RequestMapping("/customerInfo/exportData")
-    protected  void export(HttpServletResponse response, ExportExcelEntity excelEntity) throws UnsupportedEncodingException {
+    public  void export(HttpServletResponse response, ExportExcelEntity excelEntity) throws UnsupportedEncodingException {
         String fileName = "学员数据.xlsx";
         response.setHeader("Content-disposition", "attachment; filename="+
                 new String(fileName.getBytes("utf-8"),"ISO-8859-1"));// 设定输出文件头
@@ -865,7 +979,7 @@ public class CustomerInfoController {
             outputStream = response.getOutputStream();
         } catch (IOException e) {
            logger.error("io异常");
-        } finally {
+        } /*finally {
             if(outputStream !=null){
                 try {
                     outputStream.close();
@@ -873,7 +987,7 @@ public class CustomerInfoController {
                    logger.error("释放io资源失败!!");
                 }
             }
-        }
+        }*/
         BootstrapTable<CustomerInfoVo> bt = iCustomerInfoService.ajaxData(new Page<CustomerInfo>(0,count),wrapper);
         ExportParams ep = new ExportParams("学员","学员", ExcelType.XSSF);
         customerInfoVoList = bt.getRows();
@@ -894,8 +1008,6 @@ public class CustomerInfoController {
         }
         //outputStream.flush();
     }
-
-
 
     /**
      * 导入Excel
@@ -948,4 +1060,101 @@ public class CustomerInfoController {
 //        }
 //        return statusVO;
 //    }
+
+    /**
+     * 设置跟进时间
+     * @param traceTime
+     * @param customerIdArr
+     * @return
+     */
+    @GetMapping("/customerInfo/setTraceTime")
+    @ResponseBody
+    public Object setTraceTime(Date traceTime,Integer[] customerIdArr){
+        List<CustomerInfo> customerInfos = new ArrayList<>();
+        for(Integer id: customerIdArr){
+                CustomerInfo ci = new CustomerInfo();
+                ci.setTraceTime(traceTime);
+                ci.setCustomerId(id);
+                customerInfos.add(ci);
+        }
+        boolean result = iCustomerInfoService.updateBatchById(customerInfos);
+        if(result){//设置成功
+            return ServerResponse.createBySuccessMessage("设置成功!");
+        }else{//设置失败
+            return ServerResponse.createBySuccessMessage("设置失败!");
+        }
+
+    }
+
+    /**
+     * 将咨询的数据转到运营中
+     * @return
+     */
+    @RequiresPermissions("customerInfo:yunying")
+    @GetMapping("/customerInfo/trunToYunYing")
+    @ResponseBody
+    public Object trunToYunYing(Integer[] customerIdArr,HttpSession httpSession){
+        EmployeeInfo ei = (EmployeeInfo)httpSession.getAttribute("employeeInfo");
+        CustomerInfo ci = null;
+        List<CustomerInfo> customerInfoList = new ArrayList<>();
+        for(Integer id : customerIdArr){
+            ci = new CustomerInfo();
+            ci.setCustomerId(id);
+            ci.setCustomerType(1);
+            if(ei.getRoleName().contains("运营")){
+                ci.setYunying(ei.getUserId());  //运营数据
+            }
+            customerInfoList.add(ci);
+        }
+        boolean result = iCustomerInfoService.updateBatchById(customerInfoList);
+        if(result){
+            return ServerResponse.createBySuccessMessage("操作成功!");
+        }
+        return ServerResponse.createByErrorMessage("操作失败!");
+    }
+
+    /**
+     * 跳转到没有跟进的信息页面
+     * @return
+     */
+    @GetMapping("/customerInfo/notFollow")
+    public String notFollow(){
+        return  "customerinfo/notFollow";
+    }
+    /**
+     * 获取未跟进的信息
+     * @return
+     */
+    @GetMapping("/customerInfo/notFollowData")
+    @ResponseBody
+    public LayuiEntity<NotFollowUpVo> notFollowData(@RequestParam(value = "page",defaultValue = "1") int page,
+                                     @RequestParam(value = "limit",defaultValue = "20") int limit,
+                                     @RequestParam(value = "level",defaultValue = "17") int level,
+                                     String name,
+                                     String realName,
+                                     HttpSession httpSession){
+        EmployeeInfo employeeInfo = (EmployeeInfo)httpSession.getAttribute("employeeInfo");
+        Map<String,Object> paramsMap = new HashMap<>();
+        paramsMap.put("companyId",employeeInfo.getCompanyId());
+        paramsMap.put("offset",(page-1)*limit);
+        paramsMap.put("limit",limit);
+        if(StringUtils.isNotEmpty(name)){
+            paramsMap.put("name",name);
+        }
+        if(StringUtils.isNotEmpty(realName)){
+            paramsMap.put("realName",realName);
+        }
+        if(employeeInfo.getRoleName().contains("管理员") || employeeInfo.getRoleName().contains("总经理")){
+            paramsMap.remove("companyId");
+        }
+        if(level == 17){
+            paramsMap.put("timeCount","3");
+        }else{
+            paramsMap.put("timeCount","6");
+        }
+        paramsMap.put("recordLevel",level);
+        return this.iCustomerInfoService.selectByRecordTimeAndLevel(paramsMap);
+    }
+
+
 }

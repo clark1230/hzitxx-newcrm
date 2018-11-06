@@ -7,6 +7,7 @@ import com.hzitshop.service.IEmployeeInfoService;
 import com.hzitshop.service.ITbDictService;
 import com.hzitshop.vo.CompanyCount;
 import com.sun.javafx.sg.prism.NGShape;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -35,8 +36,9 @@ public class StatisticsController {
      * 跳转到数据统计页面
      * @return
      */
+    @RequiresPermissions("statistics:index")
     @RequestMapping(value="/statistics/index")
-    protected  String index(Model model){
+    public  String index(Model model){
         //获取所有分公司信息
         List<TbDict> tbDictList = iTbDictService.selectList(new EntityWrapper<TbDict>().where("pid=35"));
         model.addAttribute("tbDictList",tbDictList);
@@ -52,7 +54,7 @@ public class StatisticsController {
      */
     @RequestMapping(value="/statistics/companyCount")
     @ResponseBody
-    protected  List<CompanyCount> companyCount(String companyId,String month){
+    public  List<CompanyCount> companyCount(String companyId,String month){
         Map<String,Object> paramMap = new HashMap<>();
         paramMap.put("companyId",companyId);
         paramMap.put("month",month);
@@ -68,7 +70,7 @@ public class StatisticsController {
      */
     @RequestMapping(value="/statistics/baoming")
     @ResponseBody
-    protected  List<CompanyCount> baoming(String companyId,String month){
+    public  List<CompanyCount> baoming(String companyId,String month){
         Map<String,Object> paramMap = new HashMap<>();
         paramMap.put("companyId",companyId);
         paramMap.put("month",month);
@@ -80,8 +82,9 @@ public class StatisticsController {
      * 跳转到创量部门每月应聘渠道信息统计主页
      * @return
      */
+    @RequiresPermissions("statistics:recruitChannel")
     @RequestMapping(value="/statistics/recruitChannel",method = RequestMethod.GET)
-    protected  String recruitChannel(Model model){
+    public  String recruitChannel(Model model){
         //获取所有分公司信息
         List<TbDict> tbDictList = iTbDictService.selectList(new EntityWrapper<TbDict>().where("pid=35"));
         model.addAttribute("tbDictList",tbDictList);
@@ -96,7 +99,7 @@ public class StatisticsController {
      */
     @RequestMapping(value="/statistics/recruitChannel",method = RequestMethod.POST)
     @ResponseBody
-    protected  List<CompanyCount>  recruitChannel(String companyId,String month){
+    public  List<CompanyCount>  recruitChannel(String companyId,String month){
         Map<String,Object> paramMap = new HashMap<>();
         paramMap.put("companyId",companyId);
         paramMap.put("month",month);
@@ -112,7 +115,7 @@ public class StatisticsController {
      */
     @RequestMapping(value="/statistics/chuangliangMonthData")
     @ResponseBody
-    protected  List<CompanyCount> chuangliangMonthData(String companyId,String month){
+    public  List<CompanyCount> chuangliangMonthData(String companyId,String month){
         Map<String,Object> paramMap = new HashMap<>();
         paramMap.put("companyId",companyId);
         paramMap.put("month",month);

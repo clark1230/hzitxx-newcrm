@@ -5,9 +5,17 @@ import com.baomidou.mybatisplus.plugins.Page;
 import com.hzitshop.entity.CustomerInfo;
 import com.baomidou.mybatisplus.service.IService;
 import com.hzitshop.entity.EmployeeInfo;
+import com.hzitshop.entity.LayuiData;
+import com.hzitshop.util.LayuiEntity;
+import com.hzitshop.util.ServerResponse;
 import com.hzitshop.vo.BootstrapTable;
 import com.hzitshop.vo.CompanyCount;
 import com.hzitshop.vo.CustomerInfoVo;
+import com.hzitshop.vo.WelcomeVo;
+import com.hzitshop.vo.customerinfovo.NotFollowUpVo;
+import com.hzitshop.vo.front.FrontVo;
+import com.hzitshop.vo.huixiao.MobileHuiXiaoVo;
+import org.apache.poi.ss.usermodel.Workbook;
 
 import java.util.List;
 import java.util.Map;
@@ -21,7 +29,15 @@ import java.util.Map;
  * @since 2017-02-12
  */
 public interface ICustomerInfoService extends IService<CustomerInfo> {
+
     BootstrapTable<CustomerInfoVo> ajaxData(Page<CustomerInfo> page, Wrapper<CustomerInfo> wrapper);
+
+    /**
+     * 获取列表数据
+     * @param paramsMap
+     * @return
+     */
+    BootstrapTable<CustomerInfoVo> listData(Map<String,Object> paramsMap);
 
     /**
      * 彻底删除学员数据
@@ -64,4 +80,62 @@ public interface ICustomerInfoService extends IService<CustomerInfo> {
      * @return
      */
     List<CompanyCount> chuangliangMonthData(Map<String,Object> map);
+
+    /**
+     * 首页统计
+     * @return
+     */
+    WelcomeVo totalCount();
+
+    /**
+     * 获取跟进数据
+     * @param map
+     * @return
+     */
+    List<Map<String,Object>> traceData(Map<String,Object> map);
+
+    ServerResponse mobileHuiXiao(Map<String,Object> map);
+
+
+    /**
+     * 修改数据
+     * @param customerInfo
+     * @return
+     */
+    ServerResponse updateSelectiveById(CustomerInfo customerInfo);
+
+    /**
+     * 前台数据
+     * @param map
+     * @return
+     */
+   Workbook foregroundExportData(Map<String,Object> map);
+
+    /**
+     * 前台分页数据
+     * @param map
+     * @return
+     */
+   LayuiEntity<FrontVo> foregroundPage(Map<String,Object> map);
+
+    /**
+     * 获取不跟进的咨询师信息
+      * @param paramsMap
+     * @return
+     */
+   LayuiEntity<NotFollowUpVo> selectByRecordTimeAndLevel(Map<String,Object> paramsMap);
+
+    /**
+     * 定时任务每日获取没有跟进的信息
+     * @param paramsMap
+     * @return
+     */
+   List<NotFollowUpVo> selectByRecordTime(Map<String,Object> paramsMap);
+
+    /**
+     * 定时把咨询的数据转到运营中
+      * @param paramsMap
+     * @return
+     */
+   int updateByLevelAndCountTime(Map<String,Object> paramsMap);
 }

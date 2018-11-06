@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>前台报表导出</title>
+    <link rel="stylesheet" href="/assets/layui/css/layui.css">
+</head>
+<body>
+<fieldset class="layui-elem-field">
+<legend>前台报表导出</legend>
+    <div>
+        <div class="layui-inline" > <!-- 注意：这一层元素并不是必须的 -->
+            <input type="text" class="layui-input" id="date" placeholder="请选择日期！"
+                   style="cursor:pointer;width:270px;" readonly="readonly">
+
+        </div>
+        <button id="download" class="layui-btn layui-btn-normal">导出</button>
+        <button id="refresh" class="layui-btn">刷新数据</button>
+    </div>
+</fieldset>
+
+<table class="layui-table" lay-data="{url:'/foreground/ajaxData', page:true, id:'test'}" lay-filter="test">
+    <thead>
+    <tr>
+        <th lay-data="{type:'checkbox'}">ID</th>
+        <th lay-data="{field:'realName', width:130}">用户名</th>
+        <th lay-data="{field:'tel', width:130}">联系方式</th>
+        <th lay-data="{field:'gender', width:80}">性别</th>
+        <th lay-data="{field:'age', width:80}">年龄</th>
+        <th lay-data="{field:'education', width:100}">学历</th>
+        <th lay-data="{field:'recruitChannel', width:120}">应聘渠道</th>
+        <th lay-data="{field:'job', width:120}">应聘职位</th>
+        <th lay-data="{field:'introducer', width:120}">邀约人</th>
+        <th lay-data="{field:'interviewer', width:120}">咨询顾问</th>
+        <th lay-data="{field:'market', width:120,templet:'#marketTpl'}">会销讲师</th>
+        <th lay-data="{field:'createTime', width:180}">上门时间</th>
+    </tr>
+    </thead>
+</table>
+<script src="/assets/js/jquery-2.0.0.js"></script>
+<script src="/assets/layer/layer.js"></script>
+<script src="/assets/layui/layui.js"></script>
+<script type="text/html" id="marketTpl">
+    {{#  if(d.market === '0'){ }}
+        无
+    {{#  } else { }}
+       {{ d.market}}
+    {{#  } }}
+</script>
+<script>
+    layui.use(['table','laydate'],function(){
+            var date = new Date().format('yyyy-MM-dd');
+            var laydate = layui.laydate,table=layui.table;
+          //  var table=layui.table;
+            //执行一个laydate实例
+            laydate.render({
+                elem: '#date', //指定元素
+                value:date,
+                done: function(value, date, endDate){
+                    console.log(value); //得到日期生成的值，如：2017-08-18
+                    table.reload('test', {
+                        where: {
+                            date: value
+                        } //设定异步数据接口的额外参数
+                        //,height: 300
+                    });
+                }
+            });
+
+         //下载数据
+        $('#download').click(function(){
+            //获取导出日期
+            var date = $('#date').val();
+            if(date == ''){
+                layer.msg('请选择导出日期!',{icon:2});
+                return false;
+            }
+            window.location.href=  '/foreground/exportExcelFile?date='+date; //导出excel
+        });
+
+        //刷新表格数据
+        $('#refresh').click(function(){
+            table.reload('test', {
+                where: {} //设定异步数据接口的额外参数
+                //,height: 300
+            });
+        });
+    });
+    Date.prototype.format = function(fmt) {
+        var o = {
+            "M+" : this.getMonth()+1,                 //月份
+            "d+" : this.getDate(),                    //日
+            "h+" : this.getHours(),                   //小时
+            "m+" : this.getMinutes(),                 //分
+            "s+" : this.getSeconds(),                 //秒
+            "q+" : Math.floor((this.getMonth()+3)/3), //季度
+            "S"  : this.getMilliseconds()             //毫秒
+        };
+        if(/(y+)/.test(fmt)) {
+            fmt=fmt.replace(RegExp.$1, (this.getFullYear()+"").substr(4 - RegExp.$1.length));
+        }
+        for(var k in o) {
+            if(new RegExp("("+ k +")").test(fmt)){
+                fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));
+            }
+        }
+        return fmt;
+    }
+</script>
+
+</body>
+</html>

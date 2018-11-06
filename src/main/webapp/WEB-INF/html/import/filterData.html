@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>数据筛选</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <!-- load css -->
+    <link rel="stylesheet" type="text/css" href="/css/font/iconfont.css?v=1.0.1" media="all">
+    <link rel="stylesheet" type="text/css" href="/js/layui/css/layui.css?v=2.2.2" media="all">
+    <link rel="stylesheet" type="text/css" href="/css/main.css?v2.0.1-simple" media="all">
+    <style>
+        blockquote{
+            cursor: pointer;
+        }
+        .bq-style{
+            background-color:#3399FF;
+            color:white;
+        }
+        .span-checkbox{
+            position:absolute;
+            right:0px;
+        }
+    </style>
+    <script type="text/javascript" src="/js/layui/layui.js?v=2.2.2"></script>
+    <script type="text/javascript" src="/js/version.js?v=2.0.1"></script>
+    <script src="/js/common.js?v=2.0.1"></script>
+</head>
+<body>
+<a  href="javascript:void();" id="goback" class="layui-btn layui-btn-normal"><i class="layui-icon">&#xe65a;</i>返回</a>
+<form class="layui-form" action="">
+<div class="layui-fluid larry-wrapper">
+    <div class="layui-row layui-col-space30" id="filterData">
+        <div class="layui-col-xs6 layui-col-sm4 layui-col-md2" th:each="iFilterData : ${importInfoFilterData}">
+            <section class="panel">
+                <div class="symbol bgcolor-blue">
+                    <i class="iconfont">&#xe652;</i>
+                </div>
+                <div class="value tab-menu">
+                    <h2 th:text="${iFilterData.createBy}"></h2>
+                    总数据:<span style="color:red;font-size:17px;font-weight: bold;" th:text="${iFilterData.total}"></span>
+                    有效:<span style="color:#0099FF;font-size:17px;font-weight: bold;" th:text="${iFilterData.effectiveNum}"></span>
+                </div>
+            </section>
+            <blockquote class="layui-elem-quote layui-quote-nm"  th:each="filterData : ${iFilterData.data}">
+                <input type="checkbox"  name="filterData" title="筛选" value="1"  lay-filter="filterData" th:if="${filterData.isDelete ==0}">
+                <input type="checkbox"  name="filterData" title="筛选" value="0"  lay-filter="filterData" th:if="${filterData.isDelete ==1}" checked>
+                <input type="hidden" name="customerId" th:value="${filterData.customerId}">
+                <input type="hidden" name="username" th:value="${filterData.realName}">
+                <span th:text="${filterData.realName}"></span>
+                <br/>
+                <span style="color:#0099FF;font-weight: bold;" th:text="${filterData.tel}"></span>
+            </blockquote>
+        </div>
+
+    </div>
+</div>
+</form>
+<script>
+    layui.use("form", function(){
+        var form= layui.form;
+        var layer = layui.layer;
+        var $= layui.jquery;
+        //监听提交
+        form.on('submit(formDemo)', function(data){
+            layer.msg(JSON.stringify(data.field));
+            return false;
+        });
+
+        //监听指定开关
+        form.on('checkbox(filterData)', function(data){
+           // layer.msg(this.checked);
+            var isDelete =  0;
+            if(this.checked){
+                isDelete  = 1;
+            }else{
+                isDelete = 0;
+            }
+            var $checkbox = $(this);
+            var customerId = $(this).parent().find('input[name="customerId"]').val();
+            $.ajax({
+                type:'GET',
+                url:'/import/updateByStatus?status='+isDelete+'&customerId='+customerId,
+                success:function(resp){
+                    if(resp.code ==200){
+                        layer.msg('操作成功!',{icon:1});
+                        var $span = $(this).parent().parent().find('section').find('span').last();
+                        var num = $span.text();
+                        //修改值
+                        if(this.checked){//去除掉
+                            num = parseInt(num);
+                            num = num-1;
+                            if(num <0){
+                                num =0;
+                            }
+                        }else{
+                            num =  parseInt(num);
+                            num =num+1;
+                        }
+                        $span.text(num);
+                    }else{
+                        layer.msg('操作失败!',{icon:2});
+                    }
+                },error:function(resp){
+                    layer.msg('对不起，您没有权限修改!',{icon:2});
+                    //数据还原
+                    setTimeout(function(){
+                        $checkbox.removeAttr('checked');
+                    },1000);
+                    form.render();
+                }
+            });
+
+        });
+
+        var username;
+        //鼠标经过
+        $('blockquote').mouseover(function(){
+            var $current = $(this);
+            var username = $current.children('span:eq(0)').text().trim();
+            $('#filterData').children('input[value="'+username+'"]').addClass('bq-style');
+            $('input[value="'+username+'"]').parent('blockquote').css('background-color','#BADFEC').css('color','white');
+            var length = $('input[value="'+username+'"]').length;
+            if(length >1){  //存在重复数字
+                layer.msg('存在重复数据:'+username+"!",{icon:3});
+            }
+            $current.css('background-color','#0086B1').css('color','white');
+
+        });
+        //鼠标离开
+        $('blockquote').mouseout(function(){
+            $('blockquote').css('background-color','white').css('color','rgb(178, 175, 175)');
+        });
+
+        $('#goback').click(function(){
+            window.history.go(-1);
+        });
+    });
+</script>
+</body>
+</html>

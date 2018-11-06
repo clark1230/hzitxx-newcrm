@@ -1,0 +1,510 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hzitshop.mapper.ImportInfoMapper">
+
+    <!--根据id修改数据-->
+    <update id="updateById2" parameterType="com.hzitshop.entity.ImportInfo">
+    UPDATE import_info
+    <set>
+        <if test="realName != null">
+            real_name=#{realName},
+        </if>
+        <if test="sex != null">
+            sex=#{sex},
+        </if>
+        <if test="age!= null">
+            age=#{age},
+        </if>
+        <if test="nativePlace!= null">
+            native_place=#{nativePlace},
+        </if>
+        <if test="tel!= null">
+            tel=#{tel},
+        </if>
+        <if test="wechatNo!=null">
+            wechat_no=#{wechatNo},
+        </if>
+        <if test="qq!= null">
+            qq=#{qq},
+        </if>
+        <if test="educationBg!=null">
+            education_bg=#{educationBg},
+        </if>
+
+        <if test="graduateTime!= null">
+            graduate_time=#{graduateTime},
+        </if>
+        <if test="graduateFrom!= null">
+            graduate_from=#{graduateFrom},
+        </if>
+        <if test="majorIn!= null">
+            major_in=#{majorIn},
+        </if>
+        <if test="workAge!=null">
+            work_age=#{workAge},
+        </if>
+        <if test="workExperience!=null">
+            work_experience=#{workExperience},
+        </if>
+        <if test="job!=null">
+          job=#{job},
+        </if>
+        <if test="educateExperience!=null">
+            educate_experience=#{educateExperience},
+        </if>
+        <if test="recruitChannel!=null">
+            recruit_channel=#{recruitChannel},
+        </if>
+        <if test="customerState!=null">
+            customer_state=#{customerState},
+        </if>
+        <if test="customerLevel!= null">
+            customer_level=#{customerLevel},
+        </if>
+        <if test="userId!= null">
+            user_id=#{userId},
+        </if>
+        <if test="applyJob!=null">
+            apply_job=#{applyJob},
+        </if>
+        <if test="liveAddress!=null">
+            live_address=#{liveAddress},
+        </if>
+        <if test="curIncome!= null">
+            cur_income=#{curIncome},
+        </if>
+        <if test="license!=null">
+            license=#{license},
+        </if>
+        <if test="expectSalary!=null">
+            expect_salary=#{expectSalary},
+        </if>
+        <if test="jobStatus!=null">
+            job_status=#{jobStatus},
+        </if>
+        <if test="introducer!=null">
+            introducer=#{introducer},
+        </if>
+        <if test="memo!=null">
+            memo=#{memo},
+        </if>
+        <if test="sendTime!=null">
+            send_time=#{sendTime},
+        </if>
+        <if test="lastTime!=null">
+            last_time=#{lastTime},
+        </if>
+        <if test="createTime!=null">
+            create_time=#{createTime},
+        </if>
+        <if test="companyId!= null">
+            company_id=#{companyId},
+        </if>
+        <if test="isDelete!=null">
+            isDelete=#{isDelete},
+        </if>
+        <if test="cvType!=null">
+            cvType=#{cvType},
+        </if>
+        <if test="createBy!=null">
+            createBy=#{createBy},
+        </if>
+        <if test="repeatNum!=null">
+            repeatNum=#{repeatNum},
+        </if>
+        <if test="source!=null">
+            source=#{source},
+        </if>
+        <if test="importStatus!=null">
+            import_status=#{importStatus}
+        </if>
+        <if test="color!=null">
+            color=#{color}
+        </if>
+        <if test="status!=null">
+            status=#{status}
+        </if>
+    </set>
+    WHERE
+    customer_id = #{customerId}
+    </update>
+
+  <!--每日创量刷选数据-->
+ <select id="filterData" parameterType="map" resultMap="filterDataMap">
+    SELECT
+      customer_id,real_name,isDelete,tel
+    FROM
+      import_info
+    WHERE
+      TO_DAYS(create_time) = TO_DAYS(NOW())
+    AND
+      introducer =#{map.createBy}
+    AND
+      repeatNum >0
+ </select>
+ <!--创量有效数据筛选统计-->
+<select id="filterDataCount" parameterType="map" resultType="com.hzitshop.vo.FilterDataCount">
+    SELECT
+     COUNT(*) AS total,
+     (
+        SELECT
+         COUNT(*)
+        FROM
+             import_info
+        WHERE
+             TO_DAYS(create_time) = TO_DAYS(NOW())
+        AND
+             introducer = #{map.createBy} AND isDelete = 1
+         ) AS  invalidNum
+        FROM
+         import_info
+    WHERE
+         TO_DAYS(create_time) = TO_DAYS(NOW())
+    AND
+         introducer = #{map.createBy};
+</select>
+
+<!--逻辑删除数据-->
+<update id="updateByStatus" parameterType="map">
+     UPDATE import_info SET isDelete = #{map.isDelete} WHERE customer_id = #{map.customerId}
+</update>
+
+  <!--excel导入时判断数据是否重复-->
+<select id="checkPersonalRepreat" resultType="integer" parameterType="map">
+    SELECT
+       customer_id
+    FROM
+       import_info
+    WHERE
+        TO_DAYS(create_time) = TO_DAYS(NOW())
+     AND
+        real_name = #{map.realName}
+     AND
+        introducer = #{map.introducer}
+</select>
+
+<!--导入数据判断重复数据量-->
+<select id="checkCount" resultType="integer" parameterType="map">
+    SELECT
+     COUNT(*) AS num
+    FROM
+      import_info
+    WHERE
+      TO_DAYS(create_time) = TO_DAYS(NOW())
+    AND
+      real_name = #{map.realName}
+</select>
+
+
+<!--修改数据当日的重复量-->
+<update id="updateCheckNum" parameterType="map">
+    UPDATE
+      import_info
+    SET
+      repeatNum = #{map.repeatNum}
+    WHERE
+      TO_DAYS(create_time) = TO_DAYS(NOW())
+    AND real_name = #{map.realName}
+</update>
+
+
+<!--最近7天统计重复数据-->
+<select id="checkDailyInfo" resultMap="importInfoNameIdMap">
+    SELECT
+        real_name,customer_id
+    FROM
+        import_info
+    WHERE
+        create_time = #{map.createTime}
+    AND
+        isDelete = 0
+    AND
+        repeatNum >1
+    GROUP BY
+        real_name,create_time
+</select>
+
+
+<!--创量数据筛选 start-->
+<!--获取当日存在重复数据的应聘者名称-->
+<select id="checkDailyName"  resultMap="importInfoNameIdMap"  parameterType="map">
+    SELECT
+	  real_name,create_time
+  FROM
+      import_info
+  WHERE
+    DATE_SUB(CURDATE(), INTERVAL 182 DAY)
+      <![CDATA[<=]]>
+    DATE(create_time)
+    AND repeatNum >1
+    AND  company_id =#{map.companyId}
+    <if test="map.introducer != null">
+        AND  introducer = #{map.introducer}
+    </if>
+    <if test="map.realName != null">
+        AND  real_name like #{map.realName}
+    </if>
+    ORDER BY  create_time desc
+    LIMIT #{map.offset},#{map.limit}
+</select>
+    <!--统计最近半年需要筛选的数据-->
+    <select id="selectByRealNameCount" resultType="int" parameterType="map">
+        SELECT
+        count(*)
+        FROM
+        import_info
+        WHERE
+        DATE_SUB(CURDATE(), INTERVAL 182 DAY)  <![CDATA[<=]]>   DATE(create_time)
+        AND repeatNum >1
+        AND  company_id =#{map.companyId}
+        <if test="map.introducer != null">
+            AND  introducer = #{map.introducer}
+        </if>
+        <if test="map.realName != null">
+            AND  real_name like #{map.realName}
+        </if>
+    </select>
+ <!--根据应聘者姓名获取相应的邀约人，应聘者状态，和是否删除-->
+<select id="selectByRealName" resultMap="selectByNameMap" parameterType="map">
+    SELECT
+      ei.name,ii.customer_id,ii.tel,ii.introducer,ii.import_status,ii.isDelete
+    FROM
+      import_info ii,
+     employee_info  ei
+    WHERE
+	ii.real_name = #{map.realName}
+  AND
+    to_days(ii.create_time) = to_days(#{map.createTime})
+  AND
+    ii.introducer = ei.user_id
+  AND
+    ii.company_id = #{map.companyId}
+</select>
+<!--检查半年中有没有预约的信息-->
+<select id="checkInfoByHalfYear" resultMap="importInfoMap" parameterType="map">
+    SELECT * FROM
+      import_info
+    WHERE
+      real_name = #{map.realName}
+    AND DATE_SUB(CURDATE(), INTERVAL 182 DAY) <![CDATA[<=]]>  DATE(create_time)
+    AND import_status = 2
+    AND isDelete !=1
+</select>
+<!--修改数据-->
+ <update id="updateSelectiveById" parameterType="com.hzitshop.entity.ImportInfo">
+        UPDATE import_info
+        <set>
+            <if test="customerId != null">
+                customer_id = #{customerId},
+            </if>
+            <if test="realName != null">
+                real_name = #{realName},
+            </if>
+            <if test="sex != null">
+                sex = #{sex},
+            </if>
+            <if test="age != null">
+                age = #{age},
+            </if>
+            <if test="nativePlace != null">
+                native_place = #{nativePlace},
+            </if>
+            <if test="tel != null">
+                tel = #{tel},
+            </if>
+            <if test="wechatNo != null">
+                wechat_no = #{wechatNo},
+            </if>
+            <if test="qq != null">
+                qq = #{qq},
+            </if>
+            <if test="educationBg != null">
+                education_bg = #{educationBg},
+            </if>
+            <if test="graduateTime != null">
+                graduate_time = #{graduateTime},
+            </if>
+            <if test="graduateFrom != null">
+                graduate_from = #{graduateFrom},
+            </if>
+            <if test="majorIn != null">
+                major_in = #{majorIn},
+            </if>
+            <if test="workAge != null">
+                work_age = #{workAge},
+            </if>
+            <if test="workExperience != null">
+                work_experience = #{workExperience},
+            </if>
+            <if test="job != null">
+                job = #{job},
+            </if>
+            <if test="educateExperience != null">
+                educate_experience = #{educateExperience},
+            </if>
+            <if test="recruitChannel != null">
+                recruit_channel = #{recruitChannel},
+            </if>
+            <if test="customerState != null">
+                customer_state = #{customerState},
+            </if>
+            <if test="customerLevel != null">
+                customer_level = #{customerLevel},
+            </if>
+            <if test="userId != null">
+                user_id = #{userId},
+            </if>
+            <if test="applyJob != null">
+                apply_job = #{applyJob},
+            </if>
+            <if test="liveAddress != null">
+                live_address = #{liveAddress},
+            </if>
+            <if test="curIncome != null">
+                cur_income = #{curIncome},
+            </if>
+            <if test="license != null">
+                license = #{license},
+            </if>
+            <if test="expectSalary != null">
+                expect_salary = #{expectSalary},
+            </if>
+            <if test="jobStatus != null">
+                job_status = #{jobStatus},
+            </if>
+            <if test="introducer != null">
+                introducer = #{introducer},
+            </if>
+            <if test="memo != null">
+                memo = #{memo},
+            </if>
+            <if test="sendTime != null">
+                send_time = #{sendTime},
+            </if>
+            <if test="lastTime != null">
+                last_time = #{lastTime},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime},
+            </if>
+            <if test="companyId != null">
+                company_id = #{companyId},
+            </if>
+            <if test="isDelete != null">
+                isDelete = #{isDelete},
+            </if>
+            <if test="guandan != null">
+                guandan = #{guandan},
+            </if>
+            <if test="isMarket != null">
+                isMarket = #{isMarket},
+            </if>
+            <if test="cvType != null">
+                cvType = #{cvType},
+            </if>
+            <if test="createBy != null">
+                createBy = #{createBy},
+            </if>
+            <if test="repeatNum != null">
+                repeatNum = #{repeatNum},
+            </if>
+            <if test="source != null">
+                source = #{source},
+            </if>
+            <if test="importStatus != null">
+                import_status = #{importStatus},
+            </if>
+            <if test="color != null">
+                color = #{color},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+        </set>
+        WHERE
+        customer_id = #{customerId}
+    </update>
+ <!--前台检查该用户是否存在-->
+ <select id="checkRealName"  resultMap="importInfoMap" parameterType="com.hzitshop.entity.ImportInfo">
+    SELECT * FROM import_info WHERE real_name = #{realName}
+     AND tel=#{tel}
+     AND STATUS =0
+     AND company_id = #{companyId}
+ </select>
+  <!--前台修改状态为已上门/已报名-->
+ <update id="changeStatus" parameterType="com.hzitshop.entity.ImportInfo">
+    update import_info set status=#{status}
+    WHERE real_name = #{realName}
+     AND tel=#{tel}
+     AND STATUS = #{status}
+     AND company_id = #{companyId}
+ </update>
+<!--创量数据筛选 end-->
+<resultMap id="importInfoNameIdMap" type="com.hzitshop.vo.importresultvo.ImportVoNameId">
+<id column="customer_id" property="customerId"></id>
+<result column="real_name" property="realName"></result>
+<result column="create_time" property="createTime"></result>
+</resultMap>
+
+<resultMap id="filterDataMap" type="com.hzitshop.vo.FilterData">
+<id column="customer_id" property="customerId"></id>
+<result column="real_name" property="realName"></result>
+<result column="tel" property="tel"></result>
+<result column="isDelete" property="isDelete"></result>
+</resultMap>
+
+<resultMap id="selectByNameMap" type="com.hzitshop.vo.importresultvo.SelectByRealName">
+    <id column="customer_id" property="customerId"></id>
+    <result column="introducer" property="introducer"></result>
+    <result column="name" property="name"></result>
+    <result column="import_status" property="importStatus"></result>
+    <result column="isDelete" property="isDelete"></result>
+    <result column="tel" property="tel"></result>
+</resultMap>
+<!-- 通用查询映射结果 -->
+<resultMap id="importInfoMap" type="com.hzitshop.entity.ImportInfo">
+    <id column="customer_id" property="customerId"/>
+    <result column="real_name" property="realName"/>
+    <result column="sex" property="sex"/>
+    <result column="age" property="age"/>
+    <result column="native_place" property="nativePlace"/>
+    <result column="tel" property="tel"/>
+    <result column="wechat_no" property="wechatNo"/>
+    <result column="qq" property="qq"/>
+    <result column="education_bg" property="educationBg"/>
+    <result column="graduate_time" property="graduateTime"/>
+    <result column="graduate_from" property="graduateFrom"/>
+    <result column="major_in" property="majorIn"/>
+    <result column="work_age" property="workAge"/>
+    <result column="work_experience" property="workExperience"/>
+    <result column="job" property="job"/>
+    <result column="educate_experience" property="educateExperience"/>
+    <result column="recruit_channel" property="recruitChannel"/>
+    <result column="customer_state" property="customerState"/>
+    <result column="customer_level" property="customerLevel"/>
+    <result column="user_id" property="userId"/>
+    <result column="apply_job" property="applyJob"/>
+    <result column="live_address" property="liveAddress"/>
+    <result column="cur_income" property="curIncome"/>
+    <result column="license" property="license"/>
+    <result column="expect_salary" property="expectSalary"/>
+    <result column="job_status" property="jobStatus"/>
+    <result column="introducer" property="introducer"/>
+    <result column="memo" property="memo"/>
+    <result column="send_time" property="sendTime"/>
+    <result column="last_time" property="lastTime"/>
+    <result column="create_time" property="createTime"/>
+    <result column="company_id" property="companyId"/>
+    <result column="isDelete" property="isDelete"/>
+    <result column="guandan" property="guandan"/>
+    <result column="isMarket" property="isMarket"/>
+    <result column="cvType" property="cvType"/>
+    <result column="createBy" property="createBy"/>
+    <result column="repeatNum" property="repeatNum"/>
+    <result column="source" property="source"/>
+    <result column="import_status" property="importStatus"/>
+    <result column="color" property="color"/>
+    <result column="status" property="status"/>
+</resultMap>
+</mapper>

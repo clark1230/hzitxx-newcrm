@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hzitshop.mapper.SettingsMapper">
+    <!--tb_settings表中的列-->
+    <sql id="tbSettingsBaseColumn">
+         `id`,
+         `name`,
+         `key`,
+         `value`
+    </sql>
+
+
+    <!--添加-->
+    <insert id="addTbSettings" parameterType="com.hzitshop.entity.Settings">
+        INSERT INTO tb_settings(
+            <include refid="tbSettingsBaseColumn"/>
+        ) VALUES(
+                #{id},
+                #{name},
+                #{key},
+                #{value}
+        )
+    </insert>
+
+    <insert id="addTbSettingsSelective" parameterType="com.hzitshop.entity.Settings">
+        insert into tb_settings
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                `id`,
+            </if>
+            <if test="name != null">
+                `name`,
+            </if>
+            <if test="key != null">
+                `key`,
+            </if>
+            <if test="value != null">
+                `value`,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id},
+            </if>
+            <if test="name != null">
+                #{name},
+            </if>
+            <if test="key != null">
+                #{key},
+            </if>
+            <if test="value != null">
+                #{value},
+            </if>
+        </trim>
+    </insert>
+    <!--根据id删除数据-->
+    <delete id="deleteById" parameterType="integer">
+        DELETE FROM  tb_settings WHERE
+        id = #{id}
+    </delete>
+
+    <!--根据id批量删除数据-->
+    <delete id="deleteByIds" parameterType="java.lang.String">
+          delete FROM  tb_settings WHERE id in
+          <foreach item="idItem" collection="array" open="(" separator="," close=")">
+            #{idItem}
+          </foreach>
+    </delete>
+    <!--根据id修改数据-->
+    <update id="updateById" parameterType="com.hzitshop.entity.Settings">
+        UPDATE tb_settings
+        <set>
+          `id`=#{id},
+          `name`=#{name},
+          `key`=#{key},
+          `value`=#{value}
+        </set>
+        WHERE
+           id = #{id}
+    </update>
+
+    <update id="updateSelectiveById" parameterType="com.hzitshop.entity.Settings">
+        UPDATE tb_settings
+        <set>
+    <if test="id != null">
+          `id` = #{id},
+    </if>
+    <if test="name != null">
+          `name` = #{name},
+    </if>
+    <if test="key != null">
+          `key` = #{key},
+    </if>
+    <if test="value != null">
+          `value` = #{value},
+    </if>
+    </set>
+        WHERE
+      `id` = #{id}
+    </update>
+    <!--根据id查询一条数据-->
+    <select id="findOne" resultMap="tbSettingsMap" parameterType="integer">
+        select
+        <include refid="tbSettingsBaseColumn"/>
+        from
+            tb_settings
+        WHERE
+          id = #{id}
+    </select>
+    <!--查询数据-->
+    <select id="searchTbSettings" parameterType="map" resultMap="tbSettingsMap">
+        SELECT
+        <include refid="tbSettingsBaseColumn"/>
+        FROM tb_settings
+        <include refid="tbSettingsBaseWhereSql"/>
+    </select>
+    <!--基础查询条件-->
+    <sql id="tbSettingsBaseWhereSql">
+        <if test="map!=null">
+            <where>
+                <if test="map.id !=null">
+                    AND id = #{map.id}
+                </if>
+                <if test="map.name !=null">
+                    AND name = #{map.name}
+                </if>
+                <if test="map.key !=null">
+                    AND key = #{map.key}
+                </if>
+                <if test="map.value !=null">
+                    AND value = #{map.value}
+                </if>
+            </where>
+        </if>
+    </sql>
+
+         <!-- 通用查询映射结果 -->
+    <resultMap id="tbSettingsMap" type="com.hzitshop.entity.Settings">
+            <id column="id" property="id"/>
+            <result column="name" property="name"/>
+            <result column="key" property="key"/>
+            <result column="value" property="value"/>
+     </resultMap>
+</mapper>

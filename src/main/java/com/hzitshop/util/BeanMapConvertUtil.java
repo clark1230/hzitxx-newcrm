@@ -11,7 +11,7 @@ import java.util.Map;
 
 /**
  * 实体类|Map  相互转换的工具类
- * Created by yangxiaowei-pc on 2016/8/27.
+ *
  */
 public class BeanMapConvertUtil {
     /**

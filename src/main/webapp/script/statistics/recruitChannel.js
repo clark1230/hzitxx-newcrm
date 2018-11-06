@@ -31,7 +31,7 @@ $(function(){
                  }
                  showCompanyCount(result,recruitChannel);
              }else if(result.length==0){   //说明没有数据
-                 layer.alert('对不起,暂无数据!');
+                 layer.msg('对不起,暂无数据!');
                 // myChart.setOption(option);
                  showCompanyCount(0,0);
                  return false;

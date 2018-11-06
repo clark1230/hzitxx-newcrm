@@ -25,7 +25,7 @@ public class EmailController {
      */
     @RequiresPermissions(value={"email:index"})
     @RequestMapping("/email/index")
-    protected String index(){
+    public String index(){
         return "/email/index";
     }
 
@@ -52,7 +52,7 @@ public class EmailController {
     @RequiresPermissions(value={"email:fileUpload"})
     @RequestMapping("/email/fileUpload")
     @ResponseBody
-    protected  Map<String,Object> fileUpload(){
+    public  Map<String,Object> fileUpload(){
         Map<String,Object> resultMap = new HashMap<>();
         return resultMap;
     }

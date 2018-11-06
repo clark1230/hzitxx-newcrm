@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <title>编辑</title>
+    <link rel="stylesheet" type="text/css" href="/assets/layui/css/layui.css"/>
+</head>
+<body>
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 0px;">
+    <legend>修改</legend>
+</fieldset>
+<form id="editTbSettingsForm" class="layui-form">
+    <input type="hidden" th:value="${tbSettings.id}" name="id">
+    <div class="layui-form-item">
+        <label class="layui-form-label">名称</label>
+        <div class="layui-input-block">
+            <input type="text" name="name" readonly="readonly" th:value="${tbSettings.name}"
+                   class="layui-input" style="background-color: lightgray;">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">值(每个值之间使用","间隔(注意是英文的逗号))</label>
+        <div class="layui-input-block">
+            <textarea name="value" placeholder="请输入内容" style="height: 400px;" th:field ="${tbSettings.value}" class="layui-textarea"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" type="button" id="editSettings">提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+<script src="/assets/js/jquery.min.js"></script>
+<script src="/assets/layer/layer.js"></script>
+<script src="/assets/layui/layui.all.js"></script>
+<script>
+    layui.use('form', 'jquery', 'form', 'layer', function () {
+        var form = layui.form;
+    });
+</script>
+<script>
+    $('#editSettings').click(function(){
+        $.ajax({
+            type:'post',
+            url:'/settings/editSettings',
+            data:$('#editTbSettingsForm').serialize(),
+            success:function(resp){
+                if(resp.status === 0){
+                    layer.msg('保存成功!',{icon:1})
+                }else{
+                    layer.msg('保存失败!',{icon:2});
+                }
+
+            },error:function(resp){
+                if(resp.status == 401){
+                    layer.msg('对不起，你没有权限保存数据!',{icon:2});
+                }
+                if(resp.status == 500){
+                    layer.msg('服务器内部错误!',{icon:2});
+                }
+            }
+        })
+    });
+</script>
+</body>
+</html>

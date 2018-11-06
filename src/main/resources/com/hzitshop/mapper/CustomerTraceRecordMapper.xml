@@ -1,7 +1,92 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.hzitshop.mapper.CustomerTraceRecordMapper">
+	<!--获取每日需要跟进的数据-->
+	<select id="selectDailyTraceData" resultType="com.hzitshop.vo.trace.DailyTraceDataVo" parameterType="map">
+		SELECT
+		   ci.customer_id as customerId,
+		   ci.real_name as realName,
+		   ci.tel as tel,
+		   ci.user_id as userId,
+		   ei.name as name
+		FROM
+			customer_info  ci,
+			employee_info ei
+		WHERE
+			TO_DAYS(trace_time) = TO_DAYS(NOW())
+		AND
+			ei.user_id = ci.user_id
+			<if test="map.userId != null">
+				and ei.user_id =#{map.userId}
+			</if>
+	</select>
+	<!--获取每日需要跟进的客户数量-->
+	<select id="selectDailyTraceDataCount" resultType="integer" parameterType="map">
+		SELECT
+			count(1)
+		FROM
+		customer_info  ci,
+		employee_info ei
+		WHERE
+		TO_DAYS(trace_time) = TO_DAYS(NOW())
+		AND
+		ei.user_id = ci.user_id
+		<if test="map.userId != null">
+			and ei.user_id =#{map.userId}
+		</if>
+	</select>
 
+	<!--移动端获取跟进信息-->
+	<select id="mobileTraceMsg" resultType="com.hzitshop.vo.trace.TraceRecord" parameterType="map">
+		select
+			ct.record_date as recordDate,ct.content as content,ei.name as name
+		 from
+			customer_trace_record ct,
+			employee_info ei
+		where ct.customer_id = #{map.customerId}
+		and ei.user_id = ct.user_id
+		<if test="map.userId != null">
+			and ei.user_id =#{map.userId}
+		</if>
+		order by record_date desc
+	</select>
+	<!--移动端添加跟进信息-->
+	<insert id="addMobileTraceMsg" parameterType="com.hzitshop.entity.CustomerTraceRecord">
+		INSERT INTO customer_trace_record(customer_id,user_id,record_date,content)
+		VALUES(#{customerId},#{userId},#{recordDate},#{content});
+	</insert>
+
+	<!--获取跟进记录-->
+	<select id="traceRecordData" resultMap="traceRecordMap" parameterType="map">
+		select
+		 rec.record_id,rec.customer_id,ci.real_name,ei.name,rec.record_date,rec.content
+		from
+		 	 customer_info ci,
+			 customer_trace_record rec,
+			 employee_info ei
+		where
+		 	ci.customer_id = rec.customer_id
+		and
+			rec.user_id =  ei.user_id
+		and rec.customer_id = #{customerId}
+		order by record_date desc
+		limit #{offset},#{limit}
+	</select>
+    <!--获取跟进记录数-->
+	<select id="traceRecordDataCount" resultType="long" parameterType="map">
+		select
+			count(1)
+		from
+		customer_info ci,
+		customer_trace_record rec,
+		employee_info ei
+		where
+			ci.customer_id = rec.customer_id
+		and
+		ci.user_id =  ei.user_id
+		and rec.customer_id = #{customerId}
+	</select>
+	
 	<!-- 通用查询映射结果 -->
 	<resultMap id="BaseResultMap" type="com.hzitshop.entity.CustomerTraceRecord">
 		<id column="record_id" property="recordId" />
@@ -12,5 +97,13 @@
 		<result column="times" property="times" />
 		<result column="content" property="content" />
 	</resultMap>
-
+	
+	<resultMap id="traceRecordMap" type="com.hzitshop.vo.trace.TraceRecord">
+		<id property="recordId" column="record_id"></id>
+		<result property="customerId" column="customer_id"></result>
+		<result property="empName" column="name"></result>
+		<result property="content" column="content"></result>
+		<result property="name" column="real_name"></result>
+		<result property="recordDate" column="record_date"></result>
+	</resultMap>
 </mapper>
